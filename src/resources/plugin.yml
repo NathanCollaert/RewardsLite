@@ -1,0 +1,42 @@
+main: com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards
+name: LitePlaytimeRewards
+version: 1.0.0
+author: Nathan
+website: www.backtobedrock.com
+prefix: LitePlaytimeRewards
+description: A very lightweight plugin that gives rewards based on playtime
+commands:
+    checkplaytime:
+        description: Check your current playtime.
+        permission: liteplaytimerewards.checkplaytime
+        usage: /<command> [player]
+    givereward:
+        description: Give one of the rewards to a player.
+        permission: liteplaytimerewards.givereward
+        usage: /<command> <reward> <player>
+    redeemrewards:
+        description: Check if you are eligible for rewards.
+        permission: liteplaytimerewards.redeemrewards
+        usage: /<command>
+    checkrewards:
+        description: Get an overview of all possible rewards.
+        permission: liteplaytimerewards.checkrewards
+        usage: /<command>
+    setpt:
+        description: Set playtime of yourself [TESTING].
+        permission: liteplaytimerewards.setpt
+        usage: /<command> <amount>
+    
+permissions:
+    liteplaytimerewards.checkplaytime:
+        default: op
+    liteplaytimerewards.checkplaytime.other:
+        default: op
+    liteplaytimerewards.checkrewards:
+        deafult: op
+    liteplaytimerewards.givereward:
+        deafult: op
+    liteplaytimerewards.redeemrewards:
+        deafult: op
+    liteplaytimerewards.setpt:
+        deafult: op
