@@ -7,7 +7,6 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -26,7 +25,7 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         LitePlaytimeRewardsCRUD crud = new LitePlaytimeRewardsCRUD(this.plugin, e.getPlayer());
-        this.plugin.addToOnlinePlayerListLastPlaytimeCheck(e.getPlayer().getUniqueId(), crud.getRedeemedRewards());
+        this.plugin.addToOnlinePlayerListLastPlaytimeCheck(e.getPlayer().getUniqueId(), crud.getRewards());
         if (this.config.isCheckAvailableRewardsOnPlayerJoin() && !this.plugin.getLPRConfig().getRewards().isEmpty()) {
             this.plugin.checkEligibleForRewards(e.getPlayer());
         }

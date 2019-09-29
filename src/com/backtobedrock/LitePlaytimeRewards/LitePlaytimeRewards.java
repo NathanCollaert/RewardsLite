@@ -75,12 +75,9 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
             if (!redeemedRewards.containsKey(entry.getKey()) || entry.getValue().isLoop()) {
                 long lastPlaytimeCheck = this.onlinePlayerListLastPlaytimeCheck.get(plyr.getUniqueId()).get(entry.getKey()) == null ? 0 : this.onlinePlayerListLastPlaytimeCheck.get(plyr.getUniqueId()).get(entry.getKey());
                 int playtimeCheckDifferenceInMinutes = (int) Math.floor((plyr.getStatistic(Statistic.PLAY_ONE_MINUTE) - lastPlaytimeCheck) / 20 / 60);
-                System.out.println(lastPlaytimeCheck);
-                System.out.println(playtimeCheckDifferenceInMinutes);
                 if (playtimeCheckDifferenceInMinutes >= entry.getValue().getPlaytimeNeeded()) {
                     //check how many times reward needs to be given
                     int amount = playtimeCheckDifferenceInMinutes / entry.getValue().getPlaytimeNeeded();
-                    System.out.println(amount);
 
                     //give reward this amount of times
                     for (int i = 0; i < amount; i++) {
@@ -110,7 +107,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         //write data away if changes
         if (changed) {
             LitePlaytimeRewardsCRUD crud = new LitePlaytimeRewardsCRUD(this, plyr);
-            crud.setRedeemedRewards(redeemedRewards, true);
+            crud.setRewards(redeemedRewards, true);
         }
         return changed;
     }

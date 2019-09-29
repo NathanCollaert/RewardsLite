@@ -2,7 +2,6 @@ package com.backtobedrock.LitePlaytimeRewards;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
@@ -18,35 +17,42 @@ public class LitePlaytimeRewardsCRUD {
     private File file = null;
     private FileConfiguration configuration;
     private final OfflinePlayer player;
-    private TreeMap<String, Long> redeemedRewards;
+    private TreeMap<String, Long> rewards = new TreeMap<>();
 
     public LitePlaytimeRewardsCRUD(LitePlaytimeRewards plugin, OfflinePlayer player) {
         this.plugin = plugin;
         this.player = player;
-        this.redeemedRewards = this.getConfig().getObject("redeemedRewards", TreeMap.class, new TreeMap<>());
+        //get all rewards writen away and cast them to long
+        this.getConfig().getConfigurationSection("rewards").getValues(false).entrySet().forEach(e -> {
+            this.rewards.put(e.getKey(), Long.parseLong(String.valueOf(e.getValue())));
+        });
     }
 
     private void setNewStart() {
         FileConfiguration conf = this.getConfig();
+        TreeMap<String, Long> rewardsPH = new TreeMap<>();
         conf.set("uuid", player.getUniqueId().toString());
         conf.set("playername", player.getName());
+        //get all rewards and check if from count start or not
+        this.plugin.getLPRConfig().getRewards().entrySet().forEach(e -> {
+            rewardsPH.put(e.getKey(), e.getValue().isCountPlaytimeFromStart() ? (long) 0 : player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE));
+        });
+        conf.set("rewards", rewardsPH);
         this.saveConfig();
     }
 
-    public void setRedeemedRewards(TreeMap<String, Long> redeemedRewards, boolean save) {
+    public void setRewards(TreeMap<String, Long> rewards, boolean save) {
         FileConfiguration conf = this.getConfig();
         conf.set("playername", player.getName());
-        conf.set("redeemedRewards", redeemedRewards);
-        this.redeemedRewards = redeemedRewards;
+        conf.set("rewards", rewards);
+        this.rewards = rewards;
         if (save) {
             this.saveConfig();
         }
     }
 
-    public TreeMap<String, Long> getRedeemedRewards() {
-        System.out.println(this.redeemedRewards.values());
-        System.out.println(this.redeemedRewards.keySet());
-        return this.redeemedRewards;
+    public TreeMap<String, Long> getRewards() {
+        return this.rewards;
     }
 
     public FileConfiguration getConfig() {

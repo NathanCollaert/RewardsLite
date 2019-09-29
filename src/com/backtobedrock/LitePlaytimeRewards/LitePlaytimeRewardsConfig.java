@@ -49,6 +49,7 @@ public class LitePlaytimeRewardsConfig {
             ConfigurationSection reward = rewardsSection.getConfigurationSection(e);
             String displayName = reward.getString("DisplayName");
             int playtimeNeeded = reward.getInt("PlaytimeNeeded");
+            boolean countPlaytimeFromStart = reward.getBoolean("CountPlaytimeFromStart");
             boolean loop = reward.getBoolean("Loop");
             String notification = reward.getString("Notification").replaceAll("&", "§");
             String broadcastNotification = reward.getString("BroadcastNotification").replaceAll("&", "§");
@@ -56,7 +57,7 @@ public class LitePlaytimeRewardsConfig {
             if (displayName == null || displayName.isEmpty() || playtimeNeeded == 0 || notification == null || broadcastNotification == null || commands.isEmpty()) {
                 this.plugin.getLogger().severe(String.format("The reward %s has not been added due to it not being configured correctly.", e));
             } else {
-                rewards.put(e, new Reward(displayName, playtimeNeeded, loop, notification, broadcastNotification, commands));
+                rewards.put(e, new Reward(displayName, playtimeNeeded, countPlaytimeFromStart, loop, notification, broadcastNotification, commands));
             }
         });
         return rewards;

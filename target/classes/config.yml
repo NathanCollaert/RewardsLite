@@ -9,10 +9,6 @@ CheckAvailableRewardsOnPlayerJoin: true
 #In minutes, minimum is 1.
 RewardCheck: 60
 
-#Should players receive rewards from the playtime before this plugin was installed or start from now on?
-#True will also count playtime from before this plugin was installed, false does not.
-CountPlaytimeFromStart: false
-
 #Should getting rewards be disabled in any worlds?
 DisableGettingRewardsInWorlds:
     #- world
@@ -26,20 +22,23 @@ Rewards:
         #How many minutes should a player have to play on the server to be eligible for this reward?
         #In minutes, minimum is 1.
         PlaytimeNeeded: 60
+        #Should players receive the rewards from the playtime before this plugin was installed or start counting playtime from now on?
+        #True will also count playtime from before this plugin was installed, false does not.
+        CountPlaytimeFromStart: false
         #Should the player be able te receive this reward every time he/she reaches the PlaytimeNeeded or just once?
         #False will only give it once.
         Loop: true
         #What message should be send to the player upon receiving this reward?
         #Color codes may be used https://wiki.ess3.net/mc/ as well as \n for a new line.
         #Leave blank to disable.
-        #%player%
+        #Placholders: %player%
         Notification: "You have received the Test Reward! Congratulations!"
         #What message should be broadcasted upon player receiving this reward?
         #Color codes may be used https://wiki.ess3.net/mc/ as well as \n for a new line.
         #Leave blank to disable.
-        #%player%
+        #Placholders: %player%
         BroadcastNotification: "%player% has been awarded with the test reward!"
         #What commands should be executed upon receiving this reward?
-        #%player%
+        #Placholders: %player%
         Commands:
             - "give %player% dirt 1"
