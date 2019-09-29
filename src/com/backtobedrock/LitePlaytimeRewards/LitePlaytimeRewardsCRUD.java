@@ -1,5 +1,6 @@
 package com.backtobedrock.LitePlaytimeRewards;
 
+import com.backtobedrock.LitePlaytimeRewards.helperClasses.RedeemedReward;
 import java.io.File;
 import java.io.IOException;
 import java.util.TreeMap;
@@ -7,41 +8,39 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-public class LitePlaytimeRewardsCRUD {
+public final class LitePlaytimeRewardsCRUD {
 
     private final LitePlaytimeRewards plugin;
 
     private File file = null;
     private FileConfiguration configuration;
     private final OfflinePlayer player;
-    private TreeMap<String, Long> rewards = new TreeMap<>();
+    private TreeMap<String, RedeemedReward> rewards;
+    private final long playtimeStart;
 
     public LitePlaytimeRewardsCRUD(LitePlaytimeRewards plugin, OfflinePlayer player) {
         this.plugin = plugin;
         this.player = player;
-        //get all rewards writen away and cast them to long
-        this.getConfig().getConfigurationSection("rewards").getValues(false).entrySet().forEach(e -> {
-            this.rewards.put(e.getKey(), Long.parseLong(String.valueOf(e.getValue())));
+        this.playtimeStart = this.getConfig().getLong("playtimeStart");
+        ConfigurationSection rewardsSection = this.getConfig().getConfigurationSection("rewards");
+        rewardsSection.getKeys(false).forEach(e -> {
+            this.rewards.put(e, rewardsSection.getObject(e, RedeemedReward.class));
         });
     }
 
     private void setNewStart() {
         FileConfiguration conf = this.getConfig();
-        TreeMap<String, Long> rewardsPH = new TreeMap<>();
         conf.set("uuid", player.getUniqueId().toString());
         conf.set("playername", player.getName());
-        //get all rewards and check if from count start or not
-        this.plugin.getLPRConfig().getRewards().entrySet().forEach(e -> {
-            rewardsPH.put(e.getKey(), e.getValue().isCountPlaytimeFromStart() ? (long) 0 : player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE));
-        });
-        conf.set("rewards", rewardsPH);
+        conf.set("playtimeStart", player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE));
         this.saveConfig();
     }
 
-    public void setRewards(TreeMap<String, Long> rewards, boolean save) {
+    public void setRewards(TreeMap<String, RedeemedReward> rewards, boolean save) {
         FileConfiguration conf = this.getConfig();
         conf.set("playername", player.getName());
         conf.set("rewards", rewards);
@@ -51,8 +50,12 @@ public class LitePlaytimeRewardsCRUD {
         }
     }
 
-    public TreeMap<String, Long> getRewards() {
+    public TreeMap<String, RedeemedReward> getRewards() {
         return this.rewards;
+    }
+
+    public long getPlaytimeStart() {
+        return playtimeStart;
     }
 
     public FileConfiguration getConfig() {

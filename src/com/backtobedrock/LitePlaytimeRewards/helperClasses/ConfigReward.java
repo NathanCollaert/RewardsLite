@@ -2,7 +2,7 @@ package com.backtobedrock.LitePlaytimeRewards.helperClasses;
 
 import java.util.List;
 
-public class Reward {
+public class ConfigReward {
 
     private final String displayName;
     private final int playtimeNeeded;
@@ -12,7 +12,7 @@ public class Reward {
     private final String broadcastNotification;
     private final List<String> commands;
 
-    public Reward(String displayName, int playtimeNeeded, boolean countPlaytimeFromStart, boolean loop, String notification, String broadcastNotification, List<String> commands) {
+    public ConfigReward(String displayName, int playtimeNeeded, boolean countPlaytimeFromStart, boolean loop, String notification, String broadcastNotification, List<String> commands) {
         this.displayName = displayName;
         this.playtimeNeeded = playtimeNeeded;
         this.loop = loop;

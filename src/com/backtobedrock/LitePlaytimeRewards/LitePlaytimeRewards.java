@@ -1,16 +1,14 @@
 package com.backtobedrock.LitePlaytimeRewards;
 
 import com.backtobedrock.LitePlaytimeRewards.eventHandlers.LitePlaytimeRewardsEventHandlers;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.Reward;
+import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
+import com.backtobedrock.LitePlaytimeRewards.helperClasses.RedeemedReward;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.UpdateChecker;
 import com.backtobedrock.LitePlaytimeRewards.runnables.CheckForRewards;
 import java.io.File;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
@@ -23,12 +21,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
     private final boolean oldVersion = false;
-    private TreeMap<String, Reward> rewards;
+    private TreeMap<String, ConfigReward> rewards;
 
     private LitePlaytimeRewardsConfig config;
     private LitePlaytimeRewardsCommands commands;
 
-    private final TreeMap<UUID, TreeMap<String, Long>> onlinePlayerListLastPlaytimeCheck = new TreeMap<>();
+    private final TreeMap<UUID, TreeMap<String, RedeemedReward>> onlinePlayerListLastPlaytimeCheck = new TreeMap<>();
 
     @Override
     public void onEnable() {
@@ -70,10 +68,12 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         if (this.config.getDisableGettingRewardsInWorlds().contains(plyr.getWorld().getName().toLowerCase())) {
             return changed;
         }
-        TreeMap<String, Long> redeemedRewards = this.onlinePlayerListLastPlaytimeCheck.get(plyr.getUniqueId());
-        for (Entry<String, Reward> entry : this.rewards.entrySet()) {
+        TreeMap<String, RedeemedReward> redeemedRewards = this.onlinePlayerListLastPlaytimeCheck.get(plyr.getUniqueId());
+        LitePlaytimeRewardsCRUD crud = null;
+        for (Entry<String, ConfigReward> entry : this.rewards.entrySet()) {
             if (!redeemedRewards.containsKey(entry.getKey()) || entry.getValue().isLoop()) {
-                long lastPlaytimeCheck = this.onlinePlayerListLastPlaytimeCheck.get(plyr.getUniqueId()).get(entry.getKey()) == null ? 0 : this.onlinePlayerListLastPlaytimeCheck.get(plyr.getUniqueId()).get(entry.getKey());
+                crud = new LitePlaytimeRewardsCRUD(this, plyr);
+                long lastPlaytimeCheck = redeemedRewards.containsKey(entry.getKey()) ? redeemedRewards.get(entry.getKey()).getLastPlaytimeCheck() : entry.getValue().isCountPlaytimeFromStart() ? 0 : crud.getPlaytimeStart();
                 int playtimeCheckDifferenceInMinutes = (int) Math.floor((plyr.getStatistic(Statistic.PLAY_ONE_MINUTE) - lastPlaytimeCheck) / 20 / 60);
                 if (playtimeCheckDifferenceInMinutes >= entry.getValue().getPlaytimeNeeded()) {
                     //check how many times reward needs to be given
@@ -96,17 +96,22 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
                         Bukkit.broadcastMessage(broadcastNotification);
                     }
 
-                    //update last playtime check for reward for player and notify changes
+                    //update or create redeemedreward
                     long newLastPlaytimeCheck = lastPlaytimeCheck + ((amount * entry.getValue().getPlaytimeNeeded()) * 60 * 20);
-                    redeemedRewards.put(entry.getKey(), newLastPlaytimeCheck);
+                    if (redeemedRewards.containsKey(entry.getKey())) {
+                        RedeemedReward reward = redeemedRewards.get(entry.getKey());
+                        reward.setLastPlaytimeCheck(newLastPlaytimeCheck);
+                        reward.setAmountRedeemed(reward.getAmountRedeemed() + amount);
+                    } else {
+                        redeemedRewards.put(entry.getKey(), new RedeemedReward(newLastPlaytimeCheck, 1));
+                    }
                     changed = true;
                 }
             }
-        };
+        }
 
         //write data away if changes
-        if (changed) {
-            LitePlaytimeRewardsCRUD crud = new LitePlaytimeRewardsCRUD(this, plyr);
+        if (changed && crud != null) {
             crud.setRewards(redeemedRewards, true);
         }
         return changed;
@@ -116,8 +121,8 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         return this.config;
     }
 
-    public void addToOnlinePlayerListLastPlaytimeCheck(UUID id, TreeMap<String, Long> rewardsLastPlaytimeCheck) {
-        this.onlinePlayerListLastPlaytimeCheck.put(id, rewardsLastPlaytimeCheck);
+    public void addToOnlinePlayerListLastPlaytimeCheck(UUID id, TreeMap<String, RedeemedReward> redeemedRewards) {
+        this.onlinePlayerListLastPlaytimeCheck.put(id, redeemedRewards);
     }
 
     public void removeFromOnlinePlayerListLastPlaytimeCheck(UUID id) {

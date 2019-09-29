@@ -1,6 +1,6 @@
 package com.backtobedrock.LitePlaytimeRewards;
 
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.Reward;
+import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
 import java.util.List;
 import java.util.TreeMap;
 import org.bukkit.configuration.ConfigurationSection;
@@ -42,8 +42,8 @@ public class LitePlaytimeRewardsConfig {
     // </editor-fold>
 
     // <editor-fold desc="Rewards" defaultstate="collapsed">
-    public TreeMap<String, Reward> getRewards() {
-        TreeMap<String, Reward> rewards = new TreeMap<>();
+    public TreeMap<String, ConfigReward> getRewards() {
+        TreeMap<String, ConfigReward> rewards = new TreeMap<>();
         ConfigurationSection rewardsSection = this.config.getConfigurationSection("Rewards");
         rewardsSection.getKeys(false).forEach(e -> {
             ConfigurationSection reward = rewardsSection.getConfigurationSection(e);
@@ -57,7 +57,7 @@ public class LitePlaytimeRewardsConfig {
             if (displayName == null || displayName.isEmpty() || playtimeNeeded == 0 || notification == null || broadcastNotification == null || commands.isEmpty()) {
                 this.plugin.getLogger().severe(String.format("The reward %s has not been added due to it not being configured correctly.", e));
             } else {
-                rewards.put(e, new Reward(displayName, playtimeNeeded, countPlaytimeFromStart, loop, notification, broadcastNotification, commands));
+                rewards.put(e, new ConfigReward(displayName, playtimeNeeded, countPlaytimeFromStart, loop, notification, broadcastNotification, commands));
             }
         });
         return rewards;
