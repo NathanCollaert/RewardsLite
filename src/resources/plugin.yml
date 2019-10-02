@@ -11,7 +11,7 @@ commands:
         permission: liteplaytimerewards.checkplaytime
         usage: /<command> [player]
     givereward:
-        description: Give one of the rewards to a player.
+        description: Force give one of the rewards to a player.
         permission: liteplaytimerewards.givereward
         usage: /<command> <reward> <player>
     redeemrewards:

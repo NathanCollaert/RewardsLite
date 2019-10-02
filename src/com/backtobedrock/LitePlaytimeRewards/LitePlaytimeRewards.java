@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,6 +31,8 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        ConfigurationSerialization.registerClass(RedeemedReward.class);
+
         this.saveDefaultConfig();
 
         File dir = new File(this.getDataFolder() + "/userdata");
@@ -46,7 +49,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 //        }
         getServer().getPluginManager().registerEvents(new LitePlaytimeRewardsEventHandlers(this), this);
 
-        if (!this.getLPRConfig().getRewards().isEmpty()) {
+        if (!this.rewards.isEmpty()) {
             new CheckForRewards(this).runTaskTimer(this, 0, this.getLPRConfig().getRewardCheck() * 60 * 20);
         }
 
@@ -73,7 +76,11 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         for (Entry<String, ConfigReward> entry : this.rewards.entrySet()) {
             if (!redeemedRewards.containsKey(entry.getKey()) || entry.getValue().isLoop()) {
                 crud = new LitePlaytimeRewardsCRUD(this, plyr);
-                long lastPlaytimeCheck = redeemedRewards.containsKey(entry.getKey()) ? redeemedRewards.get(entry.getKey()).getLastPlaytimeCheck() : entry.getValue().isCountPlaytimeFromStart() ? 0 : crud.getPlaytimeStart();
+                long lastPlaytimeCheck = redeemedRewards.containsKey(entry.getKey())
+                        ? redeemedRewards.get(entry.getKey()).getLastPlaytimeCheck()
+                        : entry.getValue().isCountPlaytimeFromStart()
+                        ? 0
+                        : crud.getPlaytimeStart();
                 int playtimeCheckDifferenceInMinutes = (int) Math.floor((plyr.getStatistic(Statistic.PLAY_ONE_MINUTE) - lastPlaytimeCheck) / 20 / 60);
                 if (playtimeCheckDifferenceInMinutes >= entry.getValue().getPlaytimeNeeded()) {
                     //check how many times reward needs to be given
@@ -103,7 +110,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
                         reward.setLastPlaytimeCheck(newLastPlaytimeCheck);
                         reward.setAmountRedeemed(reward.getAmountRedeemed() + amount);
                     } else {
-                        redeemedRewards.put(entry.getKey(), new RedeemedReward(newLastPlaytimeCheck, 1));
+                        redeemedRewards.put(entry.getKey(), new RedeemedReward(newLastPlaytimeCheck, amount));
                     }
                     changed = true;
                 }

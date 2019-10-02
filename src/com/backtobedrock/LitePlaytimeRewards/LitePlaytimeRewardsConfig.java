@@ -3,6 +3,7 @@ package com.backtobedrock.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
 import java.util.List;
 import java.util.TreeMap;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -46,18 +47,12 @@ public class LitePlaytimeRewardsConfig {
         TreeMap<String, ConfigReward> rewards = new TreeMap<>();
         ConfigurationSection rewardsSection = this.config.getConfigurationSection("Rewards");
         rewardsSection.getKeys(false).forEach(e -> {
-            ConfigurationSection reward = rewardsSection.getConfigurationSection(e);
-            String displayName = reward.getString("DisplayName");
-            int playtimeNeeded = reward.getInt("PlaytimeNeeded");
-            boolean countPlaytimeFromStart = reward.getBoolean("CountPlaytimeFromStart");
-            boolean loop = reward.getBoolean("Loop");
-            String notification = reward.getString("Notification").replaceAll("&", "§");
-            String broadcastNotification = reward.getString("BroadcastNotification").replaceAll("&", "§");
-            List<String> commands = reward.getStringList("Commands");
-            if (displayName == null || displayName.isEmpty() || playtimeNeeded == 0 || notification == null || broadcastNotification == null || commands.isEmpty()) {
-                this.plugin.getLogger().severe(String.format("The reward %s has not been added due to it not being configured correctly.", e));
+            ConfigurationSection rewardConfig = rewardsSection.getConfigurationSection(e);
+            ConfigReward reward = this.getRewardFromConfig(rewardConfig);
+            if (reward != null) {
+                rewards.put(e, reward);
             } else {
-                rewards.put(e, new ConfigReward(displayName, playtimeNeeded, countPlaytimeFromStart, loop, notification, broadcastNotification, commands));
+                Bukkit.getLogger().severe(String.format("[LitePlaytimeRewards] %s was not loaded because it was configured incorrectly.", e));
             }
         });
         return rewards;
@@ -70,5 +65,42 @@ public class LitePlaytimeRewardsConfig {
         } else {
             return defaultValue;
         }
+    }
+
+    private ConfigReward getRewardFromConfig(ConfigurationSection reward) {
+        String displayName = null;
+        int playtimeNeeded = 0;
+        boolean countPlaytimeFromStart = false;
+        boolean loop = false;
+        String notification = null;
+        String broadcastNotification = null;
+        List<String> commands = null;
+        if (reward.contains("DisplayName")) {
+            displayName = reward.get("DisplayName").toString();
+        }
+        if (reward.contains("PlaytimeNeeded")) {
+            playtimeNeeded = (int) reward.get("PlaytimeNeeded");
+        }
+        if (reward.contains("CountPlaytimeFromStart")) {
+            countPlaytimeFromStart = (boolean) reward.get("CountPlaytimeFromStart");
+        }
+        if (reward.contains("Loop")) {
+            loop = (boolean) reward.get("Loop");
+        }
+        if (reward.contains("Notification")) {
+            notification = reward.get("Notification").toString();
+        }
+        if (reward.contains("BroadcastNotification")) {
+            broadcastNotification = reward.get("BroadcastNotification").toString();
+        }
+        if (reward.contains("Commands")) {
+            commands = (List<String>) reward.get("Commands");
+        }
+
+        if (displayName == null || playtimeNeeded < 1 || notification == null || broadcastNotification == null || commands == null) {
+            return null;
+        }
+
+        return new ConfigReward(displayName, playtimeNeeded, countPlaytimeFromStart, loop, notification, broadcastNotification, commands);
     }
 }

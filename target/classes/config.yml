@@ -22,7 +22,7 @@ Rewards:
         #How many minutes should a player have to play on the server to be eligible for this reward?
         #In minutes, minimum is 1.
         PlaytimeNeeded: 60
-        #Should players receive the rewards from the playtime before this plugin was installed or start counting playtime from now on?
+        #Should players receive the rewards from the playtime before this plugin was installed or start counting playtime from first join of player after this plugin was installed?
         #True will also count playtime from before this plugin was installed, false does not.
         CountPlaytimeFromStart: false
         #Should the player be able te receive this reward every time he/she reaches the PlaytimeNeeded or just once?
@@ -42,3 +42,12 @@ Rewards:
         #Placholders: %player%
         Commands:
             - "give %player% dirt 1"
+    TestReward2:
+        DisplayName: "Test Reward 2"
+        PlaytimeNeeded: 20
+        CountPlaytimeFromStart: true
+        Loop: false
+        Notification: "You have received the Test Reward 2! Congratulations!"
+        BroadcastNotification: "%player% has been awarded with test reward 2!"
+        Commands:
+            - "give %player% dirt 2"

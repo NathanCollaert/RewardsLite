@@ -15,11 +15,11 @@ public class ConfigReward {
     public ConfigReward(String displayName, int playtimeNeeded, boolean countPlaytimeFromStart, boolean loop, String notification, String broadcastNotification, List<String> commands) {
         this.displayName = displayName;
         this.playtimeNeeded = playtimeNeeded;
+        this.countPlaytimeFromStart = countPlaytimeFromStart;
         this.loop = loop;
         this.notification = notification;
         this.broadcastNotification = broadcastNotification;
         this.commands = commands;
-        this.countPlaytimeFromStart = countPlaytimeFromStart;
     }
 
     public String getDisplayName() {
@@ -54,4 +54,19 @@ public class ConfigReward {
     public String toString() {
         return "Reward{" + "displayName=" + displayName + ", playtimeNeeded=" + playtimeNeeded + ", countPlaytimeFromStart=" + countPlaytimeFromStart + ", loop=" + loop + ", notification=" + notification + ", broadcastNotification=" + broadcastNotification + ", commands=" + commands + '}';
     }
+
+//    @Override
+//    public Map<String, Object> serialize() {
+//        Map<String, Object> map = new TreeMap<>();
+//
+//        map.put("DisplayName", this.displayName);
+//        map.put("PlaytimeNeeded", this.playtimeNeeded);
+//        map.put("CountPlaytimeFromStart", this.countPlaytimeFromStart);
+//        map.put("Loop", this.loop);
+//        map.put("Notification", this.notification);
+//        map.put("BroadcastNotification", this.broadcastNotification);
+//        map.put("Commands", this.commands);
+//
+//        return map;
+//    }
 }
