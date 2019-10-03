@@ -22,7 +22,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
     private final boolean oldVersion = false;
-    private TreeMap<String, ConfigReward> rewards;
 
     private LitePlaytimeRewardsConfig config;
     private LitePlaytimeRewardsCommands commands;
@@ -39,7 +38,6 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         dir.mkdirs();
 
         this.config = new LitePlaytimeRewardsConfig(this);
-        this.rewards = this.config.getRewards();
         this.commands = new LitePlaytimeRewardsCommands(this);
 
 //        if (this.getLDBConfig().isUpdateChecker()) {
@@ -49,8 +47,10 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 //        }
         getServer().getPluginManager().registerEvents(new LitePlaytimeRewardsEventHandlers(this), this);
 
-        if (!this.rewards.isEmpty()) {
+        if (!this.config.getRewards().isEmpty()) {
             new CheckForRewards(this).runTaskTimer(this, 0, this.getLPRConfig().getRewardCheck() * 60 * 20);
+        } else {
+            this.onDisable();
         }
 
         super.onEnable();
@@ -73,35 +73,16 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         }
         TreeMap<String, RedeemedReward> redeemedRewards = this.onlinePlayerListLastPlaytimeCheck.get(plyr.getUniqueId());
         LitePlaytimeRewardsCRUD crud = null;
-        for (Entry<String, ConfigReward> entry : this.rewards.entrySet()) {
+        for (Entry<String, ConfigReward> entry : this.config.getRewards().entrySet()) {
             if (!redeemedRewards.containsKey(entry.getKey()) || entry.getValue().isLoop()) {
                 crud = new LitePlaytimeRewardsCRUD(this, plyr);
-                long lastPlaytimeCheck = redeemedRewards.containsKey(entry.getKey())
-                        ? redeemedRewards.get(entry.getKey()).getLastPlaytimeCheck()
-                        : entry.getValue().isCountPlaytimeFromStart()
-                        ? 0
-                        : crud.getPlaytimeStart();
+                long lastPlaytimeCheck = redeemedRewards.containsKey(entry.getKey()) ? redeemedRewards.get(entry.getKey()).getLastPlaytimeCheck() : entry.getValue().isCountPlaytimeFromStart() ? 0 : crud.getPlaytimeStart();
                 int playtimeCheckDifferenceInMinutes = (int) Math.floor((plyr.getStatistic(Statistic.PLAY_ONE_MINUTE) - lastPlaytimeCheck) / 20 / 60);
                 if (playtimeCheckDifferenceInMinutes >= entry.getValue().getPlaytimeNeeded()) {
                     //check how many times reward needs to be given
                     int amount = playtimeCheckDifferenceInMinutes / entry.getValue().getPlaytimeNeeded();
 
-                    //give reward this amount of times
-                    for (int i = 0; i < amount; i++) {
-                        entry.getValue().getCommands().forEach(j -> {
-                            Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), j.replaceAll("%player%", plyr.getName()));
-                        });
-                    }
-
-                    //notify user and broadcast on getting reward
-                    String notification = entry.getValue().getNotification().replaceAll("%player%", plyr.getName());
-                    String broadcastNotification = entry.getValue().getBroadcastNotification().replaceAll("%player%", plyr.getName());
-                    if (!notification.isEmpty()) {
-                        plyr.spigot().sendMessage(new ComponentBuilder(notification).create());
-                    }
-                    if (!broadcastNotification.isEmpty()) {
-                        Bukkit.broadcastMessage(broadcastNotification);
-                    }
+                    this.giveRewardAndNotify(entry.getValue(), plyr, true, amount);
 
                     //update or create redeemedreward
                     long newLastPlaytimeCheck = lastPlaytimeCheck + ((amount * entry.getValue().getPlaytimeNeeded()) * 60 * 20);
@@ -122,6 +103,25 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
             crud.setRewards(redeemedRewards, true);
         }
         return changed;
+    }
+
+    public void giveRewardAndNotify(ConfigReward reward, Player plyr, boolean broadcast, int amount) {
+        //give reward this amount of times
+        for (int i = 0; i < amount; i++) {
+            reward.getCommands().forEach(j -> {
+                Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), j.replaceAll("%player%", plyr.getName()));
+            });
+        }
+
+        //notify user and broadcast on getting reward
+        String notification = reward.getNotification().replaceAll("%player%", plyr.getName());
+        String broadcastNotification = reward.getBroadcastNotification().replaceAll("%player%", plyr.getName());
+        if (!notification.isEmpty()) {
+            plyr.spigot().sendMessage(new ComponentBuilder(notification).create());
+        }
+        if (!broadcastNotification.isEmpty() && broadcast) {
+            Bukkit.broadcastMessage(broadcastNotification);
+        }
     }
 
     public LitePlaytimeRewardsConfig getLPRConfig() {

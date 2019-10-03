@@ -13,15 +13,15 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public final class LitePlaytimeRewardsCRUD {
-    
+
     private final LitePlaytimeRewards plugin;
-    
+
     private File file = null;
     private FileConfiguration configuration;
     private final OfflinePlayer player;
     private TreeMap<String, RedeemedReward> rewards = new TreeMap<>();
     private final long playtimeStart;
-    
+
     public LitePlaytimeRewardsCRUD(LitePlaytimeRewards plugin, OfflinePlayer player) {
         this.plugin = plugin;
         this.player = player;
@@ -29,11 +29,11 @@ public final class LitePlaytimeRewardsCRUD {
         ConfigurationSection rewardsSection = this.getConfig().getConfigurationSection("rewards");
         if (rewardsSection != null) {
             rewardsSection.getKeys(false).forEach(e -> {
-                this.rewards.put(e, rewardsSection.getSerializable(e, RedeemedReward.class));
+                this.rewards.put(e.toLowerCase(), rewardsSection.getSerializable(e, RedeemedReward.class));
             });
         }
     }
-    
+
     private void setNewStart() {
         FileConfiguration conf = this.getConfig();
         conf.set("uuid", player.getUniqueId().toString());
@@ -41,7 +41,7 @@ public final class LitePlaytimeRewardsCRUD {
         conf.set("playtimeStart", player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE));
         this.saveConfig();
     }
-    
+
     public void setRewards(TreeMap<String, RedeemedReward> rewards, boolean save) {
         FileConfiguration conf = this.getConfig();
         conf.set("playername", player.getName());
@@ -51,15 +51,15 @@ public final class LitePlaytimeRewardsCRUD {
             this.saveConfig();
         }
     }
-    
+
     public TreeMap<String, RedeemedReward> getRewards() {
         return this.rewards;
     }
-    
+
     public long getPlaytimeStart() {
         return playtimeStart;
     }
-    
+
     public FileConfiguration getConfig() {
         if (configuration == null) {
             configuration = YamlConfiguration.loadConfiguration(getFile());
@@ -67,7 +67,7 @@ public final class LitePlaytimeRewardsCRUD {
         }
         return configuration;
     }
-    
+
     public void saveConfig() {
         try {
             configuration.save(this.getFile());
@@ -75,7 +75,7 @@ public final class LitePlaytimeRewardsCRUD {
             Bukkit.getLogger().log(Level.SEVERE, "Cannot save to {0}", file.getName());
         }
     }
-    
+
     private File getFile() {
         if (file == null) {
             this.file = new File(this.plugin.getDataFolder() + "/userdata/" + player.getUniqueId().toString() + ".yml");

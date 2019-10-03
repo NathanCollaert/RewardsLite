@@ -3,6 +3,7 @@ package com.backtobedrock.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -10,8 +11,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class LitePlaytimeRewardsConfig {
 
     private final FileConfiguration config;
-
     private final LitePlaytimeRewards plugin;
+
+    private final TreeMap<String, ConfigReward> rewards = new TreeMap<>();
 
     public LitePlaytimeRewardsConfig(LitePlaytimeRewards plugin) {
         this.plugin = plugin;
@@ -34,7 +36,7 @@ public class LitePlaytimeRewardsConfig {
     }
 
     public List<String> getDisableGettingRewardsInWorlds() {
-        return this.config.getStringList("DisableGettingRewardsInWorlds");
+        return this.config.getStringList("DisableGettingRewardsInWorlds").stream().map(String::toLowerCase).collect(Collectors.toList());
     }
 
     public boolean isCountPlaytimeFromStart() {
@@ -44,18 +46,19 @@ public class LitePlaytimeRewardsConfig {
 
     // <editor-fold desc="Rewards" defaultstate="collapsed">
     public TreeMap<String, ConfigReward> getRewards() {
-        TreeMap<String, ConfigReward> rewards = new TreeMap<>();
-        ConfigurationSection rewardsSection = this.config.getConfigurationSection("Rewards");
-        rewardsSection.getKeys(false).forEach(e -> {
-            ConfigurationSection rewardConfig = rewardsSection.getConfigurationSection(e);
-            ConfigReward reward = this.getRewardFromConfig(rewardConfig);
-            if (reward != null) {
-                rewards.put(e, reward);
-            } else {
-                Bukkit.getLogger().severe(String.format("[LitePlaytimeRewards] %s was not loaded because it was configured incorrectly.", e));
-            }
-        });
-        return rewards;
+        if (this.rewards.isEmpty()) {
+            ConfigurationSection rewardsSection = this.config.getConfigurationSection("Rewards");
+            rewardsSection.getKeys(false).forEach(e -> {
+                ConfigurationSection rewardConfig = rewardsSection.getConfigurationSection(e);
+                ConfigReward reward = this.getRewardFromConfig(rewardConfig);
+                if (reward != null) {
+                    this.rewards.put(e.toLowerCase(), reward);
+                } else {
+                    Bukkit.getLogger().severe(String.format("[LitePlaytimeRewards] %s was not loaded because it was configured incorrectly.", e));
+                }
+            });
+        }
+        return this.rewards;
     }
     // </editor-fold>
 

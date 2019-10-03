@@ -1,5 +1,9 @@
 package com.backtobedrock.LitePlaytimeRewards;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -7,14 +11,17 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
-public class LitePlaytimeRewardsCommands {
+public class LitePlaytimeRewardsCommands implements TabCompleter {
 
     private LitePlaytimeRewards plugin = null;
 
     public LitePlaytimeRewardsCommands(LitePlaytimeRewards plugin) {
         this.plugin = plugin;
+        Bukkit.getServer().getPluginCommand("givereward").setTabCompleter(this);
     }
 
     public boolean onCommand(CommandSender cs, Command cmnd, String alias, String[] args) {
@@ -25,6 +32,10 @@ public class LitePlaytimeRewardsCommands {
                 return this.oneParameter(cs, cmnd, args[0]);
             case 2:
                 return this.twoParameters(cs, cmnd, args);
+            case 3:
+                return this.threeParameters(cs, cmnd, args);
+            case 4:
+                return this.fourParameters(cs, cmnd, args);
             default:
                 return false;
         }
@@ -39,7 +50,7 @@ public class LitePlaytimeRewardsCommands {
             case "checkplaytime":
                 //check if player
                 if (sender == null) {
-                    cs.spigot().sendMessage(new ComponentBuilder("You'll need to log in to use this command.").color(ChatColor.RED).create());
+                    cs.spigot().sendMessage(new ComponentBuilder("You will need to log in to use this command.").color(ChatColor.RED).create());
                     return true;
                 }
                 //check for permission
@@ -52,7 +63,7 @@ public class LitePlaytimeRewardsCommands {
             case "redeemrewards":
                 //check if player
                 if (sender == null) {
-                    cs.spigot().sendMessage(new ComponentBuilder("You'll need to log in to use this command.").color(ChatColor.RED).create());
+                    cs.spigot().sendMessage(new ComponentBuilder("You will need to log in to use this command.").color(ChatColor.RED).create());
                     return true;
                 }
                 //check for permission
@@ -82,20 +93,68 @@ public class LitePlaytimeRewardsCommands {
 
                 OfflinePlayer checkPlaytimePlyr = Bukkit.getOfflinePlayer(arg);
                 if (!checkPlaytimePlyr.isOnline()) {
-                    cs.spigot().sendMessage(new ComponentBuilder(String.format("%s isn't online.", checkPlaytimePlyr.getName())).color(ChatColor.RED).create());
+                    cs.spigot().sendMessage(new ComponentBuilder(String.format("%s is not online.", checkPlaytimePlyr.getName())).color(ChatColor.RED).create());
                     return true;
                 }
                 cs.spigot().sendMessage(new ComponentBuilder(String.format("%s has played for %s on the server.", checkPlaytimePlyr.getPlayer().getName(), this.playtimeToString(checkPlaytimePlyr.getPlayer()))).color(ChatColor.GOLD).create());
-                return true;
-            case "setpt":
-                sender.setStatistic(Statistic.PLAY_ONE_MINUTE, sender.getStatistic(Statistic.PLAY_ONE_MINUTE) + 60 * 60 * 20);
                 return true;
         }
         return false;
     }
 
     private boolean twoParameters(CommandSender cs, Command cmnd, String[] args) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Player sender = null;
+        if (cs instanceof Player) {
+            sender = (Player) cs;
+        }
+        switch (cmnd.getName().toLowerCase()) {
+            case "givereward":
+                return this.giveRewardCommand(cs, cmnd, args, true, 1);
+        }
+        return false;
+    }
+
+    private boolean threeParameters(CommandSender cs, Command cmnd, String[] args) {
+        Player sender = null;
+        if (cs instanceof Player) {
+            sender = (Player) cs;
+        }
+        switch (cmnd.getName().toLowerCase()) {
+            case "givereward":
+                try {
+                    Integer.parseInt(args[2]);
+                } catch (NumberFormatException e) {
+                    cs.spigot().sendMessage(new ComponentBuilder("Amount must be a possitive number greater then 0.").color(ChatColor.RED).create());
+                    return true;
+                }
+
+                return this.giveRewardCommand(cs, cmnd, args, true, Integer.parseInt(args[2]));
+        }
+        return false;
+    }
+
+    private boolean fourParameters(CommandSender cs, Command cmnd, String[] args) {
+        Player sender = null;
+        if (cs instanceof Player) {
+            sender = (Player) cs;
+        }
+        switch (cmnd.getName().toLowerCase()) {
+            case "givereward":
+                try {
+                    Integer.parseInt(args[2]);
+                } catch (NumberFormatException e) {
+                    cs.spigot().sendMessage(new ComponentBuilder("Amount must be a possitive number greater then 0.").color(ChatColor.RED).create());
+                    return true;
+                }
+
+                if (!args[3].equalsIgnoreCase("true") && !args[3].equalsIgnoreCase("false")) {
+                    cs.spigot().sendMessage(new ComponentBuilder("Broadcast must be true or false.").color(ChatColor.RED).create());
+                    return true;
+                }
+
+                return this.giveRewardCommand(cs, cmnd, args, Boolean.getBoolean(args[3]), Integer.parseInt(args[2]));
+        }
+        return false;
     }
 
     private String playtimeToString(Player plyr) {
@@ -132,5 +191,51 @@ public class LitePlaytimeRewardsCommands {
             return sb.toString();
         }
         return "less then a second";
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmnd, String alias, String[] args) {
+        //create new array
+        final List<String> completions = new ArrayList<>();
+
+        switch (cmnd.getName().toLowerCase()) {
+            case "givereward":
+                if (args.length == 1) {
+                    StringUtil.copyPartialMatches(args[0].toLowerCase(), this.plugin.getLPRConfig().getRewards().keySet(), completions);
+                    Collections.sort(completions);
+                }
+                if (args.length == 2) {
+                    completions.addAll(this.plugin.getServer().getOnlinePlayers().stream().map(e -> e.getName()).collect(Collectors.toList()));
+                }
+                break;
+        }
+        return completions;
+    }
+
+    private boolean giveRewardCommand(CommandSender cs, Command cmnd, String[] args, boolean broadcast, int amount) {
+        //check for permission
+        if (!cmnd.testPermission(cs)) {
+            return true;
+        }
+
+        if (!this.plugin.getLPRConfig().getRewards().containsKey(args[0].toLowerCase())) {
+            cs.spigot().sendMessage(new ComponentBuilder(args[0] + " is not an available reward.").color(ChatColor.RED).create());
+            return true;
+        }
+
+        OfflinePlayer giveRewardPlyr = Bukkit.getOfflinePlayer(args[1]);
+        if (!giveRewardPlyr.isOnline()) {
+            cs.spigot().sendMessage(new ComponentBuilder(String.format("%s is not online.", giveRewardPlyr.getName())).color(ChatColor.RED).create());
+            return true;
+        }
+
+        if (amount < 1) {
+            cs.spigot().sendMessage(new ComponentBuilder(amount + " is not a viable amount.").color(ChatColor.RED).create());
+            return true;
+        }
+
+        this.plugin.giveRewardAndNotify(this.plugin.getLPRConfig().getRewards().get(args[0].toLowerCase()), giveRewardPlyr.getPlayer(), broadcast, amount);
+
+        return true;
     }
 }
