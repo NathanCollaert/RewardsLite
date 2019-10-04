@@ -21,7 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
-    private final boolean oldVersion = false;
+    private boolean oldVersion = false;
 
     private LitePlaytimeRewardsConfig config;
     private LitePlaytimeRewardsCommands commands;
@@ -40,11 +40,12 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         this.config = new LitePlaytimeRewardsConfig(this);
         this.commands = new LitePlaytimeRewardsCommands(this);
 
-//        if (this.getLDBConfig().isUpdateChecker()) {
-//            new UpdateChecker(this,).getVersion(version -> {
-//                this.oldVersion = !this.getDescription().getVersion().equalsIgnoreCase(version);
-//            });
-//        }
+        if (this.getLPRConfig().isUpdateChecker()) {
+            new UpdateChecker(this, 71784).getVersion(version -> {
+                this.oldVersion = !this.getDescription().getVersion().equalsIgnoreCase(version);
+            });
+        }
+
         getServer().getPluginManager().registerEvents(new LitePlaytimeRewardsEventHandlers(this), this);
 
         if (!this.config.getRewards().isEmpty()) {
