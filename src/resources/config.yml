@@ -15,30 +15,37 @@ DisableGettingRewardsInWorlds:
     #- world_nether
     #- world_the_end
     
+#(*) are required fields for a reward.
 Rewards:
     TestReward:
-        #This name will be shown to players
+        #This name will be shown to players (*)
         DisplayName: "Test Reward"
-        #How many minutes should a player have to play on the server to be eligible for this reward?
+        #How many minutes should a player have to play on the server to be eligible for this reward? (*)
         #In minutes, minimum is 1.
         PlaytimeNeeded: 60
         #Should players receive the rewards from the playtime before this plugin was installed or start counting playtime from first join of player after this plugin was installed?
         #True will also count playtime from before this plugin was installed, false does not.
+        #Default = false
         CountPlaytimeFromStart: false
+        #Should the plugin only give this reward when the players has free inventory space?
+        #Free slots needed in inventory to give this reward.
+        #Default = 0
+        SlotsNeeded: 1
         #Should the player be able te receive this reward every time he/she reaches the PlaytimeNeeded or just once?
         #False will only give it once.
+        #Default = false
         Loop: true
-        #What message should be send to the player upon receiving this reward?
+        #What message should be send to the player upon receiving this reward? (*)
         #Color codes may be used https://wiki.ess3.net/mc/ as well as \n for a new line.
         #Leave blank to disable.
         #Placholders: %player%
         Notification: "You have received the Test Reward! Congratulations!"
-        #What message should be broadcasted upon player receiving this reward?
+        #What message should be broadcasted upon player receiving this reward? (*)
         #Color codes may be used https://wiki.ess3.net/mc/ as well as \n for a new line.
         #Leave blank to disable.
         #Placholders: %player%
         BroadcastNotification: "%player% has been awarded with the test reward!"
-        #What commands should be executed upon receiving this reward?
+        #What commands should be executed upon receiving this reward? (*)
         #Placholders: %player%
         Commands:
             - "give %player% dirt 1"
@@ -46,8 +53,10 @@ Rewards:
         DisplayName: "Test Reward 2"
         PlaytimeNeeded: 20
         CountPlaytimeFromStart: true
+        SlotsNeeded: 2
         Loop: false
         Notification: "You have received the Test Reward 2! Congratulations!"
         BroadcastNotification: "%player% has been awarded with test reward 2!"
         Commands:
-            - "give %player% dirt 2"
+            - "give %player% dirt 1"
+            - "give %player% grass_block 1"

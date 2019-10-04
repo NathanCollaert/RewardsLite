@@ -6,17 +6,21 @@ import com.backtobedrock.LitePlaytimeRewards.helperClasses.RedeemedReward;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.UpdateChecker;
 import com.backtobedrock.LitePlaytimeRewards.runnables.CheckForRewards;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LitePlaytimeRewards extends JavaPlugin implements Listener {
@@ -80,19 +84,30 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
                 long lastPlaytimeCheck = redeemedRewards.containsKey(entry.getKey()) ? redeemedRewards.get(entry.getKey()).getLastPlaytimeCheck() : entry.getValue().isCountPlaytimeFromStart() ? 0 : crud.getPlaytimeStart();
                 int playtimeCheckDifferenceInMinutes = (int) Math.floor((plyr.getStatistic(Statistic.PLAY_ONE_MINUTE) - lastPlaytimeCheck) / 20 / 60);
                 if (playtimeCheckDifferenceInMinutes >= entry.getValue().getPlaytimeNeeded()) {
-                    //check how many times reward needs to be given
-                    int amount = playtimeCheckDifferenceInMinutes / entry.getValue().getPlaytimeNeeded();
+                    //check if enough inventory space
+                    int emptySlots = 0;
+                    for (ItemStack it : plyr.getInventory().getStorageContents()) {
+                        if (it == null) {
+                            emptySlots++;
+                        }
+                    }
+                    if (entry.getValue().getSlotsNeeded() == 0 || emptySlots >= entry.getValue().getSlotsNeeded()) {
+                        //check how many times reward needs to be given
+                        int amount = playtimeCheckDifferenceInMinutes / entry.getValue().getPlaytimeNeeded();
 
-                    this.giveRewardAndNotify(entry.getValue(), plyr, true, amount);
+                        this.giveRewardAndNotify(entry.getValue(), plyr, true, entry.getValue().isLoop() ? amount : 1);
 
-                    //update or create redeemedreward
-                    long newLastPlaytimeCheck = lastPlaytimeCheck + ((amount * entry.getValue().getPlaytimeNeeded()) * 60 * 20);
-                    if (redeemedRewards.containsKey(entry.getKey())) {
-                        RedeemedReward reward = redeemedRewards.get(entry.getKey());
-                        reward.setLastPlaytimeCheck(newLastPlaytimeCheck);
-                        reward.setAmountRedeemed(reward.getAmountRedeemed() + amount);
+                        //update or create redeemedreward
+                        long newLastPlaytimeCheck = lastPlaytimeCheck + ((amount * entry.getValue().getPlaytimeNeeded()) * 60 * 20);
+                        if (redeemedRewards.containsKey(entry.getKey())) {
+                            RedeemedReward reward = redeemedRewards.get(entry.getKey());
+                            reward.setLastPlaytimeCheck(newLastPlaytimeCheck);
+                            reward.setAmountRedeemed(reward.getAmountRedeemed() + amount);
+                        } else {
+                            redeemedRewards.put(entry.getKey(), new RedeemedReward(newLastPlaytimeCheck, amount));
+                        }
                     } else {
-                        redeemedRewards.put(entry.getKey(), new RedeemedReward(newLastPlaytimeCheck, amount));
+                        plyr.spigot().sendMessage(new ComponentBuilder("You need " + entry.getValue().getSlotsNeeded() + " open inventory slots to claim a pending reward.").color(ChatColor.GOLD).create());
                     }
                     changed = true;
                 }

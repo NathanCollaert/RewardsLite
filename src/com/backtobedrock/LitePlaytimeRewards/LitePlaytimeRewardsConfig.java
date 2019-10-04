@@ -74,6 +74,7 @@ public class LitePlaytimeRewardsConfig {
         String displayName = null;
         int playtimeNeeded = 0;
         boolean countPlaytimeFromStart = false;
+        int slotsNeeded = 0;
         boolean loop = false;
         String notification = null;
         String broadcastNotification = null;
@@ -86,6 +87,9 @@ public class LitePlaytimeRewardsConfig {
         }
         if (reward.contains("CountPlaytimeFromStart")) {
             countPlaytimeFromStart = (boolean) reward.get("CountPlaytimeFromStart");
+        }
+        if (reward.contains("SlotsNeeded")) {
+            slotsNeeded = (int) reward.get("SlotsNeeded");
         }
         if (reward.contains("Loop")) {
             loop = (boolean) reward.get("Loop");
@@ -100,10 +104,10 @@ public class LitePlaytimeRewardsConfig {
             commands = (List<String>) reward.get("Commands");
         }
 
-        if (displayName == null || playtimeNeeded < 1 || notification == null || broadcastNotification == null || commands == null) {
+        if (displayName == null || playtimeNeeded < 1 || slotsNeeded < 0 || notification == null || broadcastNotification == null || commands == null) {
             return null;
         }
 
-        return new ConfigReward(displayName, playtimeNeeded, countPlaytimeFromStart, loop, notification, broadcastNotification, commands);
+        return new ConfigReward(displayName, playtimeNeeded, countPlaytimeFromStart, slotsNeeded, loop, notification, broadcastNotification, commands);
     }
 }

@@ -7,15 +7,17 @@ public class ConfigReward {
     private final String displayName;
     private final int playtimeNeeded;
     private final boolean countPlaytimeFromStart;
+    private final int slotsNeeded;
     private final boolean loop;
     private final String notification;
     private final String broadcastNotification;
     private final List<String> commands;
 
-    public ConfigReward(String displayName, int playtimeNeeded, boolean countPlaytimeFromStart, boolean loop, String notification, String broadcastNotification, List<String> commands) {
+    public ConfigReward(String displayName, int playtimeNeeded, boolean countPlaytimeFromStart, int slotsNeeded, boolean loop, String notification, String broadcastNotification, List<String> commands) {
         this.displayName = displayName;
         this.playtimeNeeded = playtimeNeeded;
         this.countPlaytimeFromStart = countPlaytimeFromStart;
+        this.slotsNeeded = slotsNeeded;
         this.loop = loop;
         this.notification = notification;
         this.broadcastNotification = broadcastNotification;
@@ -48,6 +50,10 @@ public class ConfigReward {
 
     public boolean isCountPlaytimeFromStart() {
         return countPlaytimeFromStart;
+    }
+
+    public int getSlotsNeeded() {
+        return slotsNeeded;
     }
 
     @Override
