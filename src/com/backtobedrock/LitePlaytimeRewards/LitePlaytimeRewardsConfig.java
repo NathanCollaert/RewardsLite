@@ -108,6 +108,6 @@ public class LitePlaytimeRewardsConfig {
             return null;
         }
 
-        return new ConfigReward(displayName, playtimeNeeded, countPlaytimeFromStart, slotsNeeded, loop, notification, broadcastNotification, commands);
+        return new ConfigReward(displayName, playtimeNeeded, countPlaytimeFromStart, slotsNeeded, loop, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
     }
 }
