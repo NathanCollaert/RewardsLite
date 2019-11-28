@@ -56,11 +56,6 @@ public class ConfigReward {
         return slotsNeeded;
     }
 
-    @Override
-    public String toString() {
-        return "Reward{" + "displayName=" + displayName + ", playtimeNeeded=" + playtimeNeeded + ", countPlaytimeFromStart=" + countPlaytimeFromStart + ", loop=" + loop + ", notification=" + notification + ", broadcastNotification=" + broadcastNotification + ", commands=" + commands + '}';
-    }
-
 //    @Override
 //    public Map<String, Object> serialize() {
 //        Map<String, Object> map = new TreeMap<>();

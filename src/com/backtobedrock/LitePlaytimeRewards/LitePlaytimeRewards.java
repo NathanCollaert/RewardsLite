@@ -6,14 +6,12 @@ import com.backtobedrock.LitePlaytimeRewards.helperClasses.RedeemedReward;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.UpdateChecker;
 import com.backtobedrock.LitePlaytimeRewards.runnables.CheckForRewards;
 import java.io.File;
-import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -44,12 +42,6 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         this.config = new LitePlaytimeRewardsConfig(this);
         this.commands = new LitePlaytimeRewardsCommands(this);
 
-        if (this.getLPRConfig().isUpdateChecker()) {
-            new UpdateChecker(this, 71784).getVersion(version -> {
-                this.oldVersion = !this.getDescription().getVersion().equalsIgnoreCase(version);
-            });
-        }
-
         getServer().getPluginManager().registerEvents(new LitePlaytimeRewardsEventHandlers(this), this);
 
         if (!this.config.getRewards().isEmpty()) {
@@ -57,6 +49,8 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         } else {
             this.onDisable();
         }
+
+        this.checkForOldVersion();
 
         super.onEnable();
     }
@@ -154,5 +148,13 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
     public boolean isOldVersion() {
         return oldVersion;
+    }
+
+    public void checkForOldVersion() {
+        if (this.getLPRConfig().isUpdateChecker()) {
+            new UpdateChecker(this, 71784).getVersion(version -> {
+                this.oldVersion = !this.getDescription().getVersion().equalsIgnoreCase(version);
+            });
+        }
     }
 }
