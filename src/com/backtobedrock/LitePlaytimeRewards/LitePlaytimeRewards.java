@@ -5,11 +5,16 @@ import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.RedeemedReward;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.UpdateChecker;
 import com.backtobedrock.LitePlaytimeRewards.runnables.CheckForRewards;
+import com.backtobedrock.LitePlaytimeRewards.runnables.NotifyBossBar;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
@@ -20,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
@@ -124,13 +130,51 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         }
 
         //notify user and broadcast on getting reward
+        this.notifyUsers(reward, plyr);
+    }
+
+    private void notifyUsers(ConfigReward reward, Player plyr) {
         String notification = reward.getNotification().replaceAll("%player%", plyr.getName());
         String broadcastNotification = reward.getBroadcastNotification().replaceAll("%player%", plyr.getName());
-        if (!notification.isEmpty()) {
-            plyr.spigot().sendMessage(new ComponentBuilder(notification).create());
-        }
-        if (!broadcastNotification.isEmpty() && broadcast) {
-            Bukkit.broadcastMessage(broadcastNotification);
+
+        Collection<Player> players = new ArrayList<>();
+
+        switch (reward.getNotificationType().toLowerCase()) {
+            case "chat":
+                if (!broadcastNotification.isEmpty()) {
+                    Bukkit.broadcastMessage(broadcastNotification);
+                }
+                if (!notification.isEmpty()) {
+                    plyr.spigot().sendMessage(new ComponentBuilder(notification).create());
+                }
+                break;
+            case "bossbar":
+                if (!broadcastNotification.isEmpty()) {
+                    players = this.getServer().getOnlinePlayers().stream().map(e -> (Player) e).collect(Collectors.toList());
+                    if (!notification.isEmpty()) {
+                        players.remove(plyr);
+                    }
+                    new NotifyBossBar(this, players, broadcastNotification).runTaskTimer(this, 0, 20);
+                }
+                if (!notification.isEmpty()) {
+                    players.add(plyr);
+                    new NotifyBossBar(this, players, notification).runTaskTimer(this, 0, 20);
+                }
+                break;
+            case "actionbar":
+                if (!broadcastNotification.isEmpty()) {
+                    players = this.getServer().getOnlinePlayers().stream().map(e -> (Player) e).collect(Collectors.toList());
+                    if (!notification.isEmpty()) {
+                        players.remove(plyr);
+                    }
+                    players.stream().forEach(e -> {
+                        ((Player) e).spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(broadcastNotification).create());
+                    });
+                }
+                if (!notification.isEmpty()) {
+                    plyr.spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(notification).create());
+                }
+                break;
         }
     }
 

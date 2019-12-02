@@ -35,6 +35,10 @@ Rewards:
         #False will only give it once.
         #Default = false
         Loop: true
+        #How should the notification and broadcast be displayed?
+        #bossbar/actionbar/chat
+        #Default = chat
+        NotificationType: bossbar
         #What message should be send to the player upon receiving this reward? (*)
         #Color codes may be used https://wiki.ess3.net/mc/ as well as \n for a new line.
         #Leave blank to disable.

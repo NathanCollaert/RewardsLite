@@ -76,9 +76,11 @@ public class LitePlaytimeRewardsConfig {
         boolean countPlaytimeFromStart = false;
         int slotsNeeded = 0;
         boolean loop = false;
+        String notificationType = "chat";
         String notification = null;
         String broadcastNotification = null;
         List<String> commands = null;
+
         if (reward.contains("DisplayName")) {
             displayName = reward.get("DisplayName").toString();
         }
@@ -94,6 +96,9 @@ public class LitePlaytimeRewardsConfig {
         if (reward.contains("Loop")) {
             loop = (boolean) reward.get("Loop");
         }
+        if (reward.contains("NotificationType")) {
+            notificationType = reward.get("NotificationType").toString();
+        }
         if (reward.contains("Notification")) {
             notification = reward.get("Notification").toString();
         }
@@ -108,6 +113,6 @@ public class LitePlaytimeRewardsConfig {
             return null;
         }
 
-        return new ConfigReward(displayName, playtimeNeeded, countPlaytimeFromStart, slotsNeeded, loop, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
+        return new ConfigReward(displayName, playtimeNeeded, countPlaytimeFromStart, slotsNeeded, loop, notificationType, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
     }
 }
