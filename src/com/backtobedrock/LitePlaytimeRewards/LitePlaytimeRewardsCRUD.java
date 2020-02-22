@@ -7,7 +7,6 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Statistic;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -20,12 +19,10 @@ public final class LitePlaytimeRewardsCRUD {
     private FileConfiguration configuration;
     private final OfflinePlayer player;
     private TreeMap<String, RedeemedReward> rewards = new TreeMap<>();
-    private final long playtimeStart;
 
     public LitePlaytimeRewardsCRUD(LitePlaytimeRewards plugin, OfflinePlayer player) {
         this.plugin = plugin;
         this.player = player;
-        this.playtimeStart = this.getConfig().getLong("playtimeStart");
         ConfigurationSection rewardsSection = this.getConfig().getConfigurationSection("rewards");
         if (rewardsSection != null) {
             rewardsSection.getKeys(false).forEach(e -> {
@@ -38,7 +35,6 @@ public final class LitePlaytimeRewardsCRUD {
         FileConfiguration conf = this.getConfig();
         conf.set("uuid", player.getUniqueId().toString());
         conf.set("playername", player.getName());
-        conf.set("playtimeStart", player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE));
         this.saveConfig();
     }
 
@@ -54,10 +50,6 @@ public final class LitePlaytimeRewardsCRUD {
 
     public TreeMap<String, RedeemedReward> getRewards() {
         return this.rewards;
-    }
-
-    public long getPlaytimeStart() {
-        return playtimeStart;
     }
 
     public FileConfiguration getConfig() {

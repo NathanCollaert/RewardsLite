@@ -1,6 +1,8 @@
 package com.backtobedrock.LitePlaytimeRewards;
 
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -27,20 +29,8 @@ public class LitePlaytimeRewardsConfig {
     // </editor-fold>
 
     // <editor-fold desc="Playtime Options" defaultstate="collapsed">
-    public boolean isCheckAvailableRewardsOnPlayerJoin() {
-        return this.config.getBoolean("CheckAvailableRewardsOnPlayerJoin", true);
-    }
-
-    public int getRewardCheck() {
-        return this.checkMin(this.config.getInt("RewardCheck", 60), 1, 60);
-    }
-
     public List<String> getDisableGettingRewardsInWorlds() {
         return this.config.getStringList("DisableGettingRewardsInWorlds").stream().map(String::toLowerCase).collect(Collectors.toList());
-    }
-
-    public boolean isCountPlaytimeFromStart() {
-        return this.config.getBoolean("CountPlaytimeFromStart", false);
     }
     // </editor-fold>
 
@@ -72,10 +62,11 @@ public class LitePlaytimeRewardsConfig {
 
     private ConfigReward getRewardFromConfig(ConfigurationSection reward) {
         String displayName = null;
-        int playtimeNeeded = 0;
-        boolean countPlaytimeFromStart = false;
+        List<Integer> playtimeNeeded = new ArrayList<>();
+        boolean countAfkTime = false;
         int slotsNeeded = 0;
         boolean loop = false;
+        List<String> disabledWorlds = new ArrayList<>();
         String notificationType = "chat";
         String notification = null;
         String broadcastNotification = null;
@@ -85,16 +76,19 @@ public class LitePlaytimeRewardsConfig {
             displayName = reward.get("DisplayName").toString();
         }
         if (reward.contains("PlaytimeNeeded")) {
-            playtimeNeeded = (int) reward.get("PlaytimeNeeded");
+            playtimeNeeded = this.getNumbersFromString(reward.get("PlaytimeNeeded").toString());
         }
-        if (reward.contains("CountPlaytimeFromStart")) {
-            countPlaytimeFromStart = (boolean) reward.get("CountPlaytimeFromStart");
+        if (reward.contains("CountAfkTime")) {
+            countAfkTime = (boolean) reward.get("CountAfkTime");
         }
         if (reward.contains("SlotsNeeded")) {
             slotsNeeded = (int) reward.get("SlotsNeeded");
         }
         if (reward.contains("Loop")) {
             loop = (boolean) reward.get("Loop");
+        }
+        if (reward.contains("DisabledWorlds")) {
+            disabledWorlds = (List<String>) reward.get("DisabledWorlds");
         }
         if (reward.contains("NotificationType")) {
             notificationType = reward.get("NotificationType").toString();
@@ -109,10 +103,18 @@ public class LitePlaytimeRewardsConfig {
             commands = (List<String>) reward.get("Commands");
         }
 
-        if (displayName == null || playtimeNeeded < 1 || slotsNeeded < 0 || notification == null || broadcastNotification == null || commands == null) {
+        if (displayName == null || playtimeNeeded.isEmpty() || slotsNeeded < 0 || notification == null || broadcastNotification == null || commands == null) {
             return null;
         }
 
-        return new ConfigReward(displayName, playtimeNeeded, countPlaytimeFromStart, slotsNeeded, loop, notificationType, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
+        return new ConfigReward(displayName, playtimeNeeded, countAfkTime, slotsNeeded, loop, disabledWorlds, notificationType, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
+    }
+
+    private List<Integer> getNumbersFromString(String numbers) {
+        try {
+            return Arrays.asList(numbers.split(",")).stream().map(e -> Integer.parseInt(e)).collect(Collectors.toList());
+        } catch (NumberFormatException e) {
+            return new ArrayList<>();
+        }
     }
 }

@@ -5,21 +5,23 @@ import java.util.List;
 public class ConfigReward {
 
     private final String displayName;
-    private final int playtimeNeeded;
-    private final boolean countPlaytimeFromStart;
+    private final List<Integer> playtimeNeeded;
+    private final boolean countAfkTime;
     private final int slotsNeeded;
     private final boolean loop;
+    private final List<String> disabledWorlds;
     private final String notificationType;
     private final String notification;
     private final String broadcastNotification;
     private final List<String> commands;
 
-    public ConfigReward(String displayName, int playtimeNeeded, boolean countPlaytimeFromStart, int slotsNeeded, boolean loop, String notificationType, String notification, String broadcastNotification, List<String> commands) {
+    public ConfigReward(String displayName, List<Integer> playtimeNeeded, boolean countAfkTime, int slotsNeeded, boolean loop, List<String> disabledWorlds, String notificationType, String notification, String broadcastNotification, List<String> commands) {
         this.displayName = displayName;
         this.playtimeNeeded = playtimeNeeded;
-        this.countPlaytimeFromStart = countPlaytimeFromStart;
+        this.countAfkTime = countAfkTime;
         this.slotsNeeded = slotsNeeded;
         this.loop = loop;
+        this.disabledWorlds = disabledWorlds;
         this.notificationType = notificationType;
         this.notification = notification;
         this.broadcastNotification = broadcastNotification;
@@ -30,12 +32,20 @@ public class ConfigReward {
         return displayName;
     }
 
-    public int getPlaytimeNeeded() {
+    public List<Integer> getPlaytimeNeeded() {
         return playtimeNeeded;
+    }
+
+    public boolean isCountAfkTime() {
+        return countAfkTime;
     }
 
     public boolean isLoop() {
         return loop;
+    }
+
+    public List<String> getDisabledWorlds() {
+        return disabledWorlds;
     }
 
     public String getNotification() {
@@ -48,10 +58,6 @@ public class ConfigReward {
 
     public List<String> getCommands() {
         return commands;
-    }
-
-    public boolean isCountPlaytimeFromStart() {
-        return countPlaytimeFromStart;
     }
 
     public int getSlotsNeeded() {

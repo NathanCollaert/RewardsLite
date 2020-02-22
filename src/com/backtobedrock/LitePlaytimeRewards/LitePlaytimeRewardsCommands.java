@@ -60,21 +60,6 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
 
                 cs.spigot().sendMessage(new ComponentBuilder(String.format("You have played for %s on this server.", this.playtimeToString(sender))).color(ChatColor.GOLD).create());
                 return true;
-            case "redeemrewards":
-                //check if player
-                if (sender == null) {
-                    cs.spigot().sendMessage(new ComponentBuilder("You will need to log in to use this command.").color(ChatColor.RED).create());
-                    return true;
-                }
-                //check for permission
-                if (!cmnd.testPermission(cs)) {
-                    return true;
-                }
-
-                if (!this.plugin.checkEligibleForRewards(sender)) {
-                    cs.spigot().sendMessage(new ComponentBuilder("You aren't eligible for any rewards.").color(ChatColor.YELLOW).create());
-                }
-                return true;
         }
         return false;
     }
@@ -85,19 +70,19 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
             sender = (Player) cs;
         }
         switch (cmnd.getName().toLowerCase()) {
-            case "checkplaytime":
-                //check for permission
-                if (!cs.hasPermission("liteplaytimerewards.checkplaytime.other")) {
-                    return true;
-                }
-
-                OfflinePlayer checkPlaytimePlyr = Bukkit.getOfflinePlayer(arg);
-                if (!checkPlaytimePlyr.isOnline()) {
-                    cs.spigot().sendMessage(new ComponentBuilder(String.format("%s is not online.", checkPlaytimePlyr.getName())).color(ChatColor.RED).create());
-                    return true;
-                }
-                cs.spigot().sendMessage(new ComponentBuilder(String.format("%s has played for %s on the server.", checkPlaytimePlyr.getPlayer().getName(), this.playtimeToString(checkPlaytimePlyr.getPlayer()))).color(ChatColor.GOLD).create());
-                return true;
+//            case "checkplaytime":
+//                //check for permission
+//                if (!cs.hasPermission("liteplaytimerewards.checkplaytime.other")) {
+//                    return true;
+//                }
+//
+//                OfflinePlayer checkPlaytimePlyr = Bukkit.getOfflinePlayer(arg);
+//                if (!checkPlaytimePlyr.isOnline()) {
+//                    cs.spigot().sendMessage(new ComponentBuilder(String.format("%s is not online.", checkPlaytimePlyr.getName())).color(ChatColor.RED).create());
+//                    return true;
+//                }
+//                cs.spigot().sendMessage(new ComponentBuilder(String.format("%s has played for %s on the server.", checkPlaytimePlyr.getPlayer().getName(), this.playtimeToString(checkPlaytimePlyr.getPlayer()))).color(ChatColor.GOLD).create());
+//                return true;
         }
         return false;
     }
