@@ -10,25 +10,25 @@ api-version: 1.13
 softdepend: [EssentialsX]
 
 commands:
-#    checkplaytime:
-#        description: Check your current playtime.
-#        permission: liteplaytimerewards.checkplaytime
-#        usage: /<command> [player]
+    checkplaytime:
+        description: Check your current playtime.
+        permission: liteplaytimerewards.checkplaytime
+        usage: /<command> [player]
     givereward:
         description: Force give one of the rewards to a player.
         permission: liteplaytimerewards.givereward
         usage: /<command> <reward> <player> [amount] [broadcast]
-#    checkrewards:
-#        description: Get an overview of all possible rewards.
-#        permission: liteplaytimerewards.checkrewards
-#        usage: /<command>
+    claimRewards:
+        description: Get an overview of all possible rewards.
+        permission: liteplaytimerewards.claimRewards
+        usage: /<command>
     
 permissions:
-#    liteplaytimerewards.checkplaytime:
-#        default: op
-#    liteplaytimerewards.checkplaytime.other:
-#        default: op
-#    liteplaytimerewards.checkrewards:
-#        deafult: op
+    liteplaytimerewards.checkplaytime:
+        default: op
+    liteplaytimerewards.checkplaytime.other:
+        default: op
+    liteplaytimerewards.claimRewards:
+        deafult: op
     liteplaytimerewards.givereward:
         deafult: op

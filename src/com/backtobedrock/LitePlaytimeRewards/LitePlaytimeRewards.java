@@ -5,9 +5,12 @@ import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.RedeemedReward;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.UpdateChecker;
 import com.backtobedrock.LitePlaytimeRewards.runnables.NotifyBossBar;
+import com.backtobedrock.LitePlaytimeRewards.runnables.Reward;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeMap;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import net.ess3.api.IEssentials;
 import net.md_5.bungee.api.ChatMessageType;
@@ -27,6 +30,8 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
     private LitePlaytimeRewardsConfig config;
     private LitePlaytimeRewardsCommands commands;
+
+    private TreeMap<UUID, Integer> runningRewards;
 
     @Override
     public void onEnable() {
@@ -106,6 +111,8 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 //            crud.setRewards(redeemedRewards, true);
 //        }
 //        return changed;
+
+
         return false;
     }
 
@@ -180,5 +187,17 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
                 this.oldVersion = !this.getDescription().getVersion().equalsIgnoreCase(version);
             });
         }
+    }
+
+    public void addToRunningRewards(UUID uniqueId, int taskId) {
+        this.runningRewards.put(uniqueId, taskId);
+    }
+
+    public int getFromRunningRewards(UUID uniqueId) {
+        return this.runningRewards.get(uniqueId);
+    }
+
+    public void removeFromRunningRewards(UUID uniqueId) {
+        this.runningRewards.remove(uniqueId);
     }
 }

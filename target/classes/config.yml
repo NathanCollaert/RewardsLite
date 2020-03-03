@@ -1,7 +1,7 @@
 #Should the plugin check for updates?
 UpdateChecker: true
 
-#Should getting rewards be disabled in any worlds?
+#Should claiming rewards be disabled in any worlds? (playtime is still counted)
 DisableGettingRewardsInWorlds:
     #- world
     #- world_nether
@@ -18,7 +18,7 @@ Rewards:
         #(*)
         #How many minutes should a player have to play on the server to be eligible for this reward?
         #In minutes, minimum is 1.
-        #It is possible to give multiple times when not looping: 60,80,100. This will give the same reward after 60 minutes, then after 80, then after 100.
+        #It is possible to give multiple times when not looping: 60,80,100. This will give the same reward after 60 minutes, then after 80, then after 100 and never again afterwards (if not looping).
         PlaytimeNeeded: 60
         
         #Should afk playtime be counted towards this reward?

@@ -62,7 +62,7 @@ public class LitePlaytimeRewardsConfig {
 
     private ConfigReward getRewardFromConfig(ConfigurationSection reward) {
         String displayName = null;
-        List<Integer> playtimeNeeded = new ArrayList<>();
+        List<Long> playtimeNeeded = new ArrayList<>();
         boolean countAfkTime = false;
         int slotsNeeded = 0;
         boolean loop = false;
@@ -106,13 +106,13 @@ public class LitePlaytimeRewardsConfig {
         if (displayName == null || playtimeNeeded.isEmpty() || slotsNeeded < 0 || notification == null || broadcastNotification == null || commands == null) {
             return null;
         }
-
+        
         return new ConfigReward(displayName, playtimeNeeded, countAfkTime, slotsNeeded, loop, disabledWorlds, notificationType, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
     }
 
-    private List<Integer> getNumbersFromString(String numbers) {
+    private List<Long> getNumbersFromString(String numbers) {
         try {
-            return Arrays.asList(numbers.split(",")).stream().map(e -> Integer.parseInt(e)).collect(Collectors.toList());
+            return Arrays.asList(numbers.split(",")).stream().map(e -> Long.parseLong(e) * 1200).collect(Collectors.toList());
         } catch (NumberFormatException e) {
             return new ArrayList<>();
         }

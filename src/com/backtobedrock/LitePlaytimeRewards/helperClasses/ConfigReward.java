@@ -1,11 +1,12 @@
 package com.backtobedrock.LitePlaytimeRewards.helperClasses;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigReward {
 
     private final String displayName;
-    private final List<Integer> playtimeNeeded;
+    private final List<Long> playtimeNeeded;
     private final boolean countAfkTime;
     private final int slotsNeeded;
     private final boolean loop;
@@ -15,7 +16,7 @@ public class ConfigReward {
     private final String broadcastNotification;
     private final List<String> commands;
 
-    public ConfigReward(String displayName, List<Integer> playtimeNeeded, boolean countAfkTime, int slotsNeeded, boolean loop, List<String> disabledWorlds, String notificationType, String notification, String broadcastNotification, List<String> commands) {
+    public ConfigReward(String displayName, List<Long> playtimeNeeded, boolean countAfkTime, int slotsNeeded, boolean loop, List<String> disabledWorlds, String notificationType, String notification, String broadcastNotification, List<String> commands) {
         this.displayName = displayName;
         this.playtimeNeeded = playtimeNeeded;
         this.countAfkTime = countAfkTime;
@@ -32,7 +33,7 @@ public class ConfigReward {
         return displayName;
     }
 
-    public List<Integer> getPlaytimeNeeded() {
+    public List<Long> getPlaytimeNeeded() {
         return playtimeNeeded;
     }
 

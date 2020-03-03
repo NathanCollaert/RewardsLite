@@ -19,10 +19,14 @@ public final class LitePlaytimeRewardsCRUD {
     private FileConfiguration configuration;
     private final OfflinePlayer player;
     private TreeMap<String, RedeemedReward> rewards = new TreeMap<>();
+    private long playtime;
+    private long afktime;
 
     public LitePlaytimeRewardsCRUD(LitePlaytimeRewards plugin, OfflinePlayer player) {
         this.plugin = plugin;
         this.player = player;
+        this.playtime = this.getConfig().getInt("playtime");
+        this.afktime = this.getConfig().getInt("afktime");
         ConfigurationSection rewardsSection = this.getConfig().getConfigurationSection("rewards");
         if (rewardsSection != null) {
             rewardsSection.getKeys(false).forEach(e -> {
@@ -35,6 +39,10 @@ public final class LitePlaytimeRewardsCRUD {
         FileConfiguration conf = this.getConfig();
         conf.set("uuid", player.getUniqueId().toString());
         conf.set("playername", player.getName());
+        conf.set("playtime", 0);
+        conf.set("afktime", 0);
+        this.plugin.getLPRConfig().getRewards().entrySet().forEach(e -> rewards.put(e.getKey(), new RedeemedReward(e.getValue().getPlaytimeNeeded(), 0)));
+        conf.set("rewards", rewards);
         this.saveConfig();
     }
 
@@ -50,6 +58,34 @@ public final class LitePlaytimeRewardsCRUD {
 
     public TreeMap<String, RedeemedReward> getRewards() {
         return this.rewards;
+    }
+
+    public long getPlaytime() {
+        return this.playtime;
+    }
+
+    public void setPlaytime(long playtime, boolean save) {
+        FileConfiguration conf = this.getConfig();
+        conf.set("playername", player.getName());
+        conf.set("playtime", playtime);
+        this.playtime = playtime;
+        if (save) {
+            this.saveConfig();
+        }
+    }
+
+    public long getAfktime() {
+        return this.afktime;
+    }
+
+    public void setAfktime(long afktime, boolean save) {
+        FileConfiguration conf = this.getConfig();
+        conf.set("playername", player.getName());
+        conf.set("afktime", afktime);
+        this.afktime = afktime;
+        if (save) {
+            this.saveConfig();
+        }
     }
 
     public FileConfiguration getConfig() {
