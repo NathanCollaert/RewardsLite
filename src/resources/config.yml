@@ -18,7 +18,7 @@ Rewards:
         #(*)
         #How many minutes should a player have to play on the server to be eligible for this reward?
         #In minutes, minimum is 1.
-        #It is possible to give multiple times when not looping: 60,80,100. This will give the same reward after 60 minutes, then after 80, then after 100 and never again afterwards (if not looping).
+        #It is possible to give multiple times: 60,80,100. This will give the same reward after 60 minutes, then after 80, then after 100 and never again afterwards (if not looping).
         PlaytimeNeeded: 60
         
         #Should afk playtime be counted towards this reward?
@@ -26,8 +26,7 @@ Rewards:
         #Default = true
         CountAfkTime: false
         
-        #Should the plugin only give this reward when the players has free inventory space?
-        #Free slots needed in inventory to give this reward.
+        #How many open inventory spaces would the player need to claim this reward?
         #Default = 0
         SlotsNeeded: 1
         
@@ -71,7 +70,7 @@ Rewards:
         PlaytimeNeeded: 20,40,100,120,50
         SlotsNeeded: 2
         Notification: "You have received the Test Reward 2! Congratulations!"
-        BroadcastNotification: "%player% has been awarded with test reward 2!"
+        BroadcastNotification: ""
         Commands:
             - "give %player% dirt 1"
             - "give %player% grass_block 1"

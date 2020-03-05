@@ -3,8 +3,8 @@ package com.backtobedrock.LitePlaytimeRewards.eventHandlers;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsCRUD;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsConfig;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.RedeemedReward;
-import com.backtobedrock.LitePlaytimeRewards.runnables.Reward;
+import com.backtobedrock.LitePlaytimeRewards.helperClasses.Reward;
+import com.backtobedrock.LitePlaytimeRewards.runnables.Countdown;
 import java.util.Map;
 import java.util.TreeMap;
 import static java.util.stream.Collectors.toMap;
@@ -32,8 +32,8 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         LitePlaytimeRewardsCRUD crud = new LitePlaytimeRewardsCRUD(this.plugin, e.getPlayer());
-        TreeMap<String, RedeemedReward> redeemed = crud.getRewards().entrySet().stream().filter(r -> r.getValue().getTimeTillNextReward().get(0) != -1).collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, TreeMap::new));
-        BukkitTask rewardRunnable = new Reward(this.plugin, e.getPlayer(), redeemed, this.config.getRewards()).runTaskTimer(this.plugin, 1200, 1200);
+        TreeMap<String, Reward> redeemed = crud.getRewards().entrySet().stream().filter(r -> r.getValue().getTimeTillNextReward().get(0) != -1).collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, TreeMap::new));
+        BukkitTask rewardRunnable = new Countdown(this.plugin, e.getPlayer(), redeemed, this.config.getRewards()).runTaskTimer(this.plugin, 1200, 1200);
         this.plugin.addToRunningRewards(e.getPlayer().getUniqueId(), rewardRunnable.getTaskId());
         if (this.config.isUpdateChecker() && e.getPlayer().isOp()) {
             this.plugin.checkForOldVersion();

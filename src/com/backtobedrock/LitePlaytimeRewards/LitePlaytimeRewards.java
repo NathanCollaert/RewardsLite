@@ -2,17 +2,18 @@ package com.backtobedrock.LitePlaytimeRewards;
 
 import com.backtobedrock.LitePlaytimeRewards.eventHandlers.LitePlaytimeRewardsEventHandlers;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.RedeemedReward;
+import com.backtobedrock.LitePlaytimeRewards.helperClasses.Reward;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.UpdateChecker;
 import com.backtobedrock.LitePlaytimeRewards.runnables.NotifyBossBar;
-import com.backtobedrock.LitePlaytimeRewards.runnables.Reward;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import net.ess3.api.IEssentials;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -21,6 +22,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LitePlaytimeRewards extends JavaPlugin implements Listener {
@@ -35,7 +37,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        ConfigurationSerialization.registerClass(RedeemedReward.class);
+        ConfigurationSerialization.registerClass(Reward.class);
 
         this.saveDefaultConfig();
 
@@ -63,57 +65,45 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         return this.commands.onCommand(cs, cmnd, alias, args);
     }
 
-    public boolean checkEligibleForRewards(Player plyr) {
-//        boolean changed = false;
-//        if (this.config.getDisableGettingRewardsInWorlds().contains(plyr.getWorld().getName().toLowerCase())) {
-//            return changed;
-//        }
-//        TreeMap<String, RedeemedReward> redeemedRewards = this.onlinePlayerListLastPlaytimeCheck.get(plyr.getUniqueId());
-//        LitePlaytimeRewardsCRUD crud = null;
-//        for (Entry<String, ConfigReward> entry : this.config.getRewards().entrySet()) {
-//            if (!redeemedRewards.containsKey(entry.getKey()) || entry.getValue().isLoop()) {
-//                crud = new LitePlaytimeRewardsCRUD(this, plyr);
-//                long lastPlaytimeCheck = redeemedRewards.containsKey(entry.getKey()) ? redeemedRewards.get(entry.getKey()).getLastPlaytimeCheck() : entry.getValue().isCountPlaytimeFromStart() ? 0 : crud.getPlaytimeStart();
-//                int playtimeCheckDifferenceInMinutes = (int) Math.floor((plyr.getStatistic(Statistic.PLAY_ONE_MINUTE) - lastPlaytimeCheck) / 20 / 60);
-//                if (playtimeCheckDifferenceInMinutes >= entry.getValue().getPlaytimeNeeded()) {
-//                    //check if enough inventory space
-//                    int emptySlots = 0;
-//                    for (ItemStack it : plyr.getInventory().getStorageContents()) {
-//                        if (it == null) {
-//                            emptySlots++;
-//                        }
-//                    }
-//                    if (entry.getValue().getSlotsNeeded() == 0 || emptySlots >= entry.getValue().getSlotsNeeded()) {
-//                        //check how many times reward needs to be given
-//                        int amount = playtimeCheckDifferenceInMinutes / entry.getValue().getPlaytimeNeeded();
-//
-//                        this.giveRewardAndNotify(entry.getValue(), plyr, true, entry.getValue().isLoop() ? amount : 1);
-//
-//                        //update or create redeemedreward
-//                        long newLastPlaytimeCheck = lastPlaytimeCheck + ((amount * entry.getValue().getPlaytimeNeeded()) * 60 * 20);
-//                        if (redeemedRewards.containsKey(entry.getKey())) {
-//                            RedeemedReward reward = redeemedRewards.get(entry.getKey());
-//                            reward.setLastPlaytimeCheck(newLastPlaytimeCheck);
-//                            reward.setAmountRedeemed(reward.getAmountRedeemed() + amount);
-//                        } else {
-//                            redeemedRewards.put(entry.getKey(), new RedeemedReward(newLastPlaytimeCheck, amount));
-//                        }
-//                    } else {
-//                        plyr.spigot().sendMessage(new ComponentBuilder("You need " + entry.getValue().getSlotsNeeded() + " open inventory slots to claim a pending reward.").color(ChatColor.GOLD).create());
-//                    }
-//                    changed = true;
-//                }
-//            }
-//        }
-//
-//        //write data away if changes
-//        if (changed && crud != null) {
-//            crud.setRewards(redeemedRewards, true);
-//        }
-//        return changed;
+    public boolean checkEligibleForRewards(Player plyr, TreeMap<String, Reward> rewards) {
+        boolean notified = false;
+        for (Entry<String, Reward> entry : rewards.entrySet()) {
+            ConfigReward cReward = this.config.getRewards().get(entry.getKey());
 
+            if (cReward == null) {
+                break;
+            }
 
-        return false;
+            if (this.config.getDisableGettingRewardsInWorlds().contains(plyr.getLocation().getWorld().getName())) {
+                if (!notified) {
+                    plyr.spigot().sendMessage(new ComponentBuilder("You have a reward pending but you can't claim it in this world!").color(ChatColor.GOLD).create());
+                }
+                notified = true;
+                break;
+            }
+
+            int emptySlots = 0;
+            for (ItemStack it : plyr.getInventory().getStorageContents()) {
+                if (it == null) {
+                    emptySlots++;
+                }
+            }
+            if (emptySlots >= cReward.getSlotsNeeded()) {
+                this.giveRewardAndNotify(cReward, plyr, true, 1);
+                entry.getValue().setAmountRedeemed(entry.getValue().getAmountRedeemed() + 1);
+                entry.getValue().getTimeTillNextReward().remove(0);
+                if (cReward.isLoop()) {
+
+                }
+            } else {
+                if (!notified) {
+                    plyr.spigot().sendMessage(new ComponentBuilder("You need " + cReward.getSlotsNeeded() + " open inventory slots to claim a pending reward.").color(ChatColor.GOLD).create());
+                    notified = true;
+                    break;
+                }
+            }
+        }
+        return notified;
     }
 
     public void giveRewardAndNotify(ConfigReward reward, Player plyr, boolean broadcast, int amount) {

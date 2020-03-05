@@ -8,12 +8,12 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 
 @SerializableAs("RedeemedReward")
-public class RedeemedReward implements ConfigurationSerializable {
+public class Reward implements ConfigurationSerializable {
 
     private List<Long> timeTillNextReward;
     private int amountRedeemed;
 
-    public RedeemedReward(List<Long> timeTillNextReward, int amountRedeemed) {
+    public Reward(List<Long> timeTillNextReward, int amountRedeemed) {
         this.timeTillNextReward = timeTillNextReward;
         this.amountRedeemed = amountRedeemed;
     }
@@ -49,7 +49,7 @@ public class RedeemedReward implements ConfigurationSerializable {
         return map;
     }
 
-    public static RedeemedReward deserialize(Map<String, Object> map) {
+    public static Reward deserialize(Map<String, Object> map) {
         List<Long> timeTillNextReward = new ArrayList<>();
         int amountRedeemed = -1;
 
@@ -65,6 +65,6 @@ public class RedeemedReward implements ConfigurationSerializable {
             return null;
         }
 
-        return new RedeemedReward(timeTillNextReward, amountRedeemed);
+        return new Reward(timeTillNextReward, amountRedeemed);
     }
 }

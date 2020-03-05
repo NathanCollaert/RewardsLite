@@ -1,6 +1,6 @@
 package com.backtobedrock.LitePlaytimeRewards;
 
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.RedeemedReward;
+import com.backtobedrock.LitePlaytimeRewards.helperClasses.Reward;
 import java.io.File;
 import java.io.IOException;
 import java.util.TreeMap;
@@ -18,7 +18,7 @@ public final class LitePlaytimeRewardsCRUD {
     private File file = null;
     private FileConfiguration configuration;
     private final OfflinePlayer player;
-    private TreeMap<String, RedeemedReward> rewards = new TreeMap<>();
+    private TreeMap<String, Reward> rewards = new TreeMap<>();
     private long playtime;
     private long afktime;
 
@@ -30,7 +30,7 @@ public final class LitePlaytimeRewardsCRUD {
         ConfigurationSection rewardsSection = this.getConfig().getConfigurationSection("rewards");
         if (rewardsSection != null) {
             rewardsSection.getKeys(false).forEach(e -> {
-                this.rewards.put(e.toLowerCase(), rewardsSection.getSerializable(e, RedeemedReward.class));
+                this.rewards.put(e.toLowerCase(), rewardsSection.getSerializable(e, Reward.class));
             });
         }
     }
@@ -41,12 +41,12 @@ public final class LitePlaytimeRewardsCRUD {
         conf.set("playername", player.getName());
         conf.set("playtime", 0);
         conf.set("afktime", 0);
-        this.plugin.getLPRConfig().getRewards().entrySet().forEach(e -> rewards.put(e.getKey(), new RedeemedReward(e.getValue().getPlaytimeNeeded(), 0)));
+        this.plugin.getLPRConfig().getRewards().entrySet().forEach(e -> rewards.put(e.getKey(), new Reward(e.getValue().getPlaytimeNeeded(), 0)));
         conf.set("rewards", rewards);
         this.saveConfig();
     }
 
-    public void setRewards(TreeMap<String, RedeemedReward> rewards, boolean save) {
+    public void setRewards(TreeMap<String, Reward> rewards, boolean save) {
         FileConfiguration conf = this.getConfig();
         conf.set("playername", player.getName());
         conf.set("rewards", rewards);
@@ -56,7 +56,7 @@ public final class LitePlaytimeRewardsCRUD {
         }
     }
 
-    public TreeMap<String, RedeemedReward> getRewards() {
+    public TreeMap<String, Reward> getRewards() {
         return this.rewards;
     }
 
