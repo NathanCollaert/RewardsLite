@@ -27,6 +27,10 @@ public class LitePlaytimeRewardsConfig {
     public boolean isUpdateChecker() {
         return this.config.getBoolean("UpdateChecker", true);
     }
+    
+    public boolean isUsebStats() {
+        return this.config.getBoolean("bStats", true);
+    }
 
     public int getAutoSave() {
         return this.checkMin(this.config.getInt("AutoSave", 1), 1, 1) * 1200;

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import net.ess3.api.IEssentials;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.command.Command;
@@ -59,8 +60,13 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(new LitePlaytimeRewardsEventHandlers(), this);
 
-        this.checkForOldVersion();
         this.ess = (IEssentials) Bukkit.getPluginManager().getPlugin("Essentials");
+
+        if (this.config.isUsebStats()) {
+            int pluginId = 7380;
+            Metrics metrics = new Metrics(this, pluginId);
+            metrics.addCustomChart(new Metrics.SimplePie("reward_count", () -> Integer.toString(LitePlaytimeRewards.getInstance().getLPRConfig().getRewards().size())));
+        }
 
         super.onEnable();
     }
