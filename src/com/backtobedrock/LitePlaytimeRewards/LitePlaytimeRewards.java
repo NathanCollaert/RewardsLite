@@ -61,7 +61,6 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
         getServer().getPluginManager().registerEvents(new LitePlaytimeRewardsEventHandlers(), this);
 
-        this.checkForOldVersion();
         this.ess = (IEssentials) Bukkit.getPluginManager().getPlugin("Essentials");
 
         if (this.config.isUsebStats()) {
