@@ -27,7 +27,7 @@ commands:
         usage: /<command> [player]
     rewards:
         description: Check info on all your available rewards or a single one.
-        permission: litplaytimerewards.rewards
+        permission: liteplaytimerewards.rewards
         usage: /<command> [reward]
     
 permissions:
@@ -41,5 +41,5 @@ permissions:
         default: op
     liteplaytimerewards.playtime.other:
         default: op
-    litplaytimerewards.rewards:
+    liteplaytimerewards.rewards:
         default: op
