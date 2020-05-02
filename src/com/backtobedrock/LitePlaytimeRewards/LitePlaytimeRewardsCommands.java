@@ -15,6 +15,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Statistic;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -65,10 +66,13 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                     return true;
                 }
 
-                //get player data
-                LitePlaytimeRewardsCRUD crudplay = this.plugin.getFromOnlineCRUDs(sender.getUniqueId());
+                if (this.plugin.getLPRConfig().isCountAllPlaytime()) {
+                    cs.spigot().sendMessage(new ComponentBuilder(String.format("You have played for %s on this server.", LitePlaytimeRewardsCommands.timeToString(sender.getStatistic(Statistic.PLAY_ONE_MINUTE)))).color(ChatColor.GOLD).create());
+                } else {//get player data
+                    LitePlaytimeRewardsCRUD crudplay = this.plugin.getFromOnlineCRUDs(sender.getUniqueId());
+                    cs.spigot().sendMessage(new ComponentBuilder(String.format("You have played for %s on this server.", LitePlaytimeRewardsCommands.timeToString(crudplay.getPlaytime() + crudplay.getAfktime()))).color(ChatColor.GOLD).create());
+                }
 
-                cs.spigot().sendMessage(new ComponentBuilder(String.format("You have played for %s on this server.", LitePlaytimeRewardsCommands.timeToString(crudplay.getPlaytime() + crudplay.getAfktime()))).color(ChatColor.GOLD).create());
                 return true;
             case "afktime":
                 //check if player
@@ -170,9 +174,16 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                     return true;
                 }
 
-                //check if player has played on server before
                 OfflinePlayer plyrplayother = Bukkit.getOfflinePlayer(arg);
 
+                if (this.plugin.getLPRConfig().isCountAllPlaytime()) {
+                    if (plyrplayother.isOnline()) {
+                        cs.spigot().sendMessage(new ComponentBuilder(String.format("You have played for %s on this server.", LitePlaytimeRewardsCommands.timeToString(((Player) plyrplayother).getStatistic(Statistic.PLAY_ONE_MINUTE)))).color(ChatColor.GOLD).create());
+                        return true;
+                    }
+                }
+
+                //check if player has played on server before
                 if (!LitePlaytimeRewardsCRUD.doesPlayerDataExists(plyrplayother)) {
                     cs.spigot().sendMessage(new ComponentBuilder(String.format("%s is not online.", plyrplayother.getName())).color(ChatColor.RED).create());
                     return true;
@@ -180,8 +191,8 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
 
                 //get player data
                 LitePlaytimeRewardsCRUD crudplayother = new LitePlaytimeRewardsCRUD(plyrplayother);
-
                 cs.spigot().sendMessage(new ComponentBuilder(String.format("%s has played for %s on the server.", plyrplayother.getName(), LitePlaytimeRewardsCommands.timeToString(crudplayother.getPlaytime() + crudplayother.getAfktime()))).color(ChatColor.GOLD).create());
+
                 return true;
             case "afktime":
                 //check for permission
