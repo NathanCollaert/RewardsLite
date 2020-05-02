@@ -34,10 +34,6 @@ public class LitePlaytimeRewardsConfig {
     // </editor-fold>
 
     // <editor-fold desc="Playtime Options" defaultstate="collapsed">
-    public boolean isCountAllPlaytime() {
-        return this.config.getBoolean("CountAllPlaytime", true);
-    }
-
     public List<String> getDisableGettingRewardsInWorlds() {
         return this.config.getStringList("DisableGettingRewardsInWorlds").stream().map(String::toLowerCase).collect(Collectors.toList());
     }

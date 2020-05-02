@@ -5,10 +5,6 @@ UpdateChecker: true
 #In minutes, minimum is 1.
 AutoSave: 1
 
-#Should the plugin also count playtime from before it was installed?
-#It will not give rewards for this playtime.
-CountAllPlaytime: true
-
 #Should claiming rewards be disabled in any worlds?
 #Rewards that require claiming will be put into pending state until in allowed world.
 DisableGettingRewardsInWorlds:

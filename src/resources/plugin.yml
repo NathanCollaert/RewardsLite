@@ -6,7 +6,7 @@ website: www.backtobedrock.com
 
 main: com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards
 prefix: LPR
-api-version: 1.13
+api-version: 1.12.2
 softdepend: [Essentials]
 
 commands:

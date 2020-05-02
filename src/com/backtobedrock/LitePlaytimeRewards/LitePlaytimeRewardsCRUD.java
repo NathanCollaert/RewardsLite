@@ -40,13 +40,7 @@ public final class LitePlaytimeRewardsCRUD {
         FileConfiguration conf = this.getConfig();
         conf.set("uuid", player.getUniqueId().toString());
         conf.set("playername", player.getName());
-        if (this.plugin.getLPRConfig().isCountAllPlaytime()) {
-            Long playtime = new Long(player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE));
-            conf.set("playtime", playtime);
-            this.playtime = playtime;
-        } else {
-            conf.set("playtime", 0);
-        }
+        conf.set("playtime", 0);
         conf.set("afktime", 0);
         this.plugin.getLPRConfig().getRewards().entrySet().forEach(e -> rewards.put(e.getKey().toLowerCase(), new Reward(e.getValue(), e.getKey().toLowerCase(), e.getValue().getPlaytimeNeeded(), 0, 0)));
         conf.set("rewards", rewards);
