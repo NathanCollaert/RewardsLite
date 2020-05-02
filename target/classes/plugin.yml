@@ -1,34 +1,46 @@
 name: LitePlaytimeRewards
-version: 1.2.0-beta-1
-description: A very lightweight plugin that gives rewards based on playtime
+version: 2.0.0
+description: A lightweight plugin that gives rewards based on playtime
 author: Nathan
 website: www.backtobedrock.com
 
 main: com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards
-prefix: LitePlaytimeRewards
+prefix: LPR
 api-version: 1.13
-softdepend: [EssentialsX]
+softdepend: [Essentials]
 
 commands:
-    checkplaytime:
-        description: Check your current playtime.
-        permission: liteplaytimerewards.checkplaytime
+    afktime:
+        description: Check your current AFK time.
+        permission: liteplaytimerewards.afktime
         usage: /<command> [player]
     givereward:
         description: Force give one of the rewards to a player.
         permission: liteplaytimerewards.givereward
         usage: /<command> <reward> <player> [amount] [broadcast]
-    claimRewards:
-        description: Get an overview of all possible rewards.
-        permission: liteplaytimerewards.claimRewards
+    givereward:
+        description: Open a GUI to give a reward to a player.
+        permission: liteplaytimerewards.givereward
         usage: /<command>
+    playtime:
+        description: Check your current playtime.
+        permission: liteplaytimerewards.playtime
+        usage: /<command> [player]
+    rewards:
+        description: Check info on all your available rewards or a single one.
+        permission: litplaytimerewards.rewards
+        usage: /<command> [reward]
     
 permissions:
-    liteplaytimerewards.checkplaytime:
+    liteplaytimerewards.afktime:
         default: op
-    liteplaytimerewards.checkplaytime.other:
+    liteplaytimerewards.afktime.other:
         default: op
-    liteplaytimerewards.claimRewards:
-        deafult: op
     liteplaytimerewards.givereward:
         deafult: op
+    liteplaytimerewards.playtime:
+        default: op
+    liteplaytimerewards.playtime.other:
+        default: op
+    litplaytimerewards.rewards:
+        default: op

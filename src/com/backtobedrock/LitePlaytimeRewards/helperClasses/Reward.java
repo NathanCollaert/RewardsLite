@@ -1,5 +1,6 @@
 package com.backtobedrock.LitePlaytimeRewards.helperClasses;
 
+import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,15 +8,20 @@ import java.util.TreeMap;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 
-@SerializableAs("RedeemedReward")
-public class Reward implements ConfigurationSerializable {
+@SerializableAs("Reward")
+public class Reward extends ConfigReward implements ConfigurationSerializable {
 
+    private String id;
     private List<Long> timeTillNextReward;
     private int amountRedeemed;
+    private int amountPending;
 
-    public Reward(List<Long> timeTillNextReward, int amountRedeemed) {
+    public Reward(ConfigReward config, String id, List<Long> timeTillNextReward, int amountRedeemed, int amountPending) {
+        super(config);
+        this.id = id;
         this.timeTillNextReward = timeTillNextReward;
         this.amountRedeemed = amountRedeemed;
+        this.amountPending = amountPending;
     }
 
     public List<Long> getTimeTillNextReward() {
@@ -34,37 +40,61 @@ public class Reward implements ConfigurationSerializable {
         this.amountRedeemed = amountRedeemed;
     }
 
+    public int getAmountPending() {
+        return amountPending;
+    }
+
+    public void setAmountPending(int amountPending) {
+        this.amountPending = amountPending;
+    }
+
     @Override
     public String toString() {
-        return "RedeemedReward{" + "timeTillNextReward=" + timeTillNextReward + ", amountRedeemed=" + amountRedeemed + '}';
+        return "Reward{" + "timeTillNextReward=" + timeTillNextReward + ", amountRedeemed=" + amountRedeemed + ", amountPending=" + amountPending + '}';
     }
 
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> map = new TreeMap<>();
 
+        map.put("id", this.id);
         map.put("timeTillNextReward", this.timeTillNextReward);
         map.put("amountRedeemed", this.amountRedeemed);
+        map.put("amountPending", this.amountPending);
 
         return map;
     }
 
     public static Reward deserialize(Map<String, Object> map) {
+        String id = "";
         List<Long> timeTillNextReward = new ArrayList<>();
         int amountRedeemed = -1;
+        int amountPending = -1;
+
+        if (map.containsKey("id")) {
+            id = (String) map.get("id");
+        }
 
         if (map.containsKey("timeTillNextReward")) {
-            timeTillNextReward = (ArrayList<Long>) map.get("timeTillNextReward");
+            List<Long> longs = new ArrayList<>();
+            ((List<Integer>) map.get("timeTillNextReward")).stream().forEach(e -> {
+                longs.add(Long.valueOf(e));
+            });
+            timeTillNextReward = longs;
         }
 
         if (map.containsKey("amountRedeemed")) {
             amountRedeemed = (int) map.get("amountRedeemed");
         }
 
-        if (timeTillNextReward.isEmpty() || amountRedeemed < 0) {
+        if (map.containsKey("amountPending")) {
+            amountPending = (int) map.get("amountPending");
+        }
+
+        if (id.equals("") || amountRedeemed < 0 || amountPending < 0) {
             return null;
         }
 
-        return new Reward(timeTillNextReward, amountRedeemed);
+        return new Reward(LitePlaytimeRewards.getInstance().getLPRConfig().getRewards().get(id), id, timeTillNextReward, amountRedeemed, amountPending);
     }
 }

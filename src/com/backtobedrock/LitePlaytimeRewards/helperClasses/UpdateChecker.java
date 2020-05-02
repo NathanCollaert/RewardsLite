@@ -14,8 +14,8 @@ public class UpdateChecker {
     private final LitePlaytimeRewards plugin;
     private final int resourceId;
 
-    public UpdateChecker(LitePlaytimeRewards plugin, int resourceId) {
-        this.plugin = plugin;
+    public UpdateChecker(int resourceId) {
+        this.plugin = LitePlaytimeRewards.getInstance();
         this.resourceId = resourceId;
     }
 

@@ -17,9 +17,9 @@ public class NotifyBossBar extends BukkitRunnable {
     private final int TOTAL = 10;
     private final BossBar bar;
 
-    public NotifyBossBar(LitePlaytimeRewards plugin, Collection<?> players, String notification) {
-        this.plugin = plugin;
-        this.bar = Bukkit.createBossBar(notification, BarColor.YELLOW, BarStyle.SOLID);
+    public NotifyBossBar(Collection<?> players, String notification, BarColor color) {
+        this.plugin = LitePlaytimeRewards.getInstance();
+        this.bar = Bukkit.createBossBar(notification, color, BarStyle.SOLID);
         players.stream().forEach(e -> {
             bar.addPlayer((Player) e);
         });

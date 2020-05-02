@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Statistic;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -22,8 +23,8 @@ public final class LitePlaytimeRewardsCRUD {
     private long playtime;
     private long afktime;
 
-    public LitePlaytimeRewardsCRUD(LitePlaytimeRewards plugin, OfflinePlayer player) {
-        this.plugin = plugin;
+    public LitePlaytimeRewardsCRUD(OfflinePlayer player) {
+        this.plugin = LitePlaytimeRewards.getInstance();
         this.player = player;
         this.playtime = this.getConfig().getInt("playtime");
         this.afktime = this.getConfig().getInt("afktime");
@@ -39,9 +40,15 @@ public final class LitePlaytimeRewardsCRUD {
         FileConfiguration conf = this.getConfig();
         conf.set("uuid", player.getUniqueId().toString());
         conf.set("playername", player.getName());
-        conf.set("playtime", 0);
+        if (this.plugin.getLPRConfig().isCountAllPlaytime()) {
+            Long playtime = new Long(player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE));
+            conf.set("playtime", playtime);
+            this.playtime = playtime;
+        } else {
+            conf.set("playtime", 0);
+        }
         conf.set("afktime", 0);
-        this.plugin.getLPRConfig().getRewards().entrySet().forEach(e -> rewards.put(e.getKey(), new Reward(e.getValue().getPlaytimeNeeded(), 0)));
+        this.plugin.getLPRConfig().getRewards().entrySet().forEach(e -> rewards.put(e.getKey().toLowerCase(), new Reward(e.getValue(), e.getKey().toLowerCase(), e.getValue().getPlaytimeNeeded(), 0, 0)));
         conf.set("rewards", rewards);
         this.saveConfig();
     }
@@ -51,6 +58,16 @@ public final class LitePlaytimeRewardsCRUD {
         conf.set("playername", player.getName());
         conf.set("rewards", rewards);
         this.rewards = rewards;
+        if (save) {
+            this.saveConfig();
+        }
+    }
+
+    public void replaceRewards(TreeMap<String, Reward> rewards, boolean save) {
+        FileConfiguration conf = this.getConfig();
+        conf.set("playername", player.getName());
+        rewards.entrySet().forEach(e -> this.rewards.replace(e.getKey().toLowerCase(), e.getValue()));
+        conf.set("rewards", this.rewards);
         if (save) {
             this.saveConfig();
         }
@@ -111,14 +128,19 @@ public final class LitePlaytimeRewardsCRUD {
                 try {
                     if (this.file.createNewFile()) {
                         this.setNewStart();
-                        Bukkit.getLogger().log(Level.INFO, "[LitePlaytimeRewards] File for player {0} has been created", player.getName());
+                        Bukkit.getLogger().log(Level.INFO, "[LPR] File for player {0} has been created", player.getName());
                     }
                 } catch (IOException e) {
-                    Bukkit.getLogger().log(Level.SEVERE, "[LitePlaytimeRewards] Cannot create data for {0}", player.getName());
+                    Bukkit.getLogger().log(Level.SEVERE, "[LPR] Cannot create data for {0}", player.getName());
                 }
             }
             return file;
         }
         return file;
+    }
+
+    public static boolean doesPlayerDataExists(OfflinePlayer plyr) {
+        File file = new File(LitePlaytimeRewards.getInstance().getDataFolder() + "/userdata/" + plyr.getUniqueId().toString() + ".yml");
+        return file.exists();
     }
 }

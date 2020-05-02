@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -17,8 +18,8 @@ public class LitePlaytimeRewardsConfig {
 
     private final TreeMap<String, ConfigReward> rewards = new TreeMap<>();
 
-    public LitePlaytimeRewardsConfig(LitePlaytimeRewards plugin) {
-        this.plugin = plugin;
+    public LitePlaytimeRewardsConfig() {
+        this.plugin = LitePlaytimeRewards.getInstance();
         this.config = this.plugin.getConfig();
     }
 
@@ -26,9 +27,17 @@ public class LitePlaytimeRewardsConfig {
     public boolean isUpdateChecker() {
         return this.config.getBoolean("UpdateChecker", true);
     }
+
+    public int getAutoSave() {
+        return this.checkMin(this.config.getInt("AutoSave", 1), 1, 1) * 1200;
+    }
     // </editor-fold>
 
     // <editor-fold desc="Playtime Options" defaultstate="collapsed">
+    public boolean isCountAllPlaytime() {
+        return this.config.getBoolean("CountAllPlaytime", true);
+    }
+
     public List<String> getDisableGettingRewardsInWorlds() {
         return this.config.getStringList("DisableGettingRewardsInWorlds").stream().map(String::toLowerCase).collect(Collectors.toList());
     }
@@ -40,11 +49,11 @@ public class LitePlaytimeRewardsConfig {
             ConfigurationSection rewardsSection = this.config.getConfigurationSection("Rewards");
             rewardsSection.getKeys(false).forEach(e -> {
                 ConfigurationSection rewardConfig = rewardsSection.getConfigurationSection(e);
-                ConfigReward reward = this.getRewardFromConfig(rewardConfig);
+                ConfigReward reward = this.getRewardFromConfig(e, rewardConfig);
                 if (reward != null) {
                     this.rewards.put(e.toLowerCase(), reward);
                 } else {
-                    Bukkit.getLogger().severe(String.format("[LitePlaytimeRewards] %s was not loaded because it was configured incorrectly.", e));
+                    Bukkit.getLogger().severe(String.format("[LPR] %s was not loaded because it was configured incorrectly.", e));
                 }
             });
         }
@@ -60,20 +69,32 @@ public class LitePlaytimeRewardsConfig {
         }
     }
 
-    private ConfigReward getRewardFromConfig(ConfigurationSection reward) {
-        String displayName = null;
+    private ConfigReward getRewardFromConfig(String name, ConfigurationSection reward) {
+        String displayName = name;
+        Material displayItem = Material.STONE;
+        List<String> displayDescription = new ArrayList<>();
         List<Long> playtimeNeeded = new ArrayList<>();
-        boolean countAfkTime = false;
+        boolean countAfkTime = true;
         int slotsNeeded = 0;
         boolean loop = false;
         List<String> disabledWorlds = new ArrayList<>();
+        boolean usePermission = false;
         String notificationType = "chat";
-        String notification = null;
-        String broadcastNotification = null;
+        String notification = "";
+        String broadcastNotification = "";
         List<String> commands = null;
 
         if (reward.contains("DisplayName")) {
             displayName = reward.get("DisplayName").toString();
+        }
+        if (reward.contains("DisplayItem")) {
+            Material m = Material.matchMaterial(reward.get("DisplayItem").toString());
+            if (m != null && m != Material.AIR) {
+                displayItem = m;
+            }
+        }
+        if (reward.contains("DisplayDescription")) {
+            displayDescription = (List<String>) reward.get("DisplayDescription");
         }
         if (reward.contains("PlaytimeNeeded")) {
             playtimeNeeded = this.getNumbersFromString(reward.get("PlaytimeNeeded").toString());
@@ -90,6 +111,9 @@ public class LitePlaytimeRewardsConfig {
         if (reward.contains("DisabledWorlds")) {
             disabledWorlds = (List<String>) reward.get("DisabledWorlds");
         }
+        if (reward.contains("UsePermission")) {
+            usePermission = (boolean) reward.get("UsePermission");
+        }
         if (reward.contains("NotificationType")) {
             notificationType = reward.get("NotificationType").toString();
         }
@@ -103,11 +127,11 @@ public class LitePlaytimeRewardsConfig {
             commands = (List<String>) reward.get("Commands");
         }
 
-        if (displayName == null || playtimeNeeded.isEmpty() || slotsNeeded < 0 || notification == null || broadcastNotification == null || commands == null) {
+        if (playtimeNeeded.isEmpty() || slotsNeeded < 0 || commands == null) {
             return null;
         }
-        
-        return new ConfigReward(displayName, playtimeNeeded, countAfkTime, slotsNeeded, loop, disabledWorlds, notificationType, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
+
+        return new ConfigReward(displayName, displayItem, displayDescription, playtimeNeeded, countAfkTime, slotsNeeded, loop, disabledWorlds, usePermission, notificationType, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
     }
 
     private List<Long> getNumbersFromString(String numbers) {

@@ -1,77 +1,117 @@
 package com.backtobedrock.LitePlaytimeRewards.runnables;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
+import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsCRUD;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.Reward;
 import com.earth2me.essentials.User;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Countdown extends BukkitRunnable {
 
+    private final long loopTimer;
+    private int saveCounter = 0;
+    private boolean givenReward = false;
+    private final List<String> removeRewards = new ArrayList<>();
+
+    LitePlaytimeRewardsCRUD crud;
+
     private final LitePlaytimeRewards plugin;
     private final Player plyr;
     private final TreeMap<String, Reward> rewards;
-    private final TreeMap<String, ConfigReward> cRewards;
     private User user = null;
 
-    public Countdown(LitePlaytimeRewards plugin, Player plyr, TreeMap<String, Reward> rewards, TreeMap<String, ConfigReward> cRewards) {
-        this.plugin = plugin;
+    public Countdown(long looptimer, Player plyr, TreeMap<String, Reward> rewards, LitePlaytimeRewardsCRUD crud) {
+        this.loopTimer = looptimer;
+        this.plugin = LitePlaytimeRewards.getInstance();
         this.plyr = plyr;
         this.rewards = rewards;
-        this.cRewards = cRewards;
         if (plugin.ess != null) {
             this.user = plugin.ess.getUser(plyr);
         }
+        this.crud = crud;
     }
 
     @Override
     public void run() {
-        if (user != null) {
+        long playtime = this.crud.getPlaytime(), afktime = this.crud.getAfktime();
+
+        //Check if user is afk and increment play/afk-time
+        if (this.user == null) {
             this.checkRewards(false);
             //add playtime
+            this.crud.setPlaytime(playtime + this.loopTimer, false);
         } else {
-            this.checkRewards(user.isAfk());
-            if (user.isAfk()) {
+            this.checkRewards(this.user.isAfk());
+            if (this.user.isAfk()) {
                 //add afktime
+                this.crud.setAfktime(afktime + this.loopTimer, false);
             } else {
                 //add playtime
+                this.crud.setPlaytime(playtime + this.loopTimer, false);
             }
+        }
+
+        //Count up save counter
+        this.saveCounter += this.loopTimer;
+
+        //save data if autosave is met or reward has been given
+        if (this.saveCounter >= this.plugin.getLPRConfig().getAutoSave() || this.givenReward) {
+            this.crud.saveConfig();
+            this.saveCounter = 0;
+            this.givenReward = false;
         }
     }
 
     private void checkRewards(boolean isAfk) {
-        for (Entry<String, Reward> entry : this.rewards.entrySet()) {
-            ConfigReward config = cRewards.get(entry.getKey());
+        this.removeRewards.clear();
+        this.rewards.entrySet().forEach((entry) -> {
+            Reward reward = entry.getValue();
 
-            if(config == null){
-                this.rewards.remove(entry.getKey());
+            if (!reward.getDisabledWorlds().contains(this.plyr.getLocation().getWorld().getName().toLowerCase()) && (reward.isCountAfkTime() || !isAfk)) {
+                this.countDown(entry.getKey(), reward);
             }
-            
-            if (config.getDisabledWorlds().contains(this.plyr.getLocation().getWorld().getName())) {
-                break;
-            }
+        });
 
-            if (config.isCountAfkTime() || !isAfk) {
-                this.countDown(entry.getValue());
-            }
-        }
-        this.plugin.checkEligibleForRewards(plyr, this.rewards);
+        this.crud.replaceRewards(this.rewards, false);
+
+        this.removeRewards.forEach(e -> this.rewards.remove(e));
     }
 
-    private void countDown(Reward value) {
-        if ((value.getTimeTillNextReward().get(0) - 1200) <= 0) {
-            List<Long> newTimes = value.getTimeTillNextReward();
-            newTimes.set(0, new Long(0));
-            value.setTimeTillNextReward(newTimes);
+    private void countDown(String name, Reward value) {
+        Long timeNeededNew = !value.getTimeTillNextReward().get(0).equals(-1L) && value.getTimeTillNextReward().get(0) - this.loopTimer < 0 ? 0 : value.getTimeTillNextReward().get(0) - this.loopTimer;
+        if (timeNeededNew == 0L) {
+            value.setAmountPending(this.plugin.giveReward(value, this.plyr, true, 1));
+            value.getTimeTillNextReward().remove(0);
+            if (value.getTimeTillNextReward().isEmpty()) {
+                if (value.isLoop()) {
+                    value.setTimeTillNextReward(new ArrayList(value.getPlaytimeNeeded()));
+                } else {
+                    value.getTimeTillNextReward().add(-1L);
+                    if (value.getAmountPending() == 0) {
+                        this.removeRewards.add(name);
+                    }
+                }
+            }
+            this.givenReward = true;
         } else {
-            List<Long> newTimes = value.getTimeTillNextReward();
-            newTimes.set(0, newTimes.get(0) - 1200);
-            value.setTimeTillNextReward(newTimes);
+            if (value.getAmountPending() > 0) {
+                value.setAmountPending(this.plugin.giveReward(value, this.plyr, true, 0));
+                this.givenReward = true;
+            }
+            if (timeNeededNew < -1L) {
+                value.getTimeTillNextReward().set(0, -1L);
+                if (value.getAmountPending() == 0) {
+                    this.removeRewards.add(name);
+                }
+            } else {
+                List<Long> newTimes = value.getTimeTillNextReward();
+                newTimes.set(0, timeNeededNew);
+                value.setTimeTillNextReward(newTimes);
+            }
         }
     }
-
 }
