@@ -95,6 +95,10 @@ public class Reward extends ConfigReward implements ConfigurationSerializable {
             return null;
         }
 
-        return new Reward(LitePlaytimeRewards.getInstance().getLPRConfig().getRewards().get(id), id, timeTillNextReward, amountRedeemed, amountPending);
+        ConfigReward creward = LitePlaytimeRewards.getInstance().getLPRConfig().getRewards().get(id);
+        if (creward != null) {
+            return new Reward(creward, id, timeTillNextReward, amountRedeemed, amountPending);
+        }
+        return null;
     }
 }
