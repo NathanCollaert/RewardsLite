@@ -67,7 +67,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         if (this.config.isUsebStats()) {
             int pluginId = 7380;
             Metrics metrics = new Metrics(this, pluginId);
-            metrics.addCustomChart(new Metrics.SimplePie("Reward Count", () -> Integer.toString(LitePlaytimeRewards.getInstance().getLPRConfig().getRewards().size())));
+            metrics.addCustomChart(new Metrics.SimplePie("reward_count", () -> Integer.toString(LitePlaytimeRewards.getInstance().getLPRConfig().getRewards().size())));
         }
 
         super.onEnable();
