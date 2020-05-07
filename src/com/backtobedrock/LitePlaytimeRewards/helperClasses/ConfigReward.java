@@ -1,7 +1,6 @@
 package com.backtobedrock.LitePlaytimeRewards.helperClasses;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import org.bukkit.Material;
 
 public class ConfigReward {
@@ -61,11 +60,11 @@ public class ConfigReward {
     }
 
     public String getNotification() {
-        return notification.replaceAll("&", "§");
+        return notification;
     }
 
     public String getBroadcastNotification() {
-        return broadcastNotification.replaceAll("&", "§");
+        return broadcastNotification;
     }
 
     public List<String> getCommands() {
@@ -89,6 +88,6 @@ public class ConfigReward {
     }
 
     public List<String> getDisplayDescription() {
-        return displayDescription.stream().map(e -> e.replaceAll("&", "§")).collect(Collectors.toList());
+        return displayDescription;
     }
 }
