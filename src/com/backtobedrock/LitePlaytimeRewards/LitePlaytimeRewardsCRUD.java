@@ -9,11 +9,9 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Statistic;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 public final class LitePlaytimeRewardsCRUD {
 
@@ -40,7 +38,7 @@ public final class LitePlaytimeRewardsCRUD {
 
         conf.set("uuid", player.getUniqueId().toString());
         conf.set("playername", player.getName());
-        conf.set("playtime", this.plugin.getLPRConfig().isCountAllPlaytime() ? new Long(player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE)) : 0);
+        conf.set("playtime", 0);
         conf.set("afktime", 0);
         conf.set("rewards", new TreeMap<>());
 
