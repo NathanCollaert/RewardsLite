@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -32,8 +33,16 @@ public class LitePlaytimeRewardsConfig {
         return this.config.getBoolean("bStats", true);
     }
 
+    public boolean isUsebStats() {
+        return this.config.getBoolean("bStats", true);
+    }
+
     public int getAutoSave() {
         return this.checkMin(this.config.getInt("AutoSave", 1), 1, 1) * 1200;
+    }
+
+    public int getTimeKeepDataInCache() {
+        return this.checkMin(this.config.getInt("TimeKeepDataInCache", 5), 0, 5) * 1200;
     }
     // </editor-fold>
 
@@ -47,15 +56,17 @@ public class LitePlaytimeRewardsConfig {
     public TreeMap<String, ConfigReward> getRewards() {
         if (this.rewards.isEmpty()) {
             ConfigurationSection rewardsSection = this.config.getConfigurationSection("Rewards");
-            rewardsSection.getKeys(false).forEach(e -> {
-                ConfigurationSection rewardConfig = rewardsSection.getConfigurationSection(e);
-                ConfigReward reward = this.getRewardFromConfig(e, rewardConfig);
-                if (reward != null) {
-                    this.rewards.put(e.toLowerCase(), reward);
-                } else {
-                    Bukkit.getLogger().severe(String.format("[LPR] %s was not loaded because it was configured incorrectly.", e));
-                }
-            });
+            if (rewardsSection != null) {
+                rewardsSection.getKeys(false).forEach(e -> {
+                    ConfigurationSection rewardConfig = rewardsSection.getConfigurationSection(e);
+                    ConfigReward reward = this.getRewardFromConfig(e, rewardConfig);
+                    if (reward != null) {
+                        this.rewards.put(e.toLowerCase(), reward);
+                    } else {
+                        Bukkit.getLogger().severe(String.format("[LPR] %s was not loaded because it was configured incorrectly.", e));
+                    }
+                });
+            }
         }
         return this.rewards;
     }
@@ -71,7 +82,7 @@ public class LitePlaytimeRewardsConfig {
 
     private ConfigReward getRewardFromConfig(String name, ConfigurationSection reward) {
         String displayName = name;
-        Material displayItem = Material.STONE;
+        Material displayItem = Material.CHEST;
         List<String> displayDescription = new ArrayList<>();
         List<Long> playtimeNeeded = new ArrayList<>();
         boolean countAfkTime = true;
@@ -85,7 +96,7 @@ public class LitePlaytimeRewardsConfig {
         List<String> commands = null;
 
         if (reward.contains("DisplayName")) {
-            displayName = reward.get("DisplayName").toString();
+            displayName = ChatColor.translateAlternateColorCodes('&', reward.get("DisplayName").toString());
         }
         if (reward.contains("DisplayItem")) {
             Material m = Material.matchMaterial(reward.get("DisplayItem").toString());
@@ -94,7 +105,11 @@ public class LitePlaytimeRewardsConfig {
             }
         }
         if (reward.contains("DisplayDescription")) {
-            displayDescription = (List<String>) reward.get("DisplayDescription");
+            List<String> desc = (List<String>) reward.get("DisplayDescription");
+            if (desc != null) {
+                desc.replaceAll(e -> ChatColor.translateAlternateColorCodes('&', e));
+                displayDescription = desc;
+            }
         }
         if (reward.contains("PlaytimeNeeded")) {
             playtimeNeeded = this.getNumbersFromString(reward.get("PlaytimeNeeded").toString());
@@ -118,10 +133,10 @@ public class LitePlaytimeRewardsConfig {
             notificationType = reward.get("NotificationType").toString();
         }
         if (reward.contains("Notification")) {
-            notification = reward.get("Notification").toString();
+            notification = ChatColor.translateAlternateColorCodes('&', reward.get("Notification").toString());
         }
         if (reward.contains("BroadcastNotification")) {
-            broadcastNotification = reward.get("BroadcastNotification").toString();
+            broadcastNotification = ChatColor.translateAlternateColorCodes('&', reward.get("BroadcastNotification").toString());
         }
         if (reward.contains("Commands")) {
             commands = (List<String>) reward.get("Commands");

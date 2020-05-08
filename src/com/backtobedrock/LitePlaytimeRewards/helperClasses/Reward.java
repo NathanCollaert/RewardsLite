@@ -1,6 +1,5 @@
 package com.backtobedrock.LitePlaytimeRewards.helperClasses;
 
-import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,31 +8,44 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 
 @SerializableAs("Reward")
-public class Reward extends ConfigReward implements ConfigurationSerializable {
+public class Reward implements ConfigurationSerializable {
 
-    private String id;
     private List<Long> timeTillNextReward;
     private int amountRedeemed;
     private int amountPending;
+    private ConfigReward cReward = null;
 
-    public Reward(ConfigReward config, String id, List<Long> timeTillNextReward, int amountRedeemed, int amountPending) {
-        super(config);
-        this.id = id;
+    public Reward(ConfigReward cReward, List<Long> timeTillNextReward, int amountRedeemed, int amountPending) {
+        this(timeTillNextReward.isEmpty() ? cReward.getPlaytimeNeeded() : timeTillNextReward, amountRedeemed < 0 ? 0 : amountRedeemed, amountPending < 0 ? 0 : amountPending);
+        this.cReward = cReward;
+    }
+
+    //deserialization only
+    private Reward(List<Long> timeTillNextReward, int amountRedeemed, int amountPending) {
         this.timeTillNextReward = timeTillNextReward;
         this.amountRedeemed = amountRedeemed;
         this.amountPending = amountPending;
+    }
+
+    //new reward only
+    public Reward(ConfigReward cReward) {
+        this(cReward, cReward.getPlaytimeNeeded(), 0, 0);
+    }
+
+    public ConfigReward getcReward() {
+        return cReward;
     }
 
     public List<Long> getTimeTillNextReward() {
         return timeTillNextReward;
     }
 
-    public int getAmountRedeemed() {
-        return amountRedeemed;
-    }
-
     public void setTimeTillNextReward(List<Long> timeTillNextReward) {
         this.timeTillNextReward = timeTillNextReward;
+    }
+
+    public int getAmountRedeemed() {
+        return amountRedeemed;
     }
 
     public void setAmountRedeemed(int amountRedeemed) {
@@ -49,15 +61,9 @@ public class Reward extends ConfigReward implements ConfigurationSerializable {
     }
 
     @Override
-    public String toString() {
-        return "Reward{" + "timeTillNextReward=" + timeTillNextReward + ", amountRedeemed=" + amountRedeemed + ", amountPending=" + amountPending + '}';
-    }
-
-    @Override
     public Map<String, Object> serialize() {
         Map<String, Object> map = new TreeMap<>();
 
-        map.put("id", this.id);
         map.put("timeTillNextReward", this.timeTillNextReward);
         map.put("amountRedeemed", this.amountRedeemed);
         map.put("amountPending", this.amountPending);
@@ -66,39 +72,24 @@ public class Reward extends ConfigReward implements ConfigurationSerializable {
     }
 
     public static Reward deserialize(Map<String, Object> map) {
-        String id = "";
         List<Long> timeTillNextReward = new ArrayList<>();
         int amountRedeemed = -1;
         int amountPending = -1;
 
-        if (map.containsKey("id")) {
-            id = (String) map.get("id");
-        }
-
-        if (map.containsKey("timeTillNextReward")) {
-            List<Long> longs = new ArrayList<>();
+        if (map.containsKey("timeTillNextReward") && map.get("timeTillNextReward") != null) {
             ((List<Integer>) map.get("timeTillNextReward")).stream().forEach(e -> {
-                longs.add(Long.valueOf(e));
+                timeTillNextReward.add(Long.valueOf(e));
             });
-            timeTillNextReward = longs;
         }
 
-        if (map.containsKey("amountRedeemed")) {
+        if (map.containsKey("amountRedeemed") && map.get("amountRedeemed") != null) {
             amountRedeemed = (int) map.get("amountRedeemed");
         }
 
-        if (map.containsKey("amountPending")) {
+        if (map.containsKey("amountPending") && map.get("amountPending") != null) {
             amountPending = (int) map.get("amountPending");
         }
 
-        if (id.equals("") || amountRedeemed < 0 || amountPending < 0) {
-            return null;
-        }
-
-        ConfigReward creward = LitePlaytimeRewards.getInstance().getLPRConfig().getRewards().get(id);
-        if (creward != null) {
-            return new Reward(creward, id, timeTillNextReward, amountRedeemed, amountPending);
-        }
-        return null;
+        return new Reward(timeTillNextReward, amountRedeemed, amountPending);
     }
 }

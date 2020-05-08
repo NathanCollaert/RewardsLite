@@ -1,5 +1,5 @@
 name: LitePlaytimeRewards
-version: 2.0.1
+version: 2.1.0
 description: A lightweight plugin that gives rewards based on playtime
 author: Nathan
 website: www.backtobedrock.com
@@ -27,7 +27,7 @@ commands:
         usage: /<command> [player]
     rewards:
         description: Check info on all your available rewards or a single one.
-        permission: litplaytimerewards.rewards
+        permission: liteplaytimerewards.rewards
         usage: /<command> [reward]
     
 permissions:
@@ -41,5 +41,5 @@ permissions:
         default: op
     liteplaytimerewards.playtime.other:
         default: op
-    litplaytimerewards.rewards:
+    liteplaytimerewards.rewards:
         default: op
