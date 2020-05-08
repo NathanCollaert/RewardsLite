@@ -104,8 +104,11 @@ public class Countdown extends BukkitRunnable {
             this.givenReward = true;
         } else {
             if (value.getAmountPending() > 0) {
+                int oldPending = value.getAmountPending();
                 value.setAmountPending(this.plugin.giveReward(value, this.plyr, true, 0));
-                this.givenReward = true;
+                if (oldPending != value.getAmountPending()) {
+                    this.givenReward = true;
+                }
             }
             if (timeNeededNew < -1L) {
                 value.getTimeTillNextReward().set(0, -1L);
