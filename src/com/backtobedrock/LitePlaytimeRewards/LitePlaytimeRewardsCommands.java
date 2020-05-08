@@ -4,15 +4,12 @@ import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.Reward;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.RewardsGUI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toMap;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
@@ -50,34 +47,32 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
     }
 
     private boolean zeroParameters(CommandSender cs, Command cmnd) {
-        Player sender = null;
-        if (cs instanceof Player) {
-            sender = (Player) cs;
-        }
+        Player sender = cs instanceof Player ? (Player) cs : null;
         switch (cmnd.getName().toLowerCase()) {
             case "playtime":
                 //check if player
                 if (sender == null) {
-                    cs.spigot().sendMessage(new ComponentBuilder("You will need to log in to use this command.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNeedToBeOnline());
                     return true;
                 }
+
                 //check for permission
                 if (!cmnd.testPermission(cs)) {
                     return true;
                 }
 
                 if (this.plugin.getLPRConfig().isCountAllPlaytime()) {
-                    cs.spigot().sendMessage(new ComponentBuilder(String.format("You have played for %s on this server.", LitePlaytimeRewardsCommands.timeToString(sender.getStatistic(Statistic.PLAY_ONE_MINUTE)))).color(ChatColor.GOLD).create());
+                    cs.sendMessage(this.plugin.getMessages().getPlaytime(sender.getStatistic(Statistic.PLAY_ONE_MINUTE)));
                 } else {//get player data
-                    LitePlaytimeRewardsCRUD crudplay = this.plugin.getFromOnlineCRUDs(sender.getUniqueId());
-                    cs.spigot().sendMessage(new ComponentBuilder(String.format("You have played for %s on this server.", LitePlaytimeRewardsCommands.timeToString(crudplay.getPlaytime() + crudplay.getAfktime()))).color(ChatColor.GOLD).create());
+                    LitePlaytimeRewardsCRUD crudplay = this.plugin.getFromCRUDCache(sender.getUniqueId());
+                    cs.sendMessage(this.plugin.getMessages().getPlaytime(crudplay.getPlaytime() + crudplay.getAfktime()));
                 }
 
                 return true;
             case "afktime":
                 //check if player
                 if (sender == null) {
-                    cs.spigot().sendMessage(new ComponentBuilder("You will need to log in to use this command.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNeedToBeOnline());
                     return true;
                 }
 
@@ -87,14 +82,14 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                 }
 
                 if (this.plugin.ess == null) {
-                    cs.spigot().sendMessage(new ComponentBuilder("This server does not keep track of AFK time.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getServerDoesntKeepTrackOfAFK());
                     return true;
                 }
 
                 //get player data
-                LitePlaytimeRewardsCRUD crudafk = this.plugin.getFromOnlineCRUDs(sender.getUniqueId());
+                LitePlaytimeRewardsCRUD crudafk = this.plugin.getFromCRUDCache(sender.getUniqueId());
 
-                cs.spigot().sendMessage(new ComponentBuilder(String.format("You have AFK'd for %s on this server.", LitePlaytimeRewardsCommands.timeToString(crudafk.getAfktime()))).color(ChatColor.GOLD).create());
+                cs.sendMessage(this.plugin.getMessages().getAFKTime(crudafk.getAfktime()));
                 return true;
             case "givereward":
                 //check for permission
@@ -104,26 +99,26 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
 
                 //check if player
                 if (sender == null) {
-                    cs.spigot().sendMessage(new ComponentBuilder("You will need to log in to use this command.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNeedToBeOnline());
                     return true;
                 }
 
                 //check if rewards available
                 TreeMap<String, ConfigReward> giveRewards = this.plugin.getLPRConfig().getRewards();
                 if (giveRewards.isEmpty()) {
-                    cs.spigot().sendMessage(new ComponentBuilder("No rewards configured in the config file.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNoRewardsConfigured());
                     return true;
                 }
 
                 //Check if exceeding max inventory size
                 if (giveRewards.size() > 54) {
-                    cs.spigot().sendMessage(new ComponentBuilder("Max inventory size exceeded, please use /givereward (([reward] [player]) [amount] [broadcast]).").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getMaxInventExceeded("/givereward <reward> <player> [amount] [broadcast]"));
                     return true;
                 }
 
                 //Create GUI, add to list and open
-                final RewardsGUI giveGUI = new RewardsGUI(giveRewards);
-                this.plugin.addToGUIs(sender.getUniqueId(), giveGUI);
+                final RewardsGUI giveGUI = new RewardsGUI(giveRewards, sender);
+                this.plugin.addToGUICache(sender.getUniqueId(), giveGUI);
                 sender.openInventory(giveGUI.getGUI());
 
                 return true;
@@ -135,25 +130,30 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
 
                 //check if player
                 if (sender == null) {
-                    cs.spigot().sendMessage(new ComponentBuilder("You will need to log in to use this command.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNeedToBeOnline());
                     return true;
                 }
 
                 //check if rewards available
-                TreeMap<String, Reward> rewards = this.plugin.getFromOnlineCRUDs(sender.getUniqueId()).getRewards();
+                TreeMap<String, Reward> rewards = this.plugin.getFromCRUDCache(sender.getUniqueId()).getRewards();
                 if (rewards.isEmpty()) {
-                    cs.spigot().sendMessage(new ComponentBuilder("No rewards available for you.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNoRewardsAvailable());
                     return true;
                 }
 
                 //Check if exceeding max inventory size
                 if (rewards.size() > 54) {
-                    cs.spigot().sendMessage(new ComponentBuilder("Max inventory size exceeded, please use /rewards <reward>.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getMaxInventExceeded("/rewards <reward>"));
                     return true;
                 }
 
                 //Create GUI and open
-                final RewardsGUI rewardsGUI = new RewardsGUI(rewards);
+                TreeMap<String, Reward> filteredRewards = rewards.entrySet().stream()
+                        .filter(e -> (!e.getValue().getcReward().isUsePermission() || sender.hasPermission("liteplaytimerewards.reward." + e.getKey()))
+                        || e.getValue().getAmountPending() > 0
+                        || e.getValue().getAmountRedeemed() > 0)
+                        .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, TreeMap::new));
+                RewardsGUI rewardsGUI = new RewardsGUI(filteredRewards, sender);
                 sender.openInventory(rewardsGUI.getGUI());
 
                 return true;
@@ -162,47 +162,44 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
     }
 
     private boolean oneParameter(CommandSender cs, Command cmnd, String arg) {
-        Player sender = null;
-        if (cs instanceof Player) {
-            sender = (Player) cs;
-        }
+        Player sender = cs instanceof Player ? (Player) cs : null;
         switch (cmnd.getName().toLowerCase()) {
             case "playtime":
                 //check for permission
                 if (!cs.hasPermission("liteplaytimerewards.playtime.other")) {
-                    cs.spigot().sendMessage(new ComponentBuilder(cmnd.getPermissionMessage()).color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNoPermission());
                     return true;
                 }
 
                 OfflinePlayer plyrplayother = Bukkit.getOfflinePlayer(arg);
 
-                if (this.plugin.getLPRConfig().isCountAllPlaytime()) {
-                    if (plyrplayother.isOnline()) {
-                        cs.spigot().sendMessage(new ComponentBuilder(String.format("You have played for %s on this server.", LitePlaytimeRewardsCommands.timeToString(((Player) plyrplayother).getStatistic(Statistic.PLAY_ONE_MINUTE)))).color(ChatColor.GOLD).create());
-                        return true;
-                    }
+                if (this.plugin.getLPRConfig().isCountAllPlaytime() && plyrplayother.isOnline()) {
+                    cs.sendMessage(this.plugin.getMessages().getPlaytimeOther(((Player) plyrplayother).getStatistic(Statistic.PLAY_ONE_MINUTE), plyrplayother.getName()));
+                    return true;
                 }
 
                 //check if player has played on server before
                 if (!LitePlaytimeRewardsCRUD.doesPlayerDataExists(plyrplayother)) {
-                    cs.spigot().sendMessage(new ComponentBuilder(String.format("%s is not online.", plyrplayother.getName())).color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNoData(plyrplayother.getName()));
                     return true;
                 }
 
                 //get player data
-                LitePlaytimeRewardsCRUD crudplayother = new LitePlaytimeRewardsCRUD(plyrplayother);
-                cs.spigot().sendMessage(new ComponentBuilder(String.format("%s has played for %s on the server.", plyrplayother.getName(), LitePlaytimeRewardsCommands.timeToString(crudplayother.getPlaytime() + crudplayother.getAfktime()))).color(ChatColor.GOLD).create());
+                LitePlaytimeRewardsCRUD crudplayother = plyrplayother.isOnline()
+                        ? this.plugin.getFromCRUDCache(plyrplayother.getUniqueId())
+                        : new LitePlaytimeRewardsCRUD(plyrplayother);
+                cs.sendMessage(this.plugin.getMessages().getPlaytimeOther(crudplayother.getPlaytime() + crudplayother.getAfktime(), plyrplayother.getName()));
 
                 return true;
             case "afktime":
                 //check for permission
                 if (!cs.hasPermission("liteplaytimerewards.afktime.other")) {
-                    cs.spigot().sendMessage(new ComponentBuilder(cmnd.getPermissionMessage()).color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNoPermission());
                     return true;
                 }
 
                 if (this.plugin.ess == null) {
-                    cs.spigot().sendMessage(new ComponentBuilder("This server does not keep track of AFK time.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getServerDoesntKeepTrackOfAFK());
                     return true;
                 }
 
@@ -210,14 +207,16 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                 OfflinePlayer plyrafkother = Bukkit.getOfflinePlayer(arg);
 
                 if (!LitePlaytimeRewardsCRUD.doesPlayerDataExists(plyrafkother)) {
-                    cs.spigot().sendMessage(new ComponentBuilder(String.format("%s is not online.", plyrafkother.getName())).color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNoData(plyrafkother.getName()));
                     return true;
                 }
 
                 //get player data
-                LitePlaytimeRewardsCRUD crudafkother = new LitePlaytimeRewardsCRUD(plyrafkother);
+                LitePlaytimeRewardsCRUD crudafkother = plyrafkother.isOnline()
+                        ? this.plugin.getFromCRUDCache(plyrafkother.getUniqueId())
+                        : new LitePlaytimeRewardsCRUD(plyrafkother);
 
-                cs.spigot().sendMessage(new ComponentBuilder(String.format("%s has played for %s on the server.", plyrafkother.getName(), LitePlaytimeRewardsCommands.timeToString(crudafkother.getAfktime()))).color(ChatColor.GOLD).create());
+                cs.sendMessage(this.plugin.getMessages().getAFKTimeOther(crudafkother.getAfktime(), plyrafkother.getName()));
                 return true;
             case "rewards":
                 //check for permission
@@ -227,21 +226,21 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
 
                 //check if player
                 if (sender == null) {
-                    cs.spigot().sendMessage(new ComponentBuilder("You will need to log in to use this command.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNeedToBeOnline());
                     return true;
                 }
 
-                //check if rewards available
-                TreeMap<String, Reward> rewards = this.plugin.getFromOnlineCRUDs(sender.getUniqueId()).getRewards().entrySet().stream()
+                //check if reward available
+                TreeMap<String, Reward> rewards = this.plugin.getFromCRUDCache(sender.getUniqueId()).getRewards().entrySet().stream()
                         .filter(e -> e.getKey().equalsIgnoreCase(arg))
                         .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, TreeMap::new));
                 if (rewards.isEmpty()) {
-                    cs.spigot().sendMessage(new ComponentBuilder("No rewards available for " + sender.getName() + ".").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNoSuchReward(arg));
                     return true;
                 }
 
                 //Create GUI and open
-                final RewardsGUI rewardsGUI = new RewardsGUI(rewards);
+                final RewardsGUI rewardsGUI = new RewardsGUI(rewards, sender);
                 sender.openInventory(rewardsGUI.getGUI());
 
                 return true;
@@ -250,10 +249,7 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
     }
 
     private boolean twoParameters(CommandSender cs, Command cmnd, String[] args) {
-        Player sender = null;
-        if (cs instanceof Player) {
-            sender = (Player) cs;
-        }
+        Player sender = cs instanceof Player ? (Player) cs : null;
         switch (cmnd.getName().toLowerCase()) {
             case "givereward":
                 //check for permission
@@ -261,17 +257,16 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                     return true;
                 }
 
-                LitePlaytimeRewardsCommands.giveRewardCommand(cs, args[0], args[1], true, 1);
+                if (LitePlaytimeRewardsCommands.giveRewardCommand(cs, args[0], args[1], true, 1)) {
+                    cs.sendMessage(this.plugin.getMessages().getRewardGiven(args[1], args[0]));
+                }
                 return true;
         }
         return false;
     }
 
     private boolean threeParameters(CommandSender cs, Command cmnd, String[] args) {
-        Player sender = null;
-        if (cs instanceof Player) {
-            sender = (Player) cs;
-        }
+        Player sender = cs instanceof Player ? (Player) cs : null;
         switch (cmnd.getName().toLowerCase()) {
             case "givereward":
                 //check for permission
@@ -283,21 +278,21 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                 try {
                     Integer.parseInt(args[2]);
                 } catch (NumberFormatException e) {
-                    cs.spigot().sendMessage(new ComponentBuilder("Amount must be a possitive number greater then 0.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNotANumber());
                     return true;
                 }
 
-                LitePlaytimeRewardsCommands.giveRewardCommand(cs, args[0], args[1], true, Integer.parseInt(args[2]));
+                if (LitePlaytimeRewardsCommands.giveRewardCommand(cs, args[0], args[1], true, Integer.parseInt(args[2]))) {
+                    cs.sendMessage(this.plugin.getMessages().getRewardGiven(args[1], args[0]));
+                }
+
                 return true;
         }
         return false;
     }
 
     private boolean fourParameters(CommandSender cs, Command cmnd, String[] args) {
-        Player sender = null;
-        if (cs instanceof Player) {
-            sender = (Player) cs;
-        }
+        Player sender = cs instanceof Player ? (Player) cs : null;
         switch (cmnd.getName().toLowerCase()) {
             case "givereward":
                 //check for permission
@@ -309,56 +304,23 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                 try {
                     Integer.parseInt(args[2]);
                 } catch (NumberFormatException e) {
-                    cs.spigot().sendMessage(new ComponentBuilder("Amount must be a possitive number greater then 0.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNotANumber());
                     return true;
                 }
 
                 //check if boolean
                 if (!args[3].equalsIgnoreCase("true") && !args[3].equalsIgnoreCase("false")) {
-                    cs.spigot().sendMessage(new ComponentBuilder("Broadcast must be true or false.").color(ChatColor.RED).create());
+                    cs.sendMessage(this.plugin.getMessages().getNotABoolean());
                     return true;
                 }
 
-                LitePlaytimeRewardsCommands.giveRewardCommand(cs, args[0], args[1], Boolean.getBoolean(args[3]), Integer.parseInt(args[2]));
+                if (LitePlaytimeRewardsCommands.giveRewardCommand(cs, args[0], args[1], Boolean.getBoolean(args[3]), Integer.parseInt(args[2]))) {
+                    cs.sendMessage(this.plugin.getMessages().getRewardGiven(args[1], args[0]));
+                }
+
                 return true;
         }
         return false;
-    }
-
-    public static String timeToString(long time) {
-        if (time >= 20) {
-            long playtimeInSeconds = time / 20;
-            StringBuilder sb = new StringBuilder();
-            if (playtimeInSeconds >= 86400) {
-                long days = playtimeInSeconds / 86400;
-                sb.append(days).append(" days");
-                playtimeInSeconds -= (days * 86400);
-                if (playtimeInSeconds != 0) {
-                    sb.append(", ");
-                }
-            }
-            if (playtimeInSeconds >= 3600) {
-                long hours = playtimeInSeconds / 3600;
-                sb.append(hours).append(" hours");
-                playtimeInSeconds -= (hours * 3600);
-                if (playtimeInSeconds != 0) {
-                    sb.append(", ");
-                }
-            }
-            if (playtimeInSeconds >= 60) {
-                long minutes = playtimeInSeconds / 60;
-                sb.append(minutes).append(" minutes");
-                playtimeInSeconds -= (minutes * 60);
-                if (playtimeInSeconds != 0) {
-                    sb.append(" and ");
-                }
-            }
-            if (playtimeInSeconds >= 1) {
-                sb.append(playtimeInSeconds).append(" seconds");
-            }
-            return sb.toString();
-        }
-        return "less then a second";
     }
 
     @Override
@@ -378,7 +340,7 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                 break;
             case "rewards":
                 if (args.length == 1) {
-                    StringUtil.copyPartialMatches(args[0].toLowerCase(), this.plugin.getFromOnlineCRUDs(((Player) sender).getUniqueId()).getRewards().keySet(), completions);
+                    StringUtil.copyPartialMatches(args[0].toLowerCase(), this.plugin.getFromCRUDCache(((Player) sender).getUniqueId()).getRewards().keySet(), completions);
                     Collections.sort(completions);
                 }
                 break;
@@ -391,36 +353,33 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
 
         //check if reward exists
         if (!plugin.getLPRConfig().getRewards().containsKey(rewardName.toLowerCase())) {
-            cs.spigot().sendMessage(new ComponentBuilder(rewardName + " is not an available reward.").color(ChatColor.RED).create());
-            return true;
-        }
-
-        //check if player is online
-        OfflinePlayer giveRewardPlyr = Bukkit.getOfflinePlayer(playerName);
-        if (!giveRewardPlyr.isOnline()) {
-            cs.spigot().sendMessage(new ComponentBuilder(String.format("The player %s is not online.", giveRewardPlyr.getName())).color(ChatColor.RED).create());
+            cs.sendMessage(LitePlaytimeRewards.getInstance().getMessages().getNoSuchReward(rewardName));
             return false;
         }
 
         //check if amount is bigger then 1
         if (amount < 1) {
-            cs.spigot().sendMessage(new ComponentBuilder(amount + " is not a viable amount.").color(ChatColor.RED).create());
-            return true;
+            cs.sendMessage(LitePlaytimeRewards.getInstance().getMessages().getNotANumber());
+            return false;
         }
 
-        LitePlaytimeRewardsCRUD crud = plugin.getFromOnlineCRUDs(giveRewardPlyr.getUniqueId());
-        TreeMap<String, Reward> rewards = crud.getRewards();
-
-        //if reward is not saved, it should be added with -1 time
-        if (!rewards.containsKey(rewardName.toLowerCase())) {
-            rewards.put(rewardName.toLowerCase(), new Reward(plugin.getLPRConfig().getRewards().get(rewardName.toLowerCase()), rewardName.toLowerCase(), Arrays.asList(-1L), 0, 0));
+        //check if player has data on server
+        OfflinePlayer plyr = Bukkit.getOfflinePlayer(playerName);
+        if (!LitePlaytimeRewardsCRUD.doesPlayerDataExists(plyr)) {
+            cs.sendMessage(LitePlaytimeRewards.getInstance().getMessages().getNoData(plyr.getName()));
+            return false;
         }
 
-        //give reward and set pending
-        rewards.get(rewardName.toLowerCase()).setAmountPending(plugin.giveReward(rewards.get(rewardName.toLowerCase()), giveRewardPlyr.getPlayer(), broadcast, amount));
+        LitePlaytimeRewardsCRUD crud = plyr.isOnline() ? plugin.getFromCRUDCache(plyr.getUniqueId()) : new LitePlaytimeRewardsCRUD(plyr);
 
-        //save rewards
-        crud.setRewards(rewards, true);
+        //get reward
+        Reward reward = crud.getRewards().get(rewardName.toLowerCase());
+
+        if (reward != null) {
+            //give reward and set pending
+            reward.setAmountPending(plugin.giveReward(reward, plyr, broadcast, amount));
+            crud.saveConfig();
+        }
 
         return true;
     }

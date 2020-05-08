@@ -4,15 +4,12 @@ import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsCRUD;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsCommands;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsConfig;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.Reward;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.RewardsGUI;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.RewardsGUICustomHolder;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.RewardsGUIReward;
 import com.backtobedrock.LitePlaytimeRewards.runnables.Countdown;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
-import static java.util.stream.Collectors.toMap;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -30,6 +27,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 public class LitePlaytimeRewardsEventHandlers implements Listener {
@@ -46,28 +44,18 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        LitePlaytimeRewardsCRUD crud = new LitePlaytimeRewardsCRUD(e.getPlayer());
+        //check if cached crud
+        if (!this.plugin.doesCRUDCacheContain(e.getPlayer().getUniqueId())) {
+            //get crud and add to cache
+            LitePlaytimeRewardsCRUD crud = new LitePlaytimeRewardsCRUD(e.getPlayer());
+            this.plugin.addToCRUDCache(e.getPlayer().getUniqueId(), crud);
+        } else {
+            Bukkit.getScheduler().cancelTask(this.plugin.removeFromRunnableCache(e.getPlayer().getUniqueId()));
+        }
 
-        //check if config has untracked rewards
-        TreeMap<String, Reward> rewards = new TreeMap<>();
-        this.config.getRewards().entrySet().stream().forEach(f -> {
-            if (crud.getRewards().containsKey(f.getKey()) && (!f.getValue().isUsePermission() || e.getPlayer().hasPermission("liteplaytimerewards.reward." + f.getKey()))) {
-                rewards.put(f.getKey(), crud.getRewards().get(f.getKey()));
-            } else if (!f.getValue().isUsePermission() || e.getPlayer().hasPermission("liteplaytimerewards.reward." + f.getKey())) {
-                rewards.put(f.getKey(), new Reward(f.getValue(), f.getKey(), f.getValue().getPlaytimeNeeded(), 0, 0));
-            }
-        });
-        crud.setRewards(rewards, true);
-
-        //filter what rewards should be ran
-        TreeMap<String, Reward> loopRewards = rewards.entrySet().stream()
-                .filter(r -> !r.getValue().getTimeTillNextReward().get(0).equals(-1L) || r.getValue().getAmountPending() > 0)
-                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, TreeMap::new));
-
-        //run task, add task to map and crud to online players
-        this.plugin.addToOnlineCRUDs(e.getPlayer().getUniqueId(), crud);
-        BukkitTask rewardRunnable = new Countdown(20L, e.getPlayer(), loopRewards, crud).runTaskTimer(this.plugin, 20, 20);
-        this.plugin.addToRunningRewards(e.getPlayer().getUniqueId(), rewardRunnable.getTaskId());
+        //run task, add task to cache
+        BukkitTask rewardRunnable = new Countdown(20L, e.getPlayer()).runTaskTimer(this.plugin, 20, 20);
+        this.plugin.addToRunnableCache(e.getPlayer().getUniqueId(), rewardRunnable.getTaskId());
 
         //check for updates
         if (this.config.isUpdateChecker() && e.getPlayer().isOp()) {
@@ -80,10 +68,29 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
 
     @EventHandler
     public void onPlayerQuitEvent(PlayerQuitEvent e) {
-        //remove from online crud, cancel task, remove task from map
-        this.plugin.removeFromOnlineCRUDs(e.getPlayer().getUniqueId()).saveConfig();
-        Bukkit.getScheduler().cancelTask(this.plugin.getFromRunningRewards(e.getPlayer().getUniqueId()));
-        this.plugin.removeFromRunningRewards(e.getPlayer().getUniqueId());
+        //cancel task and remove from cache
+        Bukkit.getScheduler().cancelTask(this.plugin.removeFromRunnableCache(e.getPlayer().getUniqueId()));
+
+        //save player data
+        this.plugin.getFromCRUDCache(e.getPlayer().getUniqueId()).saveConfig();
+
+        //cancel give reward if giving
+        this.isGivingReward.remove(e.getPlayer().getUniqueId());
+
+        //shedule task to clear cache
+        BukkitTask cacheRunnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!e.getPlayer().isOnline()) {
+                    //remove from crud cache
+                    LitePlaytimeRewards.getInstance().removeFromCRUDCache(e.getPlayer().getUniqueId());
+                    LitePlaytimeRewards.getInstance().removeFromRunnableCache(e.getPlayer().getUniqueId());
+                }
+            }
+        }.runTaskLater(this.plugin, this.config.getTimeKeepDataInCache());
+
+        //add remove from cache id to cache
+        this.plugin.addToRunnableCache(e.getPlayer().getUniqueId(), cacheRunnable.getTaskId());
     }
 
     @EventHandler
@@ -91,10 +98,10 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
         Player plyr = (Player) e.getWhoClicked();
         Inventory openInv = e.getView().getTopInventory();
 
-        if (openInv.getHolder() instanceof RewardsGUICustomHolder && ((RewardsGUICustomHolder) openInv.getHolder()).getTitle().equals("Available Rewards")) {
+        if (openInv.getHolder() instanceof RewardsGUICustomHolder && ((RewardsGUICustomHolder) openInv.getHolder()).getTitle().equals(this.plugin.getMessages().getGiveRewardInventoryTitle())) {
             e.setCancelled(true);
 
-            RewardsGUI gui = this.plugin.getFromGUIs(plyr.getUniqueId());
+            RewardsGUI gui = this.plugin.getFromGUICache(plyr.getUniqueId());
 
             if (e.getCurrentItem() != null) {
                 //get clicked item and ItemMeta
@@ -128,7 +135,7 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
                     }
                 }
             }
-        } else if (openInv.getHolder() instanceof RewardsGUICustomHolder && ((RewardsGUICustomHolder) openInv.getHolder()).getTitle().equals("Your Rewards")) {
+        } else if (openInv.getHolder() instanceof RewardsGUICustomHolder && ((RewardsGUICustomHolder) openInv.getHolder()).getTitle().equals(this.plugin.getMessages().getRewardsInventoryTitle())) {
             e.setCancelled(true);
         }
     }
@@ -139,7 +146,7 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
         Inventory openInv = e.getView().getTopInventory();
 
         if (openInv.getHolder() instanceof RewardsGUICustomHolder && !this.isGivingReward.containsKey(plyr.getUniqueId())) {
-            this.plugin.removeFromGUIs(plyr.getUniqueId());
+            this.plugin.removeFromGUICache(plyr.getUniqueId());
         }
     }
 
@@ -153,18 +160,18 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
             e.setCancelled(true);
 
             String rewardName = this.isGivingReward.get(plyr.getUniqueId());
-            RewardsGUIReward reward = this.plugin.getFromGUIs(plyr.getUniqueId()).getGUIRewards().get(rewardName);
+            RewardsGUIReward reward = this.plugin.getFromGUICache(plyr.getUniqueId()).getGUIRewards().get(rewardName);
 
             Bukkit.getScheduler().runTask(this.plugin, () -> {
                 if (e.getMessage().equalsIgnoreCase("!cancel")) {
                     this.isGivingReward.remove(plyr.getUniqueId());
-                    plyr.openInventory(this.plugin.getFromGUIs(plyr.getUniqueId()).getGUI());
+                    plyr.openInventory(this.plugin.getFromGUICache(plyr.getUniqueId()).getGUI());
                 } else if (LitePlaytimeRewardsCommands.giveRewardCommand(plyr, rewardName, e.getMessage(), reward.isBroadcast(), reward.getAmount())) {
-                    plyr.spigot().sendMessage(new ComponentBuilder("The " + rewardName + " reward has been given to " + e.getMessage() + ".").color(ChatColor.GREEN).create());
+                    plyr.sendMessage(this.plugin.getMessages().getRewardGiven(e.getMessage(), rewardName));
                     this.isGivingReward.remove(plyr.getUniqueId());
-                    this.plugin.removeFromGUIs(plyr.getUniqueId());
+                    this.plugin.removeFromGUICache(plyr.getUniqueId());
                 } else {
-                    plyr.openInventory(this.plugin.getFromGUIs(plyr.getUniqueId()).getGUI());
+                    plyr.openInventory(this.plugin.getFromGUICache(plyr.getUniqueId()).getGUI());
                 }
             });
         }

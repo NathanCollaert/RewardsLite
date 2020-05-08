@@ -9,6 +9,11 @@ bStats: true
 #In minutes, minimum is 1.
 AutoSave: 1
 
+#How long should the plugin save the playerdata in cache after logout?
+#This will save performance for RAM.
+#In minutes, minimum is 0.
+TimeKeepDataInCache: 5
+
 #Should the plugin also count playtime from before it was installed?
 #It will not give rewards for this playtime.
 CountAllPlaytime: true
@@ -26,17 +31,18 @@ Rewards:
     TestReward:
         #This name will be displayed for the reward in the rewards GUI.
         #This name does not need be unique.
+        #Color codes may be used https://wiki.ess3.net/mc/.
         #Default = reward name
-        DisplayName: "Test Reward"
+        DisplayName: "&6Test &eReward"
         
         #This item will be displayed for the reward in the rewards GUI.
-        #All possible materials (except for AIR) can be used for this (https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html).
-        #Default = stone
-        DisplayItem: "dirt"
+        #All possible materials (except for AIR) can be used for this (https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html ).
+        #Default = chest
+        DisplayItem: "ender_chest"
         
         #The item in the reward GUI will have this description.
         #Color codes may be used https://wiki.ess3.net/mc/.
-        #Every item will be on a different line.
+        #Each list item will be a new line.
         #Default = empty (no description)
         DisplayDescription:
             - "This will go on the first line."
