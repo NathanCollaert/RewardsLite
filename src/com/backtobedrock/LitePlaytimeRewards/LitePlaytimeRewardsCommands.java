@@ -61,9 +61,12 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                     return true;
                 }
 
-                //get player data
-                LitePlaytimeRewardsCRUD crudplay = this.plugin.getFromCRUDCache(sender.getUniqueId());
-                cs.sendMessage(this.plugin.getMessages().getPlaytime(crudplay.getPlaytime() + crudplay.getAfktime()));
+                if (this.plugin.getLPRConfig().isCountAllPlaytime()) {
+                    cs.sendMessage(this.plugin.getMessages().getPlaytime(sender.getStatistic(Statistic.PLAY_ONE_MINUTE)));
+                } else {//get player data
+                    LitePlaytimeRewardsCRUD crudplay = this.plugin.getFromCRUDCache(sender.getUniqueId());
+                    cs.sendMessage(this.plugin.getMessages().getPlaytime(crudplay.getPlaytime() + crudplay.getAfktime()));
+                }
 
                 return true;
             case "afktime":
@@ -169,6 +172,11 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                 }
 
                 OfflinePlayer plyrplayother = Bukkit.getOfflinePlayer(arg);
+
+                if (this.plugin.getLPRConfig().isCountAllPlaytime() && plyrplayother.isOnline()) {
+                    cs.sendMessage(this.plugin.getMessages().getPlaytimeOther(((Player) plyrplayother).getStatistic(Statistic.PLAY_ONE_MINUTE), plyrplayother.getName()));
+                    return true;
+                }
 
                 //check if player has played on server before
                 if (!LitePlaytimeRewardsCRUD.doesPlayerDataExists(plyrplayother)) {
