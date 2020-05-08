@@ -39,7 +39,7 @@ public final class LitePlaytimeRewardsCRUD {
 
         conf.set("uuid", player.getUniqueId().toString());
         conf.set("playername", player.getName());
-        conf.set("playtime", this.plugin.getLPRConfig().isCountAllPlaytime() ? new Long(player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE)) : 0);
+        conf.set("playtime", 0);
         conf.set("afktime", 0);
         conf.set("rewards", new TreeMap<>());
 
