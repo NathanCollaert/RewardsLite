@@ -10,7 +10,7 @@ import org.bukkit.configuration.serialization.SerializableAs;
 @SerializableAs("Reward")
 public class Reward implements ConfigurationSerializable {
 
-    private List<Long> timeTillNextReward;
+    private List<Long> timeTillNextReward = new ArrayList<>();
     private int amountRedeemed;
     private int amountPending;
     private ConfigReward cReward = null;
@@ -40,8 +40,19 @@ public class Reward implements ConfigurationSerializable {
         return timeTillNextReward;
     }
 
-    public void setTimeTillNextReward(List<Long> timeTillNextReward) {
-        this.timeTillNextReward = timeTillNextReward;
+    public void removeFirstTimeTillNextReward() {
+        this.timeTillNextReward.remove(0);
+        if (this.timeTillNextReward.isEmpty()) {
+            if (this.cReward.isLoop()) {
+                this.timeTillNextReward = new ArrayList(this.cReward.getPlaytimeNeeded());
+            } else {
+                this.timeTillNextReward.add(0, -1L);
+            }
+        }
+    }
+
+    public void setFirstTimeTillNextReward(Long time) {
+        this.timeTillNextReward.set(0, time);
     }
 
     public int getAmountRedeemed() {
