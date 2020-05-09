@@ -136,7 +136,7 @@ public class LitePlaytimeRewardsMessages {
     }
 
     public String getNotANumber() {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("NotANumber", "&4Amount must be a possitive number greater then 0.").toString());
+        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("NotANumber", "&4Amount must be a positive number greater then 0.").toString());
     }
 
     public String getNotABoolean() {

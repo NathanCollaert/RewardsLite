@@ -30,12 +30,12 @@ NextReward:
 NextRewardNever:
 - "&cClaimed all rewards already."
 
-#Info displayed under reward description when executing /rewards if no permission for it but claimed or pending at least one.
+#Info displayed under reward description when executing /rewards if no permission for it but claimed or pending at least once.
 NextRewardNoPermission:
 - "&cYou can't earn this reward."
 
 #Available placeholders: %player% - %rewardname% - %world%
-#Notification send to players if they have a reward pending cause in a unclaimable world.
+#Notification send to players if they have a reward pending cause in an unclaimable world.
 PendingNotificationWrongWorld: "&eYou have a playtime reward pending but can't claim it in this world."
 
 #Available placeholders: %player% - %rewardname% - %inventory_spaces_needed%
@@ -108,7 +108,7 @@ NoData: "&4%player% has no data on this server yet."
 NoSuchReward: "&4%rewardname% is not an available reward."
 
 #Error thrown when executing /givereward <reward> <playername> [amount] [broadcast] and amount is not a number greater then 0.
-NotANumber: "&4Amount must be a possitive number greater then 0."
+NotANumber: "&4Amount must be a positive number greater then 0."
 
 #Error thrown when executing /givereward <reward> <playername> [amount] [broadcast] and broadcast is not true or false.
 NotABoolean: "&4Broadcast must be true or false."
