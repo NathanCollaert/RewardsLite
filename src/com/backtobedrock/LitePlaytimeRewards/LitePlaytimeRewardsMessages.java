@@ -1,13 +1,13 @@
 package com.backtobedrock.LitePlaytimeRewards;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class LitePlaytimeRewardsMessages {
 
@@ -15,7 +15,7 @@ public class LitePlaytimeRewardsMessages {
     private TreeMap<String, Object> messages = new TreeMap<>();
 
     public LitePlaytimeRewardsMessages(File messagesFile) {
-        this.plugin = LitePlaytimeRewards.getInstance();
+        this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         YamlConfiguration.loadConfiguration(messagesFile).getValues(true).entrySet().forEach((e) -> {
             this.messages.put(e.getKey(), e.getValue());
         });
@@ -37,7 +37,7 @@ public class LitePlaytimeRewardsMessages {
                 .collect(Collectors.toList());
     }
 
-    public List<String> getNextReward(long time) {
+    public List<String> getNextReward(int time) {
         List<String> nextReward = (List<String>) this.messages.getOrDefault("NextReward", Arrays.asList("&eNext reward in &6", "&6%days% days, %hours% hours, %minutes% mins, %seconds% secs"));
         return nextReward.stream()
                 .map(e -> this.timeToString(time, e.replaceAll("&", "§")))
@@ -74,26 +74,36 @@ public class LitePlaytimeRewardsMessages {
     //</editor-fold>
 
     //<editor-fold desc="Commands" defaultstate="collapsed">
-    public String getPlaytime(long time) {
+    public String getPlaytime(int time) {
         return ChatColor.translateAlternateColorCodes('&', this.timeToString(time, this.messages.getOrDefault("Playtime", "&6You have played for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds on this server.").toString()));
     }
 
-    public String getPlaytimeOther(long time, String player) {
+    public String getPlaytimeOther(int time, String player) {
         return ChatColor.translateAlternateColorCodes('&', this.timeToString(time, this.messages.getOrDefault("PlaytimeOther", "&6%player% has played on this server for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds.").toString())
                 .replaceAll("%player%", player));
     }
 
-    public String getAFKTime(long time) {
+    public String getAFKTime(int time) {
         return ChatColor.translateAlternateColorCodes('&', this.timeToString(time, this.messages.getOrDefault("AFKTime", "&6You have AFK'd for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds on this server.").toString()));
     }
 
-    public String getAFKTimeOther(long time, String player) {
+    public String getAFKTimeOther(int time, String player) {
         return ChatColor.translateAlternateColorCodes('&', this.timeToString(time, this.messages.getOrDefault("AFKTimeOther", "&6%player% has AFK'd on this server for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds.").toString())
                 .replaceAll("%player%", player));
     }
 
     public String getRewardGiven(String player, String rewardname) {
         return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("RewardGiven", "&aThe %rewardname% reward has been given to %player%.").toString()
+                .replaceAll("%rewardname%", rewardname)
+                .replaceAll("%player%", player));
+    }
+    
+    public String getReloadSuccess(){
+        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("ReloadSuccess", "&aConfig and messages reloaded successfully.").toString());
+    }
+    
+    public String getResetSuccess(String player, String rewardname){
+        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("ResetSuccess", "&a%rewardname% for player %player% was successfully reset.").toString()
                 .replaceAll("%rewardname%", rewardname)
                 .replaceAll("%player%", player));
     }
@@ -149,10 +159,10 @@ public class LitePlaytimeRewardsMessages {
     }
     //</editor-fold>
 
-    private String timeToString(long time, String message) {
+    private String timeToString(int time, String message) {
         double totalSeconds = time / 20, totalMinutes = time / 1200, totalHours = time / 72000, totalDays = time / 1728000;
-        long playtimeInSeconds = time / 20;
-        long days = 0, hours = 0, minutes = 0;
+        int playtimeInSeconds = time / 20;
+        int days = 0, hours = 0, minutes = 0;
         if (playtimeInSeconds >= 86400) {
             days = playtimeInSeconds / 86400;
             playtimeInSeconds -= (days * 86400);
@@ -165,10 +175,10 @@ public class LitePlaytimeRewardsMessages {
             minutes = playtimeInSeconds / 60;
             playtimeInSeconds -= (minutes * 60);
         }
-        return message.replaceAll("%days%", Long.toString(days))
-                .replaceAll("%hours%", Long.toString(hours))
-                .replaceAll("%minutes%", Long.toString(minutes))
-                .replaceAll("%seconds%", Long.toString(playtimeInSeconds))
+        return message.replaceAll("%days%", Integer.toString(days))
+                .replaceAll("%hours%", Integer.toString(hours))
+                .replaceAll("%minutes%", Integer.toString(minutes))
+                .replaceAll("%seconds%", Integer.toString(playtimeInSeconds))
                 .replaceAll("%total_in_days%", Double.toString(totalDays))
                 .replaceAll("%total_in_hours%", Double.toString(totalHours))
                 .replaceAll("%total_in_minutes%", Double.toString(totalMinutes))

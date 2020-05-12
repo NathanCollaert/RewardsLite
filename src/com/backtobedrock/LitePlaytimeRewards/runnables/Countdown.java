@@ -7,11 +7,12 @@ import com.earth2me.essentials.User;
 import java.util.Map;
 import java.util.TreeMap;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Countdown extends BukkitRunnable {
 
-    private final long loopTimer;
+    private final int loopTimer;
     private int saveCounter = 0;
     private boolean givenReward = false;
 
@@ -19,11 +20,11 @@ public class Countdown extends BukkitRunnable {
 
     private final LitePlaytimeRewards plugin;
     private final Player plyr;
-    private TreeMap<String, Reward> rewards = new TreeMap<>();
+    private final TreeMap<String, Reward> rewards;
     private User user = null;
 
-    public Countdown(long looptimer, Player plyr) {
-        this.plugin = LitePlaytimeRewards.getInstance();
+    public Countdown(int looptimer, Player plyr) {
+        this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         this.loopTimer = looptimer;
         this.plyr = plyr;
         this.crud = this.plugin.getFromCRUDCache(plyr.getUniqueId());
@@ -35,7 +36,7 @@ public class Countdown extends BukkitRunnable {
 
     @Override
     public void run() {
-        long playtime = this.crud.getPlaytime(), afktime = this.crud.getAfktime();
+        int playtime = this.crud.getPlaytime(), afktime = this.crud.getAfktime();
 
         //Check if user is afk and increment play/afk-time
         if (this.user == null) {
@@ -67,8 +68,8 @@ public class Countdown extends BukkitRunnable {
     private void checkRewards(boolean isAfk) {
         this.rewards.entrySet().stream()
                 .filter((Map.Entry<String, Reward> r) -> r.getValue().getAmountPending() > 0
-                || ((!r.getValue().getcReward().isUsePermission() || this.plyr.hasPermission("liteplaytimerewards.reward." + r.getKey()))
-                && (!r.getValue().getTimeTillNextReward().get(0).equals(-1L))
+                || (r.getValue().isEligible()
+                && (!r.getValue().getcReward().isUsePermission() || this.plyr.hasPermission("liteplaytimerewards.reward." + r.getKey()))
                 && !r.getValue().getcReward().getDisabledWorlds().contains(this.plyr.getLocation().getWorld().getName().toLowerCase())
                 && (r.getValue().getcReward().isCountAfkTime() || !isAfk)))
                 .forEach((entry) -> {
@@ -77,14 +78,10 @@ public class Countdown extends BukkitRunnable {
     }
 
     private void countDown(Reward value) {
-        Long timeNeededNew = !value.getTimeTillNextReward().get(0).equals(-1L) && value.getTimeTillNextReward().get(0) - this.loopTimer <= 0L
-                ? 0L
-                : value.getTimeTillNextReward().get(0).equals(-1L)
-                ? value.getTimeTillNextReward().get(0)
-                : value.getTimeTillNextReward().get(0) - this.loopTimer;
-        if (timeNeededNew.equals(0L)) {
-            value.setAmountPending(this.plugin.giveReward(value, this.plyr, true, 1));
+        int timeNeededNew = value.getTimeTillNextReward().get(0) - this.loopTimer;
+        if (timeNeededNew <= 0) {
             value.removeFirstTimeTillNextReward();
+            value.setAmountPending(this.plugin.giveReward(value, this.plyr, true, 1));
             this.givenReward = true;
         } else {
             if (value.getAmountPending() > 0) {
@@ -94,7 +91,7 @@ public class Countdown extends BukkitRunnable {
                     this.givenReward = true;
                 }
             }
-            if (timeNeededNew > 0L) {
+            if (value.isEligible()) {
                 value.setFirstTimeTillNextReward(timeNeededNew);
             }
         }

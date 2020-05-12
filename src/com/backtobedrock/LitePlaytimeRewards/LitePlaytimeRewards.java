@@ -29,8 +29,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
-    private static LitePlaytimeRewards plugin;
-
     private boolean oldVersion = false;
     public IEssentials ess;
 
@@ -44,8 +42,6 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        plugin = this;
-
         //initialize maps
         this.runnableCache = new TreeMap<>();
         this.CRUDCache = new TreeMap<>();
@@ -58,8 +54,8 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         this.saveDefaultConfig();
 
         //make userdata folder if not exist
-        File dir = new File(this.getDataFolder() + "/userdata");
-        dir.mkdirs();
+        File udFile = new File(this.getDataFolder() + "/userdata");
+        udFile.mkdirs();
 
         //get messages.yml and make if not exists
         File messagesFile = new File(this.getDataFolder(), "messages.yml");
@@ -82,7 +78,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         if (this.config.isUsebStats()) {
             int pluginId = 7380;
             Metrics metrics = new Metrics(this, pluginId);
-            metrics.addCustomChart(new Metrics.SimplePie("reward_count", () -> Integer.toString(LitePlaytimeRewards.getInstance().getLPRConfig().getRewards().size())));
+            metrics.addCustomChart(new Metrics.SimplePie("reward_count", () -> Integer.toString(this.getLPRConfig().getRewards().size())));
         }
 
         super.onEnable();
@@ -90,9 +86,6 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        //unload variable
-        plugin = null;
-
         //save players
         this.CRUDCache.entrySet().forEach(e -> e.getValue().saveConfig());
 
@@ -261,6 +254,10 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         return this.CRUDCache.containsKey(uniqueId);
     }
 
+    public TreeMap<UUID, LitePlaytimeRewardsCRUD> getAllCRUDs() {
+        return this.CRUDCache;
+    }
+
     public void addToGUICache(UUID id, RewardsGUI gui) {
         this.GUICache.put(id, gui);
     }
@@ -273,7 +270,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         return this.GUICache.get(id);
     }
 
-    public static LitePlaytimeRewards getInstance() {
-        return plugin;
+    public void setMessages(File file) {
+        this.messages = new LitePlaytimeRewardsMessages(file);
     }
 }

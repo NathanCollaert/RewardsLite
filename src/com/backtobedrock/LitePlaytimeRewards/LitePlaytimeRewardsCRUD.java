@@ -13,6 +13,7 @@ import org.bukkit.Statistic;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public final class LitePlaytimeRewardsCRUD {
 
@@ -23,11 +24,11 @@ public final class LitePlaytimeRewardsCRUD {
     private final OfflinePlayer player;
 
     private TreeMap<String, Reward> rewards = new TreeMap<>();
-    private long playtime;
-    private long afktime;
+    private int playtime;
+    private int afktime;
 
     public LitePlaytimeRewardsCRUD(OfflinePlayer player) {
-        this.plugin = LitePlaytimeRewards.getInstance();
+        this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         this.player = player;
 
         //initialize data with data from file
@@ -46,7 +47,11 @@ public final class LitePlaytimeRewardsCRUD {
         this.saveConfig();
     }
 
-    private void getData() {
+    public void getData() {
+        //clear rewards and conf for reload
+        this.rewards.clear();
+        this.configuration = null;
+
         FileConfiguration conf = this.getConfig();
 
         this.playtime = conf.getInt("playtime");
@@ -59,7 +64,7 @@ public final class LitePlaytimeRewardsCRUD {
             if (keys.contains(f.getKey())) {
                 Reward reward = rewardsSection.getSerializable(f.getKey(), Reward.class);
                 if (reward != null) {
-                    this.rewards.put(f.getKey(), new Reward(f.getValue(), reward.getTimeTillNextReward(), reward.getAmountRedeemed(), reward.getAmountPending()));
+                    this.rewards.put(f.getKey(), new Reward(f.getValue(), reward.getTimeTillNextReward(), reward.getAmountRedeemed(), reward.getAmountPending(), reward.isEligible()));
                 }
             } else {
                 this.rewards.put(f.getKey(), new Reward(f.getValue()));
@@ -94,11 +99,11 @@ public final class LitePlaytimeRewardsCRUD {
         return this.rewards;
     }
 
-    public long getPlaytime() {
+    public int getPlaytime() {
         return this.playtime;
     }
 
-    public void setPlaytime(long playtime, boolean save) {
+    public void setPlaytime(int playtime, boolean save) {
         FileConfiguration conf = this.getConfig();
         conf.set("playtime", playtime);
         this.playtime = playtime;
@@ -107,11 +112,11 @@ public final class LitePlaytimeRewardsCRUD {
         }
     }
 
-    public long getAfktime() {
+    public int getAfktime() {
         return this.afktime;
     }
 
-    public void setAfktime(long afktime, boolean save) {
+    public void setAfktime(int afktime, boolean save) {
         FileConfiguration conf = this.getConfig();
         conf.set("afktime", afktime);
         this.afktime = afktime;
@@ -155,7 +160,7 @@ public final class LitePlaytimeRewardsCRUD {
     }
 
     public static boolean doesPlayerDataExists(OfflinePlayer plyr) {
-        File file = new File(LitePlaytimeRewards.getInstance().getDataFolder() + "/userdata/" + plyr.getUniqueId().toString() + ".yml");
+        File file = new File(JavaPlugin.getPlugin(LitePlaytimeRewards.class).getDataFolder() + "/userdata/" + plyr.getUniqueId().toString() + ".yml");
         return file.exists();
     }
 }

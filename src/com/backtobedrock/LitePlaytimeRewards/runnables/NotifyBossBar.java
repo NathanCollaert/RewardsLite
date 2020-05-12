@@ -7,6 +7,7 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class NotifyBossBar extends BukkitRunnable {
@@ -18,7 +19,7 @@ public class NotifyBossBar extends BukkitRunnable {
     private final BossBar bar;
 
     public NotifyBossBar(Collection<?> players, String notification, BarColor color) {
-        this.plugin = LitePlaytimeRewards.getInstance();
+        this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         this.bar = Bukkit.createBossBar(notification, color, BarStyle.SOLID);
         players.stream().forEach(e -> {
             bar.addPlayer((Player) e);

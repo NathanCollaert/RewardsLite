@@ -8,7 +8,7 @@ public class ConfigReward {
     private final String displayName;
     private final Material displayItem;
     private final List<String> displayDescription;
-    private final List<Long> playtimeNeeded;
+    private final List<Integer> playtimeNeeded;
     private final boolean countAfkTime;
     private final int slotsNeeded;
     private final boolean loop;
@@ -19,7 +19,7 @@ public class ConfigReward {
     private final String broadcastNotification;
     private final List<String> commands;
 
-    public ConfigReward(String displayName, Material displayItem, List<String> displayDescription, List<Long> playtimeNeeded, boolean countAfkTime, int slotsNeeded, boolean loop, List<String> disabledWorlds, boolean UsePermission, String notificationType, String notification, String broadcastNotification, List<String> commands) {
+    public ConfigReward(String displayName, Material displayItem, List<String> displayDescription, List<Integer> playtimeNeeded, boolean countAfkTime, int slotsNeeded, boolean loop, List<String> disabledWorlds, boolean UsePermission, String notificationType, String notification, String broadcastNotification, List<String> commands) {
         this.displayName = displayName;
         this.displayItem = displayItem;
         this.displayDescription = displayDescription;
@@ -43,7 +43,7 @@ public class ConfigReward {
         return displayName;
     }
 
-    public List<Long> getPlaytimeNeeded() {
+    public List<Integer> getPlaytimeNeeded() {
         return playtimeNeeded;
     }
 

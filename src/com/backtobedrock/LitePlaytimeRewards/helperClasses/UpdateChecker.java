@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class UpdateChecker {
 
@@ -15,7 +16,7 @@ public class UpdateChecker {
     private final int resourceId;
 
     public UpdateChecker(int resourceId) {
-        this.plugin = LitePlaytimeRewards.getInstance();
+        this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         this.resourceId = resourceId;
     }
 

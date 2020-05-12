@@ -28,14 +28,14 @@ NextReward:
 
 #Info displayed under reward description when executing /rewards if player can't claim reward anymore.
 NextRewardNever:
-- "&cClaimed all rewards already."
+- "&cAlready earned this reward."
 
-#Info displayed under reward description when executing /rewards if no permission for it but claimed or pending at least one.
+#Info displayed under reward description when executing /rewards if no permission for it but claimed or pending at least once.
 NextRewardNoPermission:
 - "&cYou can't earn this reward."
 
 #Available placeholders: %player% - %rewardname% - %world%
-#Notification send to players if they have a reward pending cause in a unclaimable world.
+#Notification send to players if they have a reward pending cause in an unclaimable world.
 PendingNotificationWrongWorld: "&eYou have a playtime reward pending but can't claim it in this world."
 
 #Available placeholders: %player% - %rewardname% - %inventory_spaces_needed%
@@ -73,6 +73,13 @@ AFKTimeOther: "&6%player% has AFK'd on this server for %days% days, %hours% hour
 #Shown to player executing the command /givereward if the reward has been successfully given to player.
 RewardGiven: "&aThe %rewardname% reward has been given to %player%."
 
+#Shown to player if executing the command /lpr reload was successful.
+ReloadSuccess: "&aConfig and messages reloaded successfully."
+
+#Available placeholders: %player% - %rewardname%
+#Shown to player if executing the command /lpr reset <reward> <player> was successful.
+ResetSuccess: "&a%rewardname% for player %player% was successfully reset."
+
 
 ############################################################
 # +------------------------------------------------------+ #
@@ -81,39 +88,38 @@ RewardGiven: "&aThe %rewardname% reward has been given to %player%."
 ############################################################
 
 #Error thrown if command requires to be executed by an online player.
-NeedToBeOnline: "&4You will need to log in to use this command."
+NeedToBeOnline: "&cYou will need to log in to use this command."
 
 #Error thrown when executing the command /afktime or /afktime <player> and if server hasn't got essentials installed.
-ServerDoesntKeepTrackOfAFK: "&4This server does not keep track of AFK time."
+ServerDoesntKeepTrackOfAFK: "&cThis server does not keep track of AFK time."
 
 #Error thrown when executing the command /givereward and no rewards are configured in the config file.
-NoRewardsConfigured: "&4No rewards configured in the config file."
+NoRewardsConfigured: "&cNo rewards configured in the config file."
 
 #Available placeholders: %command%
 #Error thrown when executing the command /rewards or /givereward and the amount of rewards exceeds the maximum inventory spaces.
-MaxInventExceeded: "&4Max inventory size exceeded, please use &b%command%&4."
+MaxInventExceeded: "&cMax inventory size exceeded, please use &b%command%&4."
 
 #Error thrown when executing the command /rewards and there are no rewards available for the player.
-NoRewardsAvailable: "&4There are no rewards available for you."
+NoRewardsAvailable: "&cThere are no rewards available for you."
 
 #Error thrown if player has no permission to use the command.
-NoPermission: "&4You do not have permission to perform this command."
+NoPermission: "&cYou do not have permission to perform this command."
 
 #Available placeholders: %player%
 #Error thrown if command requires player data but player has no data on the server.
-NoData: "&4%player% has no data on this server yet."
+NoData: "&c%player% has no data on this server yet."
 
 #Available placeholders: %rewardname%
 #Error thrown when executing /givereward <reward> <playername> [amount] [broadcast] and reward isn't configured on the server.
-NoSuchReward: "&4%rewardname% is not an available reward."
+NoSuchReward: "&c%rewardname% is not an available reward."
 
 #Error thrown when executing /givereward <reward> <playername> [amount] [broadcast] and amount is not a number greater then 0.
-NotANumber: "&4Amount must be a possitive number greater then 0."
+NotANumber: "&cAmount must be a positive number greater then 0."
 
 #Error thrown when executing /givereward <reward> <playername> [amount] [broadcast] and broadcast is not true or false.
-NotABoolean: "&4Broadcast must be true or false."
+NotABoolean: "&cBroadcast must be true or false."
 
 #Available placeholders: %player%
 #Error thrown if command requires receiving player to be online but isn't.
-NotOnline: "&4The player %player% is not online."
-
+NotOnline: "&cThe player %player% is not online."

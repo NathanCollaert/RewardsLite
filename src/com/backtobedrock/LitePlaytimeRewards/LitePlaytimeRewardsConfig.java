@@ -11,17 +11,23 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class LitePlaytimeRewardsConfig {
 
-    private final FileConfiguration config;
+    private FileConfiguration config;
     private final LitePlaytimeRewards plugin;
 
-    private final TreeMap<String, ConfigReward> rewards = new TreeMap<>();
+    private TreeMap<String, ConfigReward> rewards = new TreeMap<>();
 
     public LitePlaytimeRewardsConfig() {
-        this.plugin = LitePlaytimeRewards.getInstance();
+        this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         this.config = this.plugin.getConfig();
+    }
+
+    public void setConfig(FileConfiguration fc) {
+        this.config = fc;
+        this.rewards.clear();
     }
 
     // <editor-fold desc="Miscellaneous" defaultstate="collapsed">
@@ -72,88 +78,46 @@ public class LitePlaytimeRewardsConfig {
     }
     // </editor-fold>
 
-    private int checkMin(int value, int min, int defaultValue) {
-        if (value >= min) {
-            return value;
-        } else {
-            return defaultValue;
-        }
-    }
-
     private ConfigReward getRewardFromConfig(String name, ConfigurationSection reward) {
-        String displayName = name;
+        String displayName = ChatColor.translateAlternateColorCodes('&', reward.getString("DisplayName", name));
         Material displayItem = Material.CHEST;
-        List<String> displayDescription = new ArrayList<>();
-        List<Long> playtimeNeeded = new ArrayList<>();
-        boolean countAfkTime = true;
-        int slotsNeeded = 0;
-        boolean loop = false;
-        List<String> disabledWorlds = new ArrayList<>();
-        boolean usePermission = false;
-        String notificationType = "chat";
-        String notification = "";
-        String broadcastNotification = "";
-        List<String> commands = null;
+        List<String> displayDescription = reward.getStringList("DisplayDescription").stream().map(e -> ChatColor.translateAlternateColorCodes('&', e)).collect(Collectors.toList());
+        List<Integer> playtimeNeeded = this.getNumbersFromString(reward.getString("PlaytimeNeeded", ""));
+        boolean countAfkTime = reward.getBoolean("CountAfkTime", true);
+        int slotsNeeded = this.checkMin(reward.getInt("SlotsNeeded", 0), 0, 0);
+        boolean loop = reward.getBoolean("Loop", false);
+        List<String> disabledWorlds = reward.getStringList("DisabledWorlds");
+        boolean usePermission = reward.getBoolean("UsePermission", false);
+        String notificationType = reward.getString("NotificationType", "bossbar");
+        String notification = ChatColor.translateAlternateColorCodes('&', reward.getString("Notification", ""));
+        String broadcastNotification = ChatColor.translateAlternateColorCodes('&', reward.getString("BroadcastNotification", ""));
+        List<String> commands = reward.getStringList("Commands");
 
-        if (reward.contains("DisplayName")) {
-            displayName = ChatColor.translateAlternateColorCodes('&', reward.get("DisplayName").toString());
-        }
-        if (reward.contains("DisplayItem")) {
-            Material m = Material.matchMaterial(reward.get("DisplayItem").toString());
-            if (m != null && m != Material.AIR) {
-                displayItem = m;
-            }
-        }
-        if (reward.contains("DisplayDescription")) {
-            List<String> desc = (List<String>) reward.get("DisplayDescription");
-            if (desc != null) {
-                desc.replaceAll(e -> ChatColor.translateAlternateColorCodes('&', e));
-                displayDescription = desc;
-            }
-        }
-        if (reward.contains("PlaytimeNeeded")) {
-            playtimeNeeded = this.getNumbersFromString(reward.get("PlaytimeNeeded").toString());
-        }
-        if (reward.contains("CountAfkTime")) {
-            countAfkTime = (boolean) reward.get("CountAfkTime");
-        }
-        if (reward.contains("SlotsNeeded")) {
-            slotsNeeded = (int) reward.get("SlotsNeeded");
-        }
-        if (reward.contains("Loop")) {
-            loop = (boolean) reward.get("Loop");
-        }
-        if (reward.contains("DisabledWorlds")) {
-            disabledWorlds = (List<String>) reward.get("DisabledWorlds");
-        }
-        if (reward.contains("UsePermission")) {
-            usePermission = (boolean) reward.get("UsePermission");
-        }
-        if (reward.contains("NotificationType")) {
-            notificationType = reward.get("NotificationType").toString();
-        }
-        if (reward.contains("Notification")) {
-            notification = ChatColor.translateAlternateColorCodes('&', reward.get("Notification").toString());
-        }
-        if (reward.contains("BroadcastNotification")) {
-            broadcastNotification = ChatColor.translateAlternateColorCodes('&', reward.get("BroadcastNotification").toString());
-        }
-        if (reward.contains("Commands")) {
-            commands = (List<String>) reward.get("Commands");
+        Material m = Material.matchMaterial(reward.getString("DisplayItem", "chest"));
+        if (m != null && m != Material.AIR) {
+            displayItem = m;
         }
 
-        if (playtimeNeeded.isEmpty() || slotsNeeded < 0 || commands == null) {
+        if (playtimeNeeded.isEmpty() || slotsNeeded < 0 || commands.isEmpty()) {
             return null;
         }
 
         return new ConfigReward(displayName, displayItem, displayDescription, playtimeNeeded, countAfkTime, slotsNeeded, loop, disabledWorlds, usePermission, notificationType, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
     }
 
-    private List<Long> getNumbersFromString(String numbers) {
+    private List<Integer> getNumbersFromString(String numbers) {
         try {
-            return Arrays.asList(numbers.split(",")).stream().map(e -> Long.parseLong(e) * 1200).collect(Collectors.toList());
+            return Arrays.asList(numbers.split(",")).stream().map(e -> (Integer.parseInt(e) > 1789569 ? 1789569 : Integer.parseInt(e)) * 1200).collect(Collectors.toList());
         } catch (NumberFormatException e) {
             return new ArrayList<>();
+        }
+    }
+
+    private int checkMin(int value, int min, int defaultValue) {
+        if (value >= min) {
+            return value;
+        } else {
+            return defaultValue;
         }
     }
 }

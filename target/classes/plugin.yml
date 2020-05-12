@@ -1,5 +1,5 @@
 name: LitePlaytimeRewards
-version: 2.1.1
+version: 2.2.0
 description: A lightweight plugin that gives rewards based on playtime
 author: Nathan
 website: www.backtobedrock.com
@@ -16,11 +16,14 @@ commands:
     givereward:
         description: Force give one of the rewards to a player.
         permission: liteplaytimerewards.givereward
-        usage: /<command> <reward> <player> [amount] [broadcast]
+        usage: /<command> <reward> <player> [amount] [true|false]
     givereward:
         description: Open a GUI to give a reward to a player.
         permission: liteplaytimerewards.givereward
         usage: /<command>
+    lpr:
+        description: LPR commands.
+        usage: /<command> [help|reload|reset]
     playtime:
         description: Check your current playtime.
         permission: liteplaytimerewards.playtime
@@ -42,4 +45,10 @@ permissions:
     liteplaytimerewards.playtime.other:
         default: op
     liteplaytimerewards.rewards:
+        default: op
+    liteplaytimerewards.reset:
+        default: op
+    liteplaytimerewards.reload:
+        default: op
+    liteplaytimerewards.help:
         default: op

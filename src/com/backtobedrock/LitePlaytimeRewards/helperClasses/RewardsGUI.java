@@ -9,17 +9,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class RewardsGUI {
 
+    private final LitePlaytimeRewards plugin;
     private final OfflinePlayer player;
     private final Inventory GUI;
     private final TreeMap<String, RewardsGUIReward> GUIRewards = new TreeMap<>();
 
     public RewardsGUI(TreeMap<String, ?> rewards, OfflinePlayer player) {
+        plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         RewardsGUICustomHolder holder = (rewards.firstEntry().getValue() instanceof Reward
-                ? new RewardsGUICustomHolder((int) (Math.ceil(((double) rewards.size()) / 9) * 9), LitePlaytimeRewards.getInstance().getMessages().getRewardsInventoryTitle())
-                : new RewardsGUICustomHolder((int) (Math.ceil(((double) rewards.size()) / 9) * 9), LitePlaytimeRewards.getInstance().getMessages().getGiveRewardInventoryTitle()));
+                ? new RewardsGUICustomHolder((int) (Math.ceil(((double) rewards.size()) / 9) * 9), this.plugin.getMessages().getRewardsInventoryTitle())
+                : new RewardsGUICustomHolder((int) (Math.ceil(((double) rewards.size()) / 9) * 9), this.plugin.getMessages().getGiveRewardInventoryTitle()));
         this.GUI = holder.getInventory();
         this.player = player;
         this.initializeGUI(rewards);
@@ -44,14 +47,14 @@ public class RewardsGUI {
                 description.add(0, "§f----");
             }
             if (reward instanceof Reward) {
-                description.addAll(0, LitePlaytimeRewards.getInstance().getMessages().getRewardInfo(((Reward) reward).getAmountRedeemed(), ((Reward) reward).getAmountPending()));
+                description.addAll(0, this.plugin.getMessages().getRewardInfo(((Reward) reward).getAmountRedeemed(), ((Reward) reward).getAmountPending()));
                 description.add("§f----");
-                Long nextReward = ((Reward) reward).getTimeTillNextReward().get(0);
+                int nextReward = ((Reward) reward).getTimeTillNextReward().get(0);
                 description.addAll(player.isOnline() && (((Player) player).hasPermission("liteplaytimerewards.reward." + name.toLowerCase()) || !cReward.isUsePermission())
-                        ? nextReward > -1L
-                                ? LitePlaytimeRewards.getInstance().getMessages().getNextReward(nextReward)
-                                : LitePlaytimeRewards.getInstance().getMessages().getNextRewardNever()
-                        : LitePlaytimeRewards.getInstance().getMessages().getNextRewardNoPermission());
+                        ? ((Reward) reward).isEligible()
+                        ? this.plugin.getMessages().getNextReward(nextReward)
+                        : this.plugin.getMessages().getNextRewardNever()
+                        : this.plugin.getMessages().getNextRewardNoPermission());
             } else {
                 description.add(0, String.format("§a(amount: §2%d§a, broadcast: §2%s§a)", 1, false));
                 description.add("§f----");

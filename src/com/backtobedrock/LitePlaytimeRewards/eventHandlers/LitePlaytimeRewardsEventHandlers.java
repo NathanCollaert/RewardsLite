@@ -2,8 +2,8 @@ package com.backtobedrock.LitePlaytimeRewards.eventHandlers;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsCRUD;
-import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsCommands;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsConfig;
+import com.backtobedrock.LitePlaytimeRewards.commands.GiverewardCommand;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.RewardsGUI;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.RewardsGUICustomHolder;
 import com.backtobedrock.LitePlaytimeRewards.helperClasses.RewardsGUIReward;
@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -38,7 +39,7 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
     private final TreeMap<UUID, String> isGivingReward = new TreeMap<>();
 
     public LitePlaytimeRewardsEventHandlers() {
-        this.plugin = LitePlaytimeRewards.getInstance();
+        this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         this.config = this.plugin.getLPRConfig();
     }
 
@@ -54,7 +55,7 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
         }
 
         //run task, add task to cache
-        BukkitTask rewardRunnable = new Countdown(20L, e.getPlayer()).runTaskTimer(this.plugin, 20, 20);
+        BukkitTask rewardRunnable = new Countdown(20, e.getPlayer()).runTaskTimer(this.plugin, 20, 20);
         this.plugin.addToRunnableCache(e.getPlayer().getUniqueId(), rewardRunnable.getTaskId());
 
         //check for updates
@@ -83,8 +84,8 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
             public void run() {
                 if (!e.getPlayer().isOnline()) {
                     //remove from crud cache
-                    LitePlaytimeRewards.getInstance().removeFromCRUDCache(e.getPlayer().getUniqueId());
-                    LitePlaytimeRewards.getInstance().removeFromRunnableCache(e.getPlayer().getUniqueId());
+                    JavaPlugin.getPlugin(LitePlaytimeRewards.class).removeFromCRUDCache(e.getPlayer().getUniqueId());
+                    JavaPlugin.getPlugin(LitePlaytimeRewards.class).removeFromRunnableCache(e.getPlayer().getUniqueId());
                 }
             }
         }.runTaskLater(this.plugin, this.config.getTimeKeepDataInCache());
@@ -166,7 +167,7 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
                 if (e.getMessage().equalsIgnoreCase("!cancel")) {
                     this.isGivingReward.remove(plyr.getUniqueId());
                     plyr.openInventory(this.plugin.getFromGUICache(plyr.getUniqueId()).getGUI());
-                } else if (LitePlaytimeRewardsCommands.giveRewardCommand(plyr, rewardName, e.getMessage(), reward.isBroadcast(), reward.getAmount())) {
+                } else if (GiverewardCommand.giveRewardCommand(plyr, rewardName, e.getMessage(), reward.isBroadcast(), reward.getAmount())) {
                     plyr.sendMessage(this.plugin.getMessages().getRewardGiven(e.getMessage(), rewardName));
                     this.isGivingReward.remove(plyr.getUniqueId());
                     this.plugin.removeFromGUICache(plyr.getUniqueId());
