@@ -43,7 +43,7 @@ public class AfktimeCommand extends LitePlaytimeRewardsCommand {
                 }
                 break;
             default:
-                this.sendUsageMessage("§6/afktime §e[player]§r: Check your current AFK time or that of another player.");
+                this.sendUsageMessage(Commands.AFKTIME);
                 break;
         }
     }

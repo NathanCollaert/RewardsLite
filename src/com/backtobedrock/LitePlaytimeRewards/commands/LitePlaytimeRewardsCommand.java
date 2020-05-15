@@ -6,29 +6,29 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public abstract class LitePlaytimeRewardsCommand {
-    
+
     LitePlaytimeRewards plugin;
     CommandSender cs;
     Player sender;
     String[] args;
-    
+
     public LitePlaytimeRewardsCommand(CommandSender cs, String[] args) {
         this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         this.cs = cs;
         this.sender = cs instanceof Player ? (Player) cs : null;
         this.args = args;
     }
-    
+
     public abstract void run();
-    
+
     public boolean checkPermission(String permission) {
-        if (!this.sender.hasPermission("liteplaytimerewards." + permission)) {
+        if (!this.cs.hasPermission("liteplaytimerewards." + permission)) {
             this.cs.sendMessage(this.plugin.getMessages().getNoPermission());
             return false;
         }
         return true;
     }
-    
+
     public boolean checkIfPlayer() {
         if (this.sender == null) {
             this.cs.sendMessage(this.plugin.getMessages().getNeedToBeOnline());
@@ -36,8 +36,8 @@ public abstract class LitePlaytimeRewardsCommand {
         }
         return true;
     }
-    
-    public void sendUsageMessage(String usage) {
-        this.cs.sendMessage("§bCommand usage:\n" + usage);
+
+    public void sendUsageMessage(Commands command) {
+        this.cs.sendMessage(new String[]{"§8§m--------------§6 Command §fUsage §8§m--------------", command.getFancyVersion(), "§8§m------------------------------------------"});
     }
 }

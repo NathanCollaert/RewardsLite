@@ -50,29 +50,39 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         //register Reward for serialization
         ConfigurationSerialization.registerClass(Reward.class);
 
-        //save and get config
-        this.saveDefaultConfig();
+        //check if essentials is installed
+        this.ess = (IEssentials) Bukkit.getPluginManager().getPlugin("Essentials");
+        if (this.ess == null) {
+            this.getLogger().info("Essentials not found, AFK time won't be counted.");
+        }
+
+        //get config.yml and make if not exists
+        File configFile = new File(this.getDataFolder(), "config.yml");
+        if (!configFile.exists()) {
+            this.getLogger().info("Creating config.yml file.");
+            this.saveResource("config.yml", false);
+        }
 
         //make userdata folder if not exist
         File udFile = new File(this.getDataFolder() + "/userdata");
-        udFile.mkdirs();
+        if (udFile.mkdirs()) {
+            this.getLogger().info("Creating userdata folder.");
+        }
 
         //get messages.yml and make if not exists
         File messagesFile = new File(this.getDataFolder(), "messages.yml");
         if (!messagesFile.exists()) {
+            this.getLogger().info("Creating messages.yml file.");
             this.saveResource("messages.yml", false);
         }
 
         //initialize config, messages and command classes
-        this.config = new LitePlaytimeRewardsConfig();
+        this.config = new LitePlaytimeRewardsConfig(configFile);
         this.messages = new LitePlaytimeRewardsMessages(messagesFile);
         this.commands = new LitePlaytimeRewardsCommands();
 
         //register eventhandler class
         getServer().getPluginManager().registerEvents(new LitePlaytimeRewardsEventHandlers(), this);
-
-        //check if essentials is installed
-        this.ess = (IEssentials) Bukkit.getPluginManager().getPlugin("Essentials");
 
         //bStats
         if (this.config.isUsebStats()) {

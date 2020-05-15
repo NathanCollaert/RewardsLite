@@ -1,6 +1,7 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -9,14 +10,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class LprCommand extends LitePlaytimeRewardsCommand {
-
-    private final List<String> commands = Arrays.asList("§6/afktime §e[player]§r: Check your current AFK time or that of another player.",
-            "§6/givereward §e<reward> <player> [amount] [broadcast]§r: Force give one of the reward to a player.",
-            "§6/lpr help§r: List of LitePlaytimeRewards commands.",
-            "§6/lpr reload§r: Reload the config and messages files.",
-            "§6/lpr reset §e<reward> <player>§r: Resets the reward time for the given reward for the given player.",
-            "§6/playtime §e[player]§r: Check your current playtime or that of another player.",
-            "§6/rewards §e[reward]§r: Check info on all your available rewards or a single one.");
 
     public LprCommand(CommandSender cs, String[] args) {
         super(cs, args);
@@ -44,8 +37,7 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
                                 this.plugin.setMessages(messageFile);
 
                                 //reload config file
-                                YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-                                this.plugin.getLPRConfig().setConfig(config);
+                                this.plugin.getLPRConfig().setConfig(YamlConfiguration.loadConfiguration(configFile));
 
                                 //save all cruds and redo rewards
                                 this.plugin.getAllCRUDs().entrySet().stream().forEach(e -> {
@@ -55,7 +47,7 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
 
                                 this.cs.sendMessage(this.plugin.getMessages().getReloadSuccess());
                             } else {
-                                this.sendUsageMessage("§6/lpr reload§r: Reload the config and messages files.");
+                                this.sendUsageMessage(Commands.LPR_RELOAD);
                             }
                         }
                         break;
@@ -64,7 +56,7 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
                             if (this.args.length == 1) {
                                 this.sendHelpMessage(this.cs);
                             } else {
-                                this.sendUsageMessage("§6/lpr help§r: List of LitePlaytimeRewards commands.");
+                                this.sendUsageMessage(Commands.LPR_HELP);
                             }
                         }
                         break;
@@ -88,12 +80,12 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
 
                                 this.cs.sendMessage(this.plugin.getMessages().getResetSuccess(plyrReset.getName(), args[1].toLowerCase()));
                             } else {
-                                this.sendUsageMessage("§6/lpr reset §e<reward> <player>§r: Resets the reward time for the given reward for the given player.");
+                                this.sendUsageMessage(Commands.LPR_RESET);
                             }
                         }
                         break;
                     default:
-                        this.sendUsageMessage("§6/lpr §e[help§f|§ereload§f|§ereset]§r: LPR commands.");
+                        this.sendUsageMessage(Commands.LPR);
                         break;
                 }
                 break;
@@ -101,9 +93,11 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
     }
 
     private void sendHelpMessage(CommandSender cs) {
-        StringBuilder sb = new StringBuilder("§bAvailable commands:");
-        this.commands.stream().forEach(e -> sb.append("\n").append(e));
-        cs.sendMessage(sb.toString());
+        List<String> helpMessage = new ArrayList<>();
+        helpMessage.add("§8§m----------§6 LitePlaytimeRewards §fHelp §8§m----------");
+        Arrays.stream(Commands.values()).forEach(e -> helpMessage.add(e.getFancyVersion()));
+        helpMessage.add("§8§m------------------------------------------");
+        cs.sendMessage(Arrays.stream(helpMessage.toArray()).toArray(String[]::new));
     }
 
 }

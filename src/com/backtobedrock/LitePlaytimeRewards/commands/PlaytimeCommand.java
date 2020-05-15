@@ -52,7 +52,7 @@ public class PlaytimeCommand extends LitePlaytimeRewardsCommand {
                 }
                 break;
             default:
-                this.sendUsageMessage("§6/playtime §e[player]§r: Check your current playtime or that of another player.");
+                this.sendUsageMessage(Commands.PLAYTIME);
                 break;
         }
     }

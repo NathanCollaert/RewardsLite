@@ -32,7 +32,7 @@ public class GiverewardCommand extends LitePlaytimeRewardsCommand {
 
                     //Check if exceeding max inventory size
                     if (giveRewards.size() > 54) {
-                        this.cs.sendMessage(this.plugin.getMessages().getMaxInventExceeded("§6/givereward §e<reward> <player> [amount] [broadcast]"));
+                        this.cs.sendMessage(this.plugin.getMessages().getMaxInventExceeded("§e" + Commands.GIVEREWARD.getUsage()));
                         break;
                     }
 
@@ -72,7 +72,7 @@ public class GiverewardCommand extends LitePlaytimeRewardsCommand {
                 }
                 break;
             default:
-                this.sendUsageMessage("§6/givereward §e<reward> <player> [amount] [broadcast]§r: Force give one of the reward to a player.");
+                this.sendUsageMessage(Commands.GIVEREWARD);
                 break;
         }
     }

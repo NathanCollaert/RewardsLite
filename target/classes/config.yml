@@ -36,7 +36,7 @@ Rewards:
         DisplayName: "&6Test &eReward"
         
         #This item will be displayed for the reward in the rewards GUI.
-        #All possible materials (except for AIR) can be used for this (https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html ).
+        #All possible materials that have an inventory item in game can be used for this (https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html ).
         #Default = chest
         DisplayItem: "ender_chest"
         

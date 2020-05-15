@@ -1,10 +1,10 @@
 name: LitePlaytimeRewards
-version: 2.2.0
+version: 2.2.1
 description: A lightweight plugin that gives rewards based on playtime
 author: Nathan
 website: www.backtobedrock.com
 main: com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards
-prefix: LPR
+prefix: LitePlaytimeRewards
 api-version: 1.13
 softdepend: [Essentials]
 

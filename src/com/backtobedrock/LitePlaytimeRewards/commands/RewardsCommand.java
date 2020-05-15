@@ -62,7 +62,7 @@ public class RewardsCommand extends LitePlaytimeRewardsCommand {
                 }
                 break;
             default:
-                this.sendUsageMessage("§6/rewards §e[reward]§r: Check info on all your available rewards or a single one.");
+                this.sendUsageMessage(Commands.REWARDS);
                 break;
         }
     }
