@@ -19,16 +19,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.StringUtil;
 
 public class LitePlaytimeRewardsCommands implements TabCompleter {
-    
+
     private final LitePlaytimeRewards plugin;
-    
+
     public LitePlaytimeRewardsCommands() {
         this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         Bukkit.getServer().getPluginCommand("givereward").setTabCompleter(this);
         Bukkit.getServer().getPluginCommand("rewards").setTabCompleter(this);
         Bukkit.getServer().getPluginCommand("lpr").setTabCompleter(this);
     }
-    
+
     public boolean onCommand(CommandSender cs, Command cmnd, String alias, String[] args) {
         switch (cmnd.getName().toLowerCase()) {
             case "playtime":
@@ -46,16 +46,16 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
             case "rewards":
                 new RewardsCommand(cs, args).run();
                 break;
-            
+
         }
         return true;
     }
-    
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmnd, String alias, String[] args) {
         //create new array
         final List<String> completions = new ArrayList<>();
-        
+
         switch (cmnd.getName().toLowerCase()) {
             case "givereward":
                 if (args.length == 1) {
@@ -73,7 +73,7 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                 break;
             case "rewards":
                 if (args.length == 1) {
-                    StringUtil.copyPartialMatches(args[0].toLowerCase(), this.plugin.getFromCRUDCache(((Player) sender).getUniqueId()).getRewards().keySet(), completions);
+                    StringUtil.copyPartialMatches(args[0].toLowerCase(), this.plugin.getPlayerCache().get(((Player) sender).getUniqueId()).getRewards().keySet(), completions);
                     Collections.sort(completions);
                 }
                 break;

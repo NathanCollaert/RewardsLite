@@ -1,8 +1,8 @@
 package com.backtobedrock.LitePlaytimeRewards.runnables;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
-import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsCRUD;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.Reward;
+import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
+import com.backtobedrock.LitePlaytimeRewards.models.Reward;
 import com.earth2me.essentials.User;
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,7 +16,7 @@ public class Countdown extends BukkitRunnable {
     private int saveCounter = 0;
     private boolean givenReward = false;
 
-    LitePlaytimeRewardsCRUD crud;
+    PlayerData crud;
 
     private final LitePlaytimeRewards plugin;
     private final Player plyr;
@@ -27,7 +27,7 @@ public class Countdown extends BukkitRunnable {
         this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         this.loopTimer = looptimer;
         this.plyr = plyr;
-        this.crud = this.plugin.getFromCRUDCache(plyr.getUniqueId());
+        this.crud = this.plugin.getPlayerCache().get(plyr.getUniqueId());
         this.rewards = this.crud.getRewards();
         if (plugin.ess != null) {
             this.user = plugin.ess.getUser(plyr);

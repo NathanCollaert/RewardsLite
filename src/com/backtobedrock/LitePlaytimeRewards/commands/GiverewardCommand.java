@@ -1,11 +1,12 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
-import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsCRUD;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.Reward;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.RewardsGUI;
+import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
+import com.backtobedrock.LitePlaytimeRewards.guis.GiveRewardGUI;
+import com.backtobedrock.LitePlaytimeRewards.models.ConfigReward;
+import com.backtobedrock.LitePlaytimeRewards.models.Reward;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -30,16 +31,10 @@ public class GiverewardCommand extends LitePlaytimeRewardsCommand {
                         break;
                     }
 
-                    //Check if exceeding max inventory size
-                    if (giveRewards.size() > 54) {
-                        this.cs.sendMessage(this.plugin.getMessages().getMaxInventExceeded("§e" + Commands.GIVEREWARD.getUsage()));
-                        break;
-                    }
-
                     //Create GUI, add to list and open
-                    final RewardsGUI giveGUI = new RewardsGUI(giveRewards, this.sender);
-                    this.plugin.addToGUICache(this.sender.getUniqueId(), giveGUI);
-                    this.sender.openInventory(giveGUI.getGUI());
+                    GiveRewardGUI giveGUI = new GiveRewardGUI(giveRewards);
+                    this.plugin.getGUICache().put(this.sender.getUniqueId(), giveGUI);
+                    this.sender.openInventory(giveGUI.getInventory());
                 }
                 break;
             case 2:
@@ -61,13 +56,13 @@ public class GiverewardCommand extends LitePlaytimeRewardsCommand {
                 //check for permission
                 if (this.checkPermission("givereward") && this.checkNumber()) {
                     //check if boolean
-                    if (!args[3].equalsIgnoreCase("true") && !args[3].equalsIgnoreCase("false")) {
-                        cs.sendMessage(this.plugin.getMessages().getNotABoolean());
+                    if (!this.args[3].equalsIgnoreCase("true") && !this.args[3].equalsIgnoreCase("false")) {
+                        this.cs.sendMessage(this.plugin.getMessages().getNotABoolean());
                         break;
                     }
 
-                    if (GiverewardCommand.giveRewardCommand(cs, args[0], args[1], Boolean.getBoolean(args[3]), Integer.parseInt(args[2]))) {
-                        cs.sendMessage(this.plugin.getMessages().getRewardGiven(args[1], args[0]));
+                    if (GiverewardCommand.giveRewardCommand(this.cs, this.args[0], this.args[1], Boolean.getBoolean(this.args[3]), Integer.parseInt(this.args[2]))) {
+                        this.cs.sendMessage(this.plugin.getMessages().getRewardGiven(this.args[1], this.args[0]));
                     }
                 }
                 break;
@@ -104,12 +99,12 @@ public class GiverewardCommand extends LitePlaytimeRewardsCommand {
 
         //check if player has data on server
         OfflinePlayer plyr = Bukkit.getOfflinePlayer(playerName);
-        if (!LitePlaytimeRewardsCRUD.doesPlayerDataExists(plyr)) {
+        if (!PlayerData.doesPlayerDataExists(plyr)) {
             cs.sendMessage(plugin.getMessages().getNoData(plyr.getName()));
             return false;
         }
 
-        LitePlaytimeRewardsCRUD crud = plyr.isOnline() ? plugin.getFromCRUDCache(plyr.getUniqueId()) : new LitePlaytimeRewardsCRUD(plyr);
+        PlayerData crud = plyr.isOnline() ? plugin.getPlayerCache().get(plyr.getUniqueId()) : new PlayerData(plyr);
 
         //get reward
         Reward reward = crud.getRewards().get(rewardName.toLowerCase());

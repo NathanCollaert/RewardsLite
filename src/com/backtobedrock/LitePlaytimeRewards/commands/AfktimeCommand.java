@@ -1,6 +1,6 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
-import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsCRUD;
+import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -18,7 +18,7 @@ public class AfktimeCommand extends LitePlaytimeRewardsCommand {
                 //check if player and has permission
                 if (this.checkIfPlayer() && this.checkPermission("afktime") && this.checkEssentials()) {
                     //get player data
-                    LitePlaytimeRewardsCRUD crudafk = this.plugin.getFromCRUDCache(this.sender.getUniqueId());
+                    PlayerData crudafk = this.plugin.getPlayerCache().get(this.sender.getUniqueId());
 
                     this.cs.sendMessage(this.plugin.getMessages().getAFKTime(crudafk.getAfktime()));
                 }
@@ -29,15 +29,15 @@ public class AfktimeCommand extends LitePlaytimeRewardsCommand {
                     //check if player has played on server before
                     OfflinePlayer plyrafkother = Bukkit.getOfflinePlayer(args[0]);
 
-                    if (!LitePlaytimeRewardsCRUD.doesPlayerDataExists(plyrafkother)) {
+                    if (!PlayerData.doesPlayerDataExists(plyrafkother)) {
                         cs.sendMessage(this.plugin.getMessages().getNoData(plyrafkother.getName()));
                         break;
                     }
 
                     //get player data
-                    LitePlaytimeRewardsCRUD crudafkother = plyrafkother.isOnline()
-                            ? this.plugin.getFromCRUDCache(plyrafkother.getUniqueId())
-                            : new LitePlaytimeRewardsCRUD(plyrafkother);
+                    PlayerData crudafkother = plyrafkother.isOnline()
+                            ? this.plugin.getPlayerCache().get(plyrafkother.getUniqueId())
+                            : new PlayerData(plyrafkother);
 
                     cs.sendMessage(this.plugin.getMessages().getAFKTimeOther(crudafkother.getAfktime(), plyrafkother.getName()));
                 }

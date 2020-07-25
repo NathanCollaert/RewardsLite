@@ -1,11 +1,16 @@
 package com.backtobedrock.LitePlaytimeRewards;
 
+import com.backtobedrock.LitePlaytimeRewards.configs.Config;
+import com.backtobedrock.LitePlaytimeRewards.configs.Messages;
+import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
 import com.backtobedrock.LitePlaytimeRewards.eventHandlers.LitePlaytimeRewardsEventHandlers;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.ConfigReward;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.Reward;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.RewardsGUI;
-import com.backtobedrock.LitePlaytimeRewards.helperClasses.UpdateChecker;
+import com.backtobedrock.LitePlaytimeRewards.guis.GiveRewardGUI;
+import com.backtobedrock.LitePlaytimeRewards.models.ConfigReward;
+import com.backtobedrock.LitePlaytimeRewards.models.Reward;
+import com.backtobedrock.LitePlaytimeRewards.utils.UpdateChecker;
+import com.backtobedrock.LitePlaytimeRewards.models.GUIReward;
 import com.backtobedrock.LitePlaytimeRewards.runnables.NotifyBossBar;
+import com.backtobedrock.LitePlaytimeRewards.utils.Metrics;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +20,6 @@ import java.util.stream.Collectors;
 import net.ess3.api.IEssentials;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.boss.BarColor;
@@ -31,31 +35,68 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
     private boolean oldVersion = false;
     public IEssentials ess;
+    private boolean legacy;
 
-    private LitePlaytimeRewardsConfig config;
-    private LitePlaytimeRewardsMessages messages;
+    private Config config;
+    private Messages messages;
     private LitePlaytimeRewardsCommands commands;
 
-    private TreeMap<UUID, Integer> runnableCache;
-    private TreeMap<UUID, LitePlaytimeRewardsCRUD> CRUDCache;
-    private TreeMap<UUID, RewardsGUI> GUICache;
+    private final TreeMap<UUID, Integer> runnableCache = new TreeMap<>();
+    private final TreeMap<UUID, PlayerData> playerCache = new TreeMap<>();
+    private final TreeMap<UUID, GiveRewardGUI> GUICache = new TreeMap<>();
+    private final TreeMap<UUID, GUIReward> isGivingReward = new TreeMap<>();
 
     @Override
     public void onEnable() {
-        //initialize maps
-        this.runnableCache = new TreeMap<>();
-        this.CRUDCache = new TreeMap<>();
-        this.GUICache = new TreeMap<>();
-
         //register Reward for serialization
         ConfigurationSerialization.registerClass(Reward.class);
 
-        //check if essentials is installed
-        this.ess = (IEssentials) Bukkit.getPluginManager().getPlugin("Essentials");
-        if (this.ess == null) {
-            this.getLogger().info("Essentials not found, AFK time won't be counted.");
+        this.initialize();
+
+        //register eventhandler class
+        getServer().getPluginManager().registerEvents(new LitePlaytimeRewardsEventHandlers(), this);
+
+        //bStats
+        if (this.config.isUsebStats()) {
+            Metrics metrics = new Metrics(this, 7380);
+            metrics.addCustomChart(new Metrics.SimplePie("reward_count", () -> Integer.toString(this.getLPRConfig().getRewards().size())));
         }
 
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        //save players
+        this.playerCache.entrySet().forEach(e -> e.getValue().saveConfig());
+
+        //remove all runnables from plugin
+        Bukkit.getScheduler().cancelTasks(this);
+
+        super.onDisable();
+    }
+
+    @Override
+    public boolean onCommand(CommandSender cs, Command cmnd, String alias, String[] args) {
+        return this.commands.onCommand(cs, cmnd, alias, args);
+    }
+
+    public void initialize() {
+        this.createFiles();
+
+        String a = this.getServer().getClass().getPackage().getName();
+        if (a.substring(a.lastIndexOf(".") + 1).equalsIgnoreCase("v1_12_R1")) {
+            this.legacy = true;
+            this.getLogger().severe("Running legacy version, disabling some features.");
+        }
+
+        this.checkDependencies();
+
+        //initialize commands.
+        this.commands = new LitePlaytimeRewardsCommands();
+    }
+
+    private void createFiles() {
         //get config.yml and make if not exists
         File configFile = new File(this.getDataFolder(), "config.yml");
         if (!configFile.exists()) {
@@ -77,37 +118,16 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         }
 
         //initialize config, messages and command classes
-        this.config = new LitePlaytimeRewardsConfig(configFile);
-        this.messages = new LitePlaytimeRewardsMessages(messagesFile);
-        this.commands = new LitePlaytimeRewardsCommands();
+        this.config = new Config(configFile);
+        this.messages = new Messages(messagesFile);
+    }
 
-        //register eventhandler class
-        getServer().getPluginManager().registerEvents(new LitePlaytimeRewardsEventHandlers(), this);
-
-        //bStats
-        if (this.config.isUsebStats()) {
-            int pluginId = 7380;
-            Metrics metrics = new Metrics(this, pluginId);
-            metrics.addCustomChart(new Metrics.SimplePie("reward_count", () -> Integer.toString(this.getLPRConfig().getRewards().size())));
+    private void checkDependencies() {
+        //check if essentials is installed
+        this.ess = (IEssentials) Bukkit.getPluginManager().getPlugin("Essentials");
+        if (this.ess == null) {
+            this.getLogger().info("Essentials not found, AFK time won't be counted.");
         }
-
-        super.onEnable();
-    }
-
-    @Override
-    public void onDisable() {
-        //save players
-        this.CRUDCache.entrySet().forEach(e -> e.getValue().saveConfig());
-
-        //remove all runnables from plugin
-        Bukkit.getScheduler().cancelTasks(this);
-
-        super.onDisable();
-    }
-
-    @Override
-    public boolean onCommand(CommandSender cs, Command cmnd, String alias, String[] args) {
-        return this.commands.onCommand(cs, cmnd, alias, args);
     }
 
     public int giveReward(Reward reward, OfflinePlayer plyr, boolean broadcast, int amount) {
@@ -216,16 +236,32 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         }
     }
 
-    public LitePlaytimeRewardsConfig getLPRConfig() {
+    public Config getLPRConfig() {
         return this.config;
     }
 
-    public LitePlaytimeRewardsMessages getMessages() {
+    public Messages getMessages() {
         return messages;
     }
 
     public boolean isOldVersion() {
         return oldVersion;
+    }
+
+    public TreeMap<UUID, Integer> getRunnableCache() {
+        return this.runnableCache;
+    }
+
+    public TreeMap<UUID, PlayerData> getPlayerCache() {
+        return this.playerCache;
+    }
+
+    public TreeMap<UUID, GiveRewardGUI> getGUICache() {
+        return this.GUICache;
+    }
+
+    public TreeMap<UUID, GUIReward> getIsGiving() {
+        return this.isGivingReward;
     }
 
     public void checkForOldVersion() {
@@ -236,51 +272,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         }
     }
 
-    public void addToRunnableCache(UUID uniqueId, int taskId) {
-        this.runnableCache.put(uniqueId, taskId);
-    }
-
-    public int removeFromRunnableCache(UUID uniqueId) {
-        return this.runnableCache.remove(uniqueId);
-    }
-
-    public boolean doesRunnableCacheContain(UUID uniqueId) {
-        return this.runnableCache.containsKey(uniqueId);
-    }
-
-    public void addToCRUDCache(UUID uniqueId, LitePlaytimeRewardsCRUD crud) {
-        this.CRUDCache.put(uniqueId, crud);
-    }
-
-    public LitePlaytimeRewardsCRUD removeFromCRUDCache(UUID uniqueId) {
-        return this.CRUDCache.remove(uniqueId);
-    }
-
-    public LitePlaytimeRewardsCRUD getFromCRUDCache(UUID uniqueId) {
-        return this.CRUDCache.get(uniqueId);
-    }
-
-    public boolean doesCRUDCacheContain(UUID uniqueId) {
-        return this.CRUDCache.containsKey(uniqueId);
-    }
-
-    public TreeMap<UUID, LitePlaytimeRewardsCRUD> getAllCRUDs() {
-        return this.CRUDCache;
-    }
-
-    public void addToGUICache(UUID id, RewardsGUI gui) {
-        this.GUICache.put(id, gui);
-    }
-
-    public RewardsGUI removeFromGUICache(UUID id) {
-        return this.GUICache.remove(id);
-    }
-
-    public RewardsGUI getFromGUICache(UUID id) {
-        return this.GUICache.get(id);
-    }
-
-    public void setMessages(File file) {
-        this.messages = new LitePlaytimeRewardsMessages(file);
+    public boolean isLegacy() {
+        return legacy;
     }
 }

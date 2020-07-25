@@ -96,10 +96,6 @@ ServerDoesntKeepTrackOfAFK: "&cThis server does not keep track of AFK time."
 #Error thrown when executing the command /givereward and no rewards are configured in the config file.
 NoRewardsConfigured: "&cNo rewards configured in the config file."
 
-#Available placeholders: %command%
-#Error thrown when executing the command /rewards or /givereward and the amount of rewards exceeds the maximum inventory spaces.
-MaxInventExceeded: "&cMax inventory size exceeded, please use &b%command%&4."
-
 #Error thrown when executing the command /rewards and there are no rewards available for the player.
 NoRewardsAvailable: "&cThere are no rewards available for you."
 

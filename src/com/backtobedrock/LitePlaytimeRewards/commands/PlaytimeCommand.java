@@ -1,6 +1,6 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
-import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewardsCRUD;
+import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
@@ -20,10 +20,10 @@ public class PlaytimeCommand extends LitePlaytimeRewardsCommand {
                 //check if player
                 if (this.checkIfPlayer() && this.checkPermission("playtime")) {
                     if (this.plugin.getLPRConfig().isCountAllPlaytime()) {
-                        this.cs.sendMessage(this.plugin.getMessages().getPlaytime(sender.getStatistic(Statistic.PLAY_ONE_MINUTE)));
+                        this.cs.sendMessage(this.plugin.getMessages().getPlaytime(this.sender.getStatistic(Statistic.PLAY_ONE_MINUTE)));
                     } else {
                         //get player data
-                        LitePlaytimeRewardsCRUD crudplay = this.plugin.getFromCRUDCache(sender.getUniqueId());
+                        PlayerData crudplay = this.plugin.getPlayerCache().get(this.sender.getUniqueId());
                         this.cs.sendMessage(this.plugin.getMessages().getPlaytime(crudplay.getPlaytime() + crudplay.getAfktime()));
                     }
                 }
@@ -39,15 +39,15 @@ public class PlaytimeCommand extends LitePlaytimeRewardsCommand {
                     }
 
                     //check if player has played on server before
-                    if (!LitePlaytimeRewardsCRUD.doesPlayerDataExists(plyrplayother)) {
+                    if (!PlayerData.doesPlayerDataExists(plyrplayother)) {
                         this.cs.sendMessage(this.plugin.getMessages().getNoData(plyrplayother.getName()));
                         break;
                     }
 
                     //get player data
-                    LitePlaytimeRewardsCRUD crudplayother = plyrplayother.isOnline()
-                            ? this.plugin.getFromCRUDCache(plyrplayother.getUniqueId())
-                            : new LitePlaytimeRewardsCRUD(plyrplayother);
+                    PlayerData crudplayother = plyrplayother.isOnline()
+                            ? this.plugin.getPlayerCache().get(plyrplayother.getUniqueId())
+                            : new PlayerData(plyrplayother);
                     this.cs.sendMessage(this.plugin.getMessages().getPlaytimeOther(crudplayother.getPlaytime() + crudplayother.getAfktime(), plyrplayother.getName()));
                 }
                 break;

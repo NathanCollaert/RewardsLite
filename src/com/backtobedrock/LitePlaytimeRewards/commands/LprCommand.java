@@ -29,21 +29,7 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
                     case "reload":
                         if (this.checkPermission("reload")) {
                             if (this.args.length == 1) {
-                                //get files
-                                File configFile = new File(this.plugin.getDataFolder(), "config.yml");
-                                File messageFile = new File(this.plugin.getDataFolder(), "messages.yml");
-
-                                //reload messages
-                                this.plugin.setMessages(messageFile);
-
-                                //reload config file
-                                this.plugin.getLPRConfig().setConfig(YamlConfiguration.loadConfiguration(configFile));
-
-                                //save all cruds and redo rewards
-                                this.plugin.getAllCRUDs().entrySet().stream().forEach(e -> {
-                                    e.getValue().saveConfig();
-                                    e.getValue().getData();
-                                });
+                                this.plugin.initialize();
 
                                 this.cs.sendMessage(this.plugin.getMessages().getReloadSuccess());
                             } else {
@@ -76,7 +62,7 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
                                     break;
                                 }
 
-                                this.plugin.getFromCRUDCache(plyrReset.getUniqueId()).getRewards().get(args[1].toLowerCase()).resetTimeTillNextReward();
+                                this.plugin.getPlayerCache().get(plyrReset.getUniqueId()).getRewards().get(args[1].toLowerCase()).resetTimeTillNextReward();
 
                                 this.cs.sendMessage(this.plugin.getMessages().getResetSuccess(plyrReset.getName(), args[1].toLowerCase()));
                             } else {
