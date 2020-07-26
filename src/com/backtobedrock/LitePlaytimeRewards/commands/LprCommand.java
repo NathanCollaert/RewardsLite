@@ -31,6 +31,12 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
                             if (this.args.length == 1) {
                                 this.plugin.initialize();
 
+                                //save all cruds and redo rewards
+                                this.plugin.getPlayerCache().entrySet().stream().forEach(e -> {
+                                    e.getValue().saveConfig();
+                                    e.getValue().getData();
+                                });
+
                                 this.cs.sendMessage(this.plugin.getMessages().getReloadSuccess());
                             } else {
                                 this.sendUsageMessage(Commands.LPR_RELOAD);

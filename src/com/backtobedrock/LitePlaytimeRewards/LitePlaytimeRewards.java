@@ -265,11 +265,9 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
     }
 
     public void checkForOldVersion() {
-        if (this.getLPRConfig().isUpdateChecker()) {
-            new UpdateChecker(71784).getVersion(version -> {
-                this.oldVersion = !this.getDescription().getVersion().equalsIgnoreCase(version);
-            });
-        }
+        new UpdateChecker(71784).getVersion(version -> {
+            this.oldVersion = !this.getDescription().getVersion().equalsIgnoreCase(version);
+        });
     }
 
     public boolean isLegacy() {
