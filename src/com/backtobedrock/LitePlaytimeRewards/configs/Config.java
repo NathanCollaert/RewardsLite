@@ -97,6 +97,7 @@ public class Config {
         List<String> displayDescription = reward.getStringList("DisplayDescription").stream().map(e -> ChatColor.translateAlternateColorCodes('&', e)).collect(Collectors.toList());
         List<Integer> playtimeNeeded = this.getNumbersFromString(reward.getString("PlaytimeNeeded", ""));
         boolean countAfkTime = reward.getBoolean("CountAfkTime", true);
+        boolean countAllPlaytime = reward.getBoolean("CountAllPlaytime", false);
         int slotsNeeded = this.checkMin(reward.getInt("SlotsNeeded", 0), 0, 0);
         boolean loop = reward.getBoolean("Loop", false);
         List<String> disabledWorlds = reward.getStringList("DisabledWorlds");
@@ -123,7 +124,7 @@ public class Config {
             this.plugin.getLogger().log(Level.SEVERE, "{0}: Commands can not be empty. Reward was not loaded.", name);
             return null;
         } else {
-            return new ConfigReward(name.toLowerCase(), displayName, displayItem, displayDescription, playtimeNeeded, countAfkTime, slotsNeeded, loop, disabledWorlds, usePermission, notificationType, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
+            return new ConfigReward(name.toLowerCase(), displayName, displayItem, displayDescription, playtimeNeeded, countAfkTime, countAllPlaytime, slotsNeeded, loop, disabledWorlds, usePermission, notificationType, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
         }
     }
 

@@ -12,6 +12,7 @@ public class ConfigReward {
     private final List<String> displayDescription;
     private final List<Integer> playtimeNeeded;
     private final boolean countAfkTime;
+    private final boolean countAllPlaytime;
     private final int slotsNeeded;
     private final boolean loop;
     private final List<String> disabledWorlds;
@@ -21,13 +22,14 @@ public class ConfigReward {
     private final String broadcastNotification;
     private final List<String> commands;
 
-    public ConfigReward(String id, String displayName, Material displayItem, List<String> displayDescription, List<Integer> playtimeNeeded, boolean countAfkTime, int slotsNeeded, boolean loop, List<String> disabledWorlds, boolean UsePermission, String notificationType, String notification, String broadcastNotification, List<String> commands) {
+    public ConfigReward(String id, String displayName, Material displayItem, List<String> displayDescription, List<Integer> playtimeNeeded, boolean countAfkTime, boolean countAllPlaytime, int slotsNeeded, boolean loop, List<String> disabledWorlds, boolean UsePermission, String notificationType, String notification, String broadcastNotification, List<String> commands) {
         this.id = id;
         this.displayName = displayName;
         this.displayItem = displayItem;
         this.displayDescription = displayDescription;
         this.playtimeNeeded = playtimeNeeded;
         this.countAfkTime = countAfkTime;
+        this.countAllPlaytime = countAllPlaytime;
         this.slotsNeeded = slotsNeeded;
         this.loop = loop;
         this.disabledWorlds = disabledWorlds;
@@ -39,7 +41,7 @@ public class ConfigReward {
     }
 
     public ConfigReward(ConfigReward config) {
-        this(config.id, config.displayName, config.displayItem, config.displayDescription, config.playtimeNeeded, config.countAfkTime, config.slotsNeeded, config.loop, config.disabledWorlds, config.UsePermission, config.notificationType, config.notification, config.broadcastNotification, config.commands);
+        this(config.id, config.displayName, config.displayItem, config.displayDescription, config.playtimeNeeded, config.countAfkTime, config.countAllPlaytime, config.slotsNeeded, config.loop, config.disabledWorlds, config.UsePermission, config.notificationType, config.notification, config.broadcastNotification, config.commands);
     }
 
     public String getDisplayName() {
@@ -98,6 +100,10 @@ public class ConfigReward {
         return id;
     }
 
+    public boolean isCountAllPlaytime() {
+        return countAllPlaytime;
+    }
+
     public List<String> getGiveRewardGUIDescription(GUIReward reward) {
         List<String> description = (this.getDisplayDescription().stream().collect(Collectors.toList()));
 
@@ -112,5 +118,10 @@ public class ConfigReward {
         description.add("§6§oShift right click §e§oto decrease amount");
 
         return description;
+    }
+
+    @Override
+    public String toString() {
+        return "ConfigReward{" + "id=" + id + ", displayName=" + displayName + ", displayItem=" + displayItem + ", displayDescription=" + displayDescription + ", playtimeNeeded=" + playtimeNeeded + ", countAfkTime=" + countAfkTime + ", countAllPlaytime=" + countAllPlaytime + ", slotsNeeded=" + slotsNeeded + ", loop=" + loop + ", disabledWorlds=" + disabledWorlds + ", UsePermission=" + UsePermission + ", notificationType=" + notificationType + ", notification=" + notification + ", broadcastNotification=" + broadcastNotification + ", commands=" + commands + '}';
     }
 }

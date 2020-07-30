@@ -45,8 +45,8 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
         //check if cached crud
         if (!this.plugin.getPlayerCache().containsKey(e.getPlayer().getUniqueId())) {
             //get crud and add to cache
-            PlayerData crud = new PlayerData(e.getPlayer());
-            this.plugin.getPlayerCache().put(e.getPlayer().getUniqueId(), crud);
+            PlayerData data = new PlayerData(e.getPlayer());
+            this.plugin.getPlayerCache().put(e.getPlayer().getUniqueId(), data);
         } else {
             Bukkit.getScheduler().cancelTask(this.plugin.getRunnableCache().remove(e.getPlayer().getUniqueId()));
         }
@@ -145,7 +145,7 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
 
         //Check if player chatting is using reward GUI
         if (this.plugin.getIsGiving().containsKey(plyr.getUniqueId())) {
-
+            
             e.setCancelled(true);
 
             GUIReward reward = this.plugin.getIsGiving().get(plyr.getUniqueId());

@@ -21,25 +21,27 @@ public class Reward implements ConfigurationSerializable {
     private int amountRedeemed;
     private int amountPending;
     private boolean eligible;
-    private ConfigReward cReward = null;
+    private boolean claimedOldPlaytime;
+    private ConfigReward cReward;
 
-    public Reward(ConfigReward cReward, List<Integer> timeTillNextReward, int amountRedeemed, int amountPending, boolean eligible) {
-        this(timeTillNextReward.isEmpty() ? new ArrayList(cReward.getPlaytimeNeeded()) : timeTillNextReward, amountRedeemed < 0 ? 0 : amountRedeemed, amountPending < 0 ? 0 : amountPending, cReward.isLoop() ? true : eligible);
+    public Reward(ConfigReward cReward, List<Integer> timeTillNextReward, int amountRedeemed, int amountPending, boolean eligible, boolean claimedOldPlaytime) {
+        this(timeTillNextReward.isEmpty() ? new ArrayList(cReward.getPlaytimeNeeded()) : timeTillNextReward, amountRedeemed < 0 ? 0 : amountRedeemed, amountPending < 0 ? 0 : amountPending, cReward.isLoop() ? true : eligible, claimedOldPlaytime);
         this.cReward = cReward;
     }
 
     //deserialization only
-    private Reward(List<Integer> timeTillNextReward, int amountRedeemed, int amountPending, boolean eligible) {
+    private Reward(List<Integer> timeTillNextReward, int amountRedeemed, int amountPending, boolean eligible, boolean claimedOldPlaytime) {
         this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         this.timeTillNextReward = timeTillNextReward;
         this.amountRedeemed = amountRedeemed;
         this.amountPending = amountPending;
         this.eligible = eligible;
+        this.claimedOldPlaytime = claimedOldPlaytime;
     }
 
     //new reward only
     public Reward(ConfigReward cReward) {
-        this(cReward, new ArrayList(cReward.getPlaytimeNeeded()), 0, 0, true);
+        this(cReward, new ArrayList(cReward.getPlaytimeNeeded()), 0, 0, true, false);
     }
 
     public ConfigReward getcReward() {
@@ -88,6 +90,14 @@ public class Reward implements ConfigurationSerializable {
         return this.eligible;
     }
 
+    public boolean isClaimedOldPlaytime() {
+        return claimedOldPlaytime;
+    }
+
+    public void setClaimedOldPlaytime(boolean claimedOldPlaytime) {
+        this.claimedOldPlaytime = claimedOldPlaytime;
+    }
+
     public List<String> getRewardsGUIDescription(OfflinePlayer player) {
         List<String> description = (this.cReward.getDisplayDescription().stream().collect(Collectors.toList()));
 
@@ -108,11 +118,6 @@ public class Reward implements ConfigurationSerializable {
     }
 
     @Override
-    public String toString() {
-        return "Reward{" + "timeTillNextReward=" + timeTillNextReward + ", amountRedeemed=" + amountRedeemed + ", amountPending=" + amountPending + ", eligible=" + eligible + ", cReward=" + cReward + '}';
-    }
-
-    @Override
     public Map<String, Object> serialize() {
         Map<String, Object> map = new TreeMap<>();
 
@@ -120,37 +125,29 @@ public class Reward implements ConfigurationSerializable {
         map.put("amountRedeemed", this.amountRedeemed);
         map.put("amountPending", this.amountPending);
         map.put("eligible", this.eligible);
+        map.put("claimedOldPlaytime", this.claimedOldPlaytime);
 
         return map;
     }
 
     public static Reward deserialize(Map<String, Object> map) {
-        List<Integer> timeTillNextReward = new ArrayList<>();
-        int amountRedeemed = -1;
-        int amountPending = -1;
-        boolean eligible = true;
+        List<Integer> timeTillNextReward = (List<Integer>) map.getOrDefault("timeTillNextReward", new ArrayList<>());
+        int amountRedeemed = (int) map.getOrDefault("amountRedeemed", 0);
+        int amountPending = (int) map.getOrDefault("amountPending", 0);
+        boolean eligible = (boolean) map.getOrDefault("eligible", true);
+        boolean claimedOldPlaytime = (boolean) map.getOrDefault("claimedOldPlaytime", false);
 
-        if (map.containsKey("timeTillNextReward") && map.get("timeTillNextReward") != null) {
-            timeTillNextReward = (List<Integer>) map.get("timeTillNextReward");
+        //old userdata conversion (-1 to empty list)
+        if (!timeTillNextReward.isEmpty() && timeTillNextReward.get(0) == -1) {
+            eligible = false;
+            timeTillNextReward = new ArrayList<>();
         }
 
-        if (map.containsKey("amountRedeemed") && map.get("amountRedeemed") != null) {
-            amountRedeemed = (int) map.get("amountRedeemed");
-        }
+        return new Reward(timeTillNextReward, amountRedeemed, amountPending, eligible, claimedOldPlaytime);
+    }
 
-        if (map.containsKey("amountPending") && map.get("amountPending") != null) {
-            amountPending = (int) map.get("amountPending");
-        }
-
-        if (map.containsKey("eligible") && map.get("eligible") != null) {
-            if (!timeTillNextReward.isEmpty() && timeTillNextReward.get(0) == -1) {
-                eligible = false;
-                timeTillNextReward = new ArrayList<>();
-            } else {
-                eligible = (boolean) map.get("eligible");
-            }
-        }
-
-        return new Reward(timeTillNextReward, amountRedeemed, amountPending, eligible);
+    @Override
+    public String toString() {
+        return "Reward{timeTillNextReward=" + timeTillNextReward + ", amountRedeemed=" + amountRedeemed + ", amountPending=" + amountPending + ", eligible=" + eligible + ", claimedOldPlaytime=" + claimedOldPlaytime + ", cReward=" + cReward + '}';
     }
 }
