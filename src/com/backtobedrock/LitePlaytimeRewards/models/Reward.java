@@ -55,12 +55,12 @@ public class Reward implements ConfigurationSerializable {
     public ConfigReward getcReward() {
         return cReward;
     }
-    
-    public String getId(){
+
+    public String getId() {
         return this.cReward.getId();
     }
-    
-    public String getName(){
+
+    public String getName() {
         return this.cReward.getDisplayName();
     }
 
@@ -135,6 +135,14 @@ public class Reward implements ConfigurationSerializable {
                 : this.plugin.getMessages().getNextRewardNoPermission());
 
         return description;
+    }
+
+    public boolean hasPermission(Player player) {
+        if (this.cReward.isUsePermission()) {
+            return player.hasPermission("liteplaytimerewards.reward." + this.getId());
+        } else {
+            return true;
+        }
     }
 
     public int giveReward(OfflinePlayer plyr, boolean broadcast, int amount) {

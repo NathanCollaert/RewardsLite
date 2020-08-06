@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
-import static java.util.stream.Collectors.toMap;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;

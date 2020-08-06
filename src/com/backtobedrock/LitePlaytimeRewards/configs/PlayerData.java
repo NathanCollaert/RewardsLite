@@ -112,21 +112,35 @@ public final class PlayerData {
     }
 
     private void checkOldPlaytime(Reward reward) {
-        if (reward.getcReward().isCountAllPlaytime() && !reward.isClaimedOldPlaytime()) {
-            int total = 0;
-            int playtimeCopy = reward.getcReward().isCountAfkTime() ? this.playtime : Math.max(this.playtime - this.afktime, 0);
-            reward.resetTimeTillNextReward();
-            while (reward.isEligible() && playtimeCopy > reward.getTimeTillNextReward().get(0)) {
-                total += 1;
-                playtimeCopy -= reward.getTimeTillNextReward().get(0);
-                reward.removeFirstTimeTillNextReward();
-            }
-            if (reward.isEligible()) {
-                reward.setFirstTimeTillNextReward(reward.getTimeTillNextReward().get(0) - playtimeCopy);
-            }
-            reward.setAmountPending(Math.max(total - reward.getAmountRedeemed(), 0));
-            reward.setClaimedOldPlaytime(true);
+        if (!reward.getcReward().isCountAllPlaytime()) {
+            return;
         }
+
+        if (reward.isClaimedOldPlaytime()) {
+            return;
+        }
+
+        if (this.player.getPlayer() == null) {
+            return;
+        }
+
+        if (!reward.hasPermission(this.player.getPlayer())) {
+            return;
+        }
+
+        int total = 0;
+        int playtimeCopy = reward.getcReward().isCountAfkTime() ? this.playtime : Math.max(this.playtime - this.afktime, 0);
+        reward.resetTimeTillNextReward();
+        while (reward.isEligible() && playtimeCopy > reward.getTimeTillNextReward().get(0)) {
+            total += 1;
+            playtimeCopy -= reward.getTimeTillNextReward().get(0);
+            reward.removeFirstTimeTillNextReward();
+        }
+        if (reward.isEligible()) {
+            reward.setFirstTimeTillNextReward(reward.getTimeTillNextReward().get(0) - playtimeCopy);
+        }
+        reward.setAmountPending(Math.max(total - reward.getAmountRedeemed(), 0));
+        reward.setClaimedOldPlaytime(true);
     }
 
     public FileConfiguration getConfig() {
