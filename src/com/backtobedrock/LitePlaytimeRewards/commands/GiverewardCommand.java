@@ -1,18 +1,18 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
+import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
 import com.backtobedrock.LitePlaytimeRewards.guis.GiveRewardGUI;
 import com.backtobedrock.LitePlaytimeRewards.models.ConfigReward;
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class GiverewardCommand extends LitePlaytimeRewardsCommand {
+public class GiverewardCommand extends Commands {
 
     public GiverewardCommand(CommandSender cs, String[] args) {
         super(cs, args);
@@ -25,7 +25,7 @@ public class GiverewardCommand extends LitePlaytimeRewardsCommand {
                 //check for permission
                 if (this.checkIfPlayer() && this.checkPermission("givereward")) {
                     //check if rewards available
-                    TreeMap<String, ConfigReward> giveRewards = this.plugin.getLPRConfig().getRewards();
+                    TreeMap<String, ConfigReward> giveRewards = this.plugin.getRewards().getAll();
                     if (giveRewards.isEmpty()) {
                         this.cs.sendMessage(this.plugin.getMessages().getNoRewardsConfigured());
                         break;
@@ -67,7 +67,7 @@ public class GiverewardCommand extends LitePlaytimeRewardsCommand {
                 }
                 break;
             default:
-                this.sendUsageMessage(Commands.GIVEREWARD);
+                this.sendUsageMessage(Command.GIVEREWARD);
                 break;
         }
     }
@@ -86,7 +86,7 @@ public class GiverewardCommand extends LitePlaytimeRewardsCommand {
         LitePlaytimeRewards plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
 
         //check if reward exists
-        if (!plugin.getLPRConfig().getRewards().containsKey(rewardName.toLowerCase())) {
+        if (!plugin.getRewards().doesRewardExist(rewardName)) {
             cs.sendMessage(plugin.getMessages().getNoSuchReward(rewardName));
             return false;
         }
@@ -111,7 +111,7 @@ public class GiverewardCommand extends LitePlaytimeRewardsCommand {
 
         if (reward != null) {
             //give reward and set pending
-            reward.setAmountPending(plugin.giveReward(reward, plyr, broadcast, amount));
+            reward.setAmountPending(reward.giveReward(plyr, broadcast, amount));
             crud.saveConfig();
         }
 

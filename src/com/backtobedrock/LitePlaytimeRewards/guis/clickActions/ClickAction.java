@@ -2,10 +2,11 @@ package com.backtobedrock.LitePlaytimeRewards.guis.clickActions;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public abstract class ClickAction implements ActionHandler {
+public abstract class ClickAction {
 
     protected LitePlaytimeRewards plugin;
 
@@ -13,7 +14,7 @@ public abstract class ClickAction implements ActionHandler {
         this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
     }
 
-    public abstract void execute(Player player);
+    public abstract void execute(Player player, ClickType type);
 
     public boolean hasEnoughInventory(Player player, ItemStack item) {
         //check if enough free invent space

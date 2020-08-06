@@ -1,0 +1,25 @@
+#Not sure what a particular reward option does?
+#Visit the LitePlaytimeRewards wiki for an explanation of each option at https://github.com/NathanCollaert/LitePlaytimeRewards/wiki/Reward-Configuration
+Rewards:
+    testreward:
+        DisplayName: "&6Test &eReward"
+        DisplayItem: "ender_chest"
+        DisplayDescription:
+            - "This will go on the first line."
+            - "This will go on the second line."
+            - "This will go on the third line."
+        PlaytimeNeeded: 60
+        CountAfkTime: false
+        CountAllPlaytime: true
+        SlotsNeeded: 2
+        Loop: true
+        DisabledWorlds:
+            - "world_nether"
+            - "world_the_end"
+        UsePermission: true
+        NotificationType: "bossbar"
+        Notification: "You have received the Test Reward! Congratulations!"
+        BroadcastNotification: "%player% has been awarded with the test reward!"
+        Commands:
+            - "give %player% dirt 1"
+            - "give %player% grass_block 1"

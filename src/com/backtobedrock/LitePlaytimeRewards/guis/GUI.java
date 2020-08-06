@@ -35,7 +35,7 @@ public abstract class GUI {
         for (int i = 0; i < this.customHolder.getSize(); i++) {
             int calc = i % 9;
             if (i < 9 || i >= (this.customHolder.getRowAmount() - 1) * 9 || calc == 0 || calc == 8) {
-                this.customHolder.setIcon(i, new Icon(borderItem, Arrays.asList()));
+                this.customHolder.setIcon(i, new Icon(borderItem, Arrays.asList(), null));
             }
         }
     }

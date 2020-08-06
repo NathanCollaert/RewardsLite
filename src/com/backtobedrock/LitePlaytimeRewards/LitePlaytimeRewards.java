@@ -3,32 +3,26 @@ package com.backtobedrock.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.configs.Config;
 import com.backtobedrock.LitePlaytimeRewards.configs.Messages;
 import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
+import com.backtobedrock.LitePlaytimeRewards.configs.Rewards;
+import com.backtobedrock.LitePlaytimeRewards.configs.ServerData;
 import com.backtobedrock.LitePlaytimeRewards.eventHandlers.LitePlaytimeRewardsEventHandlers;
 import com.backtobedrock.LitePlaytimeRewards.guis.GiveRewardGUI;
-import com.backtobedrock.LitePlaytimeRewards.models.ConfigReward;
-import com.backtobedrock.LitePlaytimeRewards.models.Reward;
 import com.backtobedrock.LitePlaytimeRewards.utils.UpdateChecker;
 import com.backtobedrock.LitePlaytimeRewards.models.GUIReward;
-import com.backtobedrock.LitePlaytimeRewards.runnables.NotifyBossBar;
+import com.backtobedrock.LitePlaytimeRewards.models.Reward;
+import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUpdater;
+import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUtils;
 import com.backtobedrock.LitePlaytimeRewards.utils.Metrics;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import net.ess3.api.IEssentials;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.boss.BarColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LitePlaytimeRewards extends JavaPlugin implements Listener {
@@ -37,8 +31,12 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
     public IEssentials ess;
     private boolean legacy;
 
+    //configs
     private Config config;
     private Messages messages;
+    private Rewards rewards;
+    private ServerData serverData;
+
     private LitePlaytimeRewardsCommands commands;
 
     private final TreeMap<UUID, Integer> runnableCache = new TreeMap<>();
@@ -51,16 +49,15 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         //register Reward for serialization
         ConfigurationSerialization.registerClass(Reward.class);
 
+        //initialize plugin
         this.initialize();
 
         //register eventhandler class
         getServer().getPluginManager().registerEvents(new LitePlaytimeRewardsEventHandlers(), this);
 
         //bStats
-        if (this.config.isUsebStats()) {
-            Metrics metrics = new Metrics(this, 7380);
-            metrics.addCustomChart(new Metrics.SimplePie("reward_count", () -> Integer.toString(this.getLPRConfig().getRewards().size())));
-        }
+        Metrics metrics = new Metrics(this, 7380);
+        metrics.addCustomChart(new Metrics.SimplePie("reward_count", () -> Integer.toString(this.rewards.getAll().size())));
 
         super.onEnable();
     }
@@ -82,32 +79,38 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
     }
 
     public void initialize() {
+        //create/load all files
         this.createFiles();
 
+        //check legacy
         String a = this.getServer().getClass().getPackage().getName();
         if (a.substring(a.lastIndexOf(".") + 1).equalsIgnoreCase("v1_12_R1")) {
             this.legacy = true;
             this.getLogger().severe("Running legacy version, disabling some features.");
         }
 
+        //check if dependencies are loaded
         this.checkDependencies();
 
-        //initialize commands.
+        //initialize commands
         this.commands = new LitePlaytimeRewardsCommands();
     }
 
     private void createFiles() {
-        //get config.yml and make if not exists
-        File configFile = new File(this.getDataFolder(), "config.yml");
-        if (!configFile.exists()) {
-            this.getLogger().info("Creating config.yml file.");
-            this.saveResource("config.yml", false);
-        }
-
         //make userdata folder if not exist
         File udFile = new File(this.getDataFolder() + "/userdata");
         if (udFile.mkdirs()) {
             this.getLogger().info("Creating userdata folder.");
+        }
+
+        //get config.yml and make if not exists
+        File configFile = new File(this.getDataFolder(), "config.yml");
+        boolean wasOld = false;
+        if (!configFile.exists()) {
+            this.getLogger().info("Creating config.yml file.");
+            this.saveResource("config.yml", false);
+        } else {
+            wasOld = true;
         }
 
         //get messages.yml and make if not exists
@@ -117,9 +120,39 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
             this.saveResource("messages.yml", false);
         }
 
-        //initialize config, messages and command classes
+        //get rewards.yml and make if not exists
+        File rewardsFile = new File(this.getDataFolder(), "rewards.yml");
+        boolean wasNew = false;
+        if (!rewardsFile.exists()) {
+            this.getLogger().info("Creating rewards.yml file.");
+            this.saveResource("rewards.yml", false);
+            wasNew = true;
+        }
+
+//        //get server.yml and make if not exists
+//        File serverFile = new File(this.getDataFolder(), "server.yml");
+//        if (!serverFile.exists()) {
+//            this.getLogger().info("Creating server.yml file.");
+//            this.saveResource("server.yml", false);
+//        }
+
+        //initialize configs
         this.config = new Config(configFile);
         this.messages = new Messages(messagesFile);
+        this.rewards = new Rewards(rewardsFile);
+//        this.serverData = new ServerData(serverFile);
+
+        //Update config file if old
+        if (wasOld) {
+            if (wasNew) {
+                this.rewards.getAll().clear();
+            }
+            //check for old rewards
+            ConfigUtils.convertOldRewards();
+            ConfigUpdater.update(this, "config.yml", configFile, Arrays.asList());
+            configFile = new File(this.getDataFolder(), "config.yml");
+            this.config = new Config(configFile);
+        }
     }
 
     private void checkDependencies() {
@@ -130,118 +163,16 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         }
     }
 
-    public int giveReward(Reward reward, OfflinePlayer plyr, boolean broadcast, int amount) {
-        String message = "";
-        boolean notified = false;
-        int pending = 0;
-        if (plyr.isOnline()) {
-            Player player = (Player) plyr;
-            //give reward this amount of times
-            for (int i = 0; i < amount + reward.getAmountPending(); i++) {
-
-                //check if enough free invent space
-                int emptySlots = 0;
-                for (ItemStack it : player.getInventory().getStorageContents()) {
-                    if (it == null) {
-                        emptySlots++;
-                    }
-                }
-
-                //check if in world that doesn't allow for rewards and free invent
-                if (this.config.getDisableGettingRewardsInWorlds().contains(player.getWorld().getName().toLowerCase())) {
-                    message = this.getMessages().getPendingNotificationWrongWorld(plyr.getName(), reward.getcReward().getDisplayName(), player.getWorld().getName());
-                    pending++;
-                } else if (emptySlots < reward.getcReward().getSlotsNeeded()) {
-                    message = this.getMessages().getPendingNotificationNotEnoughInventory(plyr.getName(), reward.getcReward().getDisplayName(), reward.getcReward().getSlotsNeeded());
-                    pending++;
-                } else {
-                    reward.getcReward().getCommands().forEach(j -> {
-                        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), j.replaceAll("%player%", plyr.getName()));
-                    });
-
-                    reward.setAmountRedeemed(reward.getAmountRedeemed() + 1);
-
-                    if (!notified) {
-                        //notify user and broadcast on getting reward
-                        this.notifyUsers(reward.getcReward(), player, broadcast);
-                        notified = true;
-                    }
-                }
-            }
-
-            if (!message.equals("") && amount > 0) {
-                switch (reward.getcReward().getNotificationType().toLowerCase()) {
-                    case "chat":
-                        player.sendMessage(message);
-                        break;
-                    case "bossbar":
-                        Collection<Player> players = new ArrayList<>();
-                        players.add(player);
-                        new NotifyBossBar(players, message, BarColor.YELLOW).runTaskTimer(this, 0, 20);
-                        break;
-                    case "actionbar":
-                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(message).create());
-                        break;
-                }
-            }
-        } else {
-            pending = amount + reward.getAmountPending();
-        }
-
-        return pending;
-    }
-
-    private void notifyUsers(ConfigReward reward, Player plyr, boolean broadcast) {
-        String notification = reward.getNotification().replaceAll("%player%", plyr.getName());
-        String broadcastNotification = reward.getBroadcastNotification().replaceAll("%player%", plyr.getName());
-
-        Collection<Player> players = new ArrayList<>();
-
-        switch (reward.getNotificationType().toLowerCase()) {
-            case "chat":
-                if (!broadcastNotification.isEmpty() && broadcast) {
-                    Bukkit.broadcastMessage(broadcastNotification);
-                }
-                if (!notification.isEmpty()) {
-                    plyr.sendMessage(notification);
-                }
-                break;
-            case "bossbar":
-                if (!broadcastNotification.isEmpty() && broadcast) {
-                    players = this.getServer().getOnlinePlayers().stream().map(e -> (Player) e).collect(Collectors.toList());
-                    if (!notification.isEmpty()) {
-                        players.remove(plyr);
-                    }
-                    new NotifyBossBar(players, broadcastNotification, BarColor.BLUE).runTaskTimer(this, 0, 20);
-                }
-                if (!notification.isEmpty()) {
-                    players.add(plyr);
-                    new NotifyBossBar(players, notification, BarColor.GREEN).runTaskTimer(this, 0, 20);
-                }
-                break;
-            case "actionbar":
-                if (!broadcastNotification.isEmpty() && broadcast) {
-                    players = this.getServer().getOnlinePlayers().stream().map(e -> (Player) e).collect(Collectors.toList());
-                    if (!notification.isEmpty()) {
-                        players.remove(plyr);
-                    }
-                    players.stream().forEach(e -> {
-                        ((Player) e).spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(broadcastNotification).create());
-                    });
-                }
-                if (!notification.isEmpty()) {
-                    plyr.spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(notification).create());
-                }
-                break;
-        }
-    }
-
     public Config getLPRConfig() {
         return this.config;
     }
 
     public Messages getMessages() {
         return messages;
+    }
+
+    public Rewards getRewards() {
+        return this.rewards;
     }
 
     public boolean isOldVersion() {

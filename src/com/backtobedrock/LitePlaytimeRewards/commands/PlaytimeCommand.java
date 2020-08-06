@@ -1,5 +1,6 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
+import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -7,7 +8,7 @@ import org.bukkit.Statistic;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class PlaytimeCommand extends LitePlaytimeRewardsCommand {
+public class PlaytimeCommand extends Commands {
 
     public PlaytimeCommand(CommandSender cs, String[] args) {
         super(cs, args);
@@ -52,7 +53,7 @@ public class PlaytimeCommand extends LitePlaytimeRewardsCommand {
                 }
                 break;
             default:
-                this.sendUsageMessage(Commands.PLAYTIME);
+                this.sendUsageMessage(Command.PLAYTIME);
                 break;
         }
     }

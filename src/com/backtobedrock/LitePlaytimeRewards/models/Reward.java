@@ -1,15 +1,23 @@
 package com.backtobedrock.LitePlaytimeRewards.models;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
+import com.backtobedrock.LitePlaytimeRewards.runnables.NotifyBossBar;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.boss.BarColor;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @SerializableAs("Reward")
@@ -47,6 +55,14 @@ public class Reward implements ConfigurationSerializable {
     public ConfigReward getcReward() {
         return cReward;
     }
+    
+    public String getId(){
+        return this.cReward.getId();
+    }
+    
+    public String getName(){
+        return this.cReward.getDisplayName();
+    }
 
     public List<Integer> getTimeTillNextReward() {
         return timeTillNextReward;
@@ -68,6 +84,10 @@ public class Reward implements ConfigurationSerializable {
 
     public void setFirstTimeTillNextReward(int time) {
         this.timeTillNextReward.set(0, time);
+    }
+
+    public int getFirstTimeTillNextReward() {
+        return this.timeTillNextReward.get(0);
     }
 
     public int getAmountRedeemed() {
@@ -117,6 +137,112 @@ public class Reward implements ConfigurationSerializable {
         return description;
     }
 
+    public int giveReward(OfflinePlayer plyr, boolean broadcast, int amount) {
+        String message = "";
+        boolean notified = false;
+        int pending = 0;
+        if (plyr.isOnline()) {
+            Player player = (Player) plyr;
+            //give reward this amount of times
+            for (int i = 0; i < amount + this.amountPending; i++) {
+
+                //check if enough free invent space
+                int emptySlots = 0;
+                for (ItemStack it : player.getInventory().getStorageContents()) {
+                    if (it == null) {
+                        emptySlots++;
+                    }
+                }
+
+                //check if in world that doesn't allow for rewards and free invent
+                if (this.plugin.getLPRConfig().getDisableGettingRewardsInWorlds().contains(player.getWorld().getName().toLowerCase())) {
+                    message = this.plugin.getMessages().getPendingNotificationWrongWorld(plyr.getName(), this.cReward.getDisplayName(), player.getWorld().getName());
+                    pending++;
+                } else if (emptySlots < this.cReward.getSlotsNeeded()) {
+                    message = this.plugin.getMessages().getPendingNotificationNotEnoughInventory(plyr.getName(), this.cReward.getDisplayName(), this.cReward.getSlotsNeeded());
+                    pending++;
+                } else {
+                    this.cReward.getCommands().forEach(j -> {
+                        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), j.replaceAll("%player%", plyr.getName()));
+                    });
+
+                    this.setAmountRedeemed(this.amountRedeemed + 1);
+
+                    if (!notified) {
+                        //notify user and broadcast on getting reward
+                        this.notifyUsers(player, broadcast);
+                        notified = true;
+                    }
+                }
+            }
+
+            if (!message.equals("") && amount > 0) {
+                switch (this.cReward.getNotificationType()) {
+                    case CHAT:
+                        player.sendMessage(message);
+                        break;
+                    case BOSSBAR:
+                        Collection<Player> players = new ArrayList<>();
+                        players.add(player);
+                        new NotifyBossBar(players, message, BarColor.YELLOW).runTaskTimer(this.plugin, 0, 20);
+                        break;
+                    case ACTIONBAR:
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(message).create());
+                        break;
+                }
+            }
+        } else {
+            pending = amount + this.amountPending;
+        }
+
+        return pending;
+    }
+
+    private void notifyUsers(Player plyr, boolean broadcast) {
+        String notification = this.cReward.getNotification().replaceAll("%player%", plyr.getName());
+        String broadcastNotification = this.cReward.getBroadcastNotification().replaceAll("%player%", plyr.getName());
+
+        Collection<Player> players = new ArrayList<>();
+
+        switch (this.cReward.getNotificationType()) {
+            case CHAT:
+                if (!broadcastNotification.isEmpty() && broadcast) {
+                    Bukkit.broadcastMessage(broadcastNotification);
+                }
+                if (!notification.isEmpty()) {
+                    plyr.sendMessage(notification);
+                }
+                break;
+            case BOSSBAR:
+                if (!broadcastNotification.isEmpty() && broadcast) {
+                    players = this.plugin.getServer().getOnlinePlayers().stream().map(e -> (Player) e).collect(Collectors.toList());
+                    if (!notification.isEmpty()) {
+                        players.remove(plyr);
+                    }
+                    new NotifyBossBar(players, broadcastNotification, BarColor.BLUE).runTaskTimer(this.plugin, 0, 20);
+                }
+                if (!notification.isEmpty()) {
+                    players.add(plyr);
+                    new NotifyBossBar(players, notification, BarColor.GREEN).runTaskTimer(this.plugin, 0, 20);
+                }
+                break;
+            case ACTIONBAR:
+                if (!broadcastNotification.isEmpty() && broadcast) {
+                    players = this.plugin.getServer().getOnlinePlayers().stream().map(e -> (Player) e).collect(Collectors.toList());
+                    if (!notification.isEmpty()) {
+                        players.remove(plyr);
+                    }
+                    players.stream().forEach(e -> {
+                        ((Player) e).spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(broadcastNotification).create());
+                    });
+                }
+                if (!notification.isEmpty()) {
+                    plyr.spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(notification).create());
+                }
+                break;
+        }
+    }
+
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> map = new TreeMap<>();
@@ -144,10 +270,5 @@ public class Reward implements ConfigurationSerializable {
         }
 
         return new Reward(timeTillNextReward, amountRedeemed, amountPending, eligible, claimedOldPlaytime);
-    }
-
-    @Override
-    public String toString() {
-        return "Reward{timeTillNextReward=" + timeTillNextReward + ", amountRedeemed=" + amountRedeemed + ", amountPending=" + amountPending + ", eligible=" + eligible + ", claimedOldPlaytime=" + claimedOldPlaytime + ", cReward=" + cReward + '}';
     }
 }
