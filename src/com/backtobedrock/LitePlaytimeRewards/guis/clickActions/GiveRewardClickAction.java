@@ -1,6 +1,5 @@
 package com.backtobedrock.LitePlaytimeRewards.guis.clickActions;
 
-import com.backtobedrock.LitePlaytimeRewards.guis.GUI;
 import com.backtobedrock.LitePlaytimeRewards.guis.PagedGUI;
 import com.backtobedrock.LitePlaytimeRewards.models.GUIReward;
 import net.md_5.bungee.api.ChatColor;
@@ -9,7 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
-public class GiveRewardClickAction extends AdvancedClickAction {
+public class GiveRewardClickAction extends ClickAction {
 
     private final PagedGUI gui;
     private final GUIReward reward;

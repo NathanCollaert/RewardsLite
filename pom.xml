@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.backtobedrock</groupId>
     <artifactId>LitePlaytimeRewards</artifactId>
-    <version>2.3.1</version>
+    <version>2.4.0</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -30,6 +30,8 @@
                     <include>plugin.yml</include>                    
                     <include>config.yml</include>
                     <include>messages.yml</include>
+                    <include>rewards.yml</include>
+                    <include>server.yml</include>
                 </includes>
             </resource>
         </resources>

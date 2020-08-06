@@ -4,8 +4,6 @@ import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
@@ -24,7 +22,7 @@ public final class PlayerData {
     private FileConfiguration configuration;
     private final OfflinePlayer player;
 
-    private TreeMap<String, Reward> rewards = new TreeMap<>();
+    private final TreeMap<String, Reward> rewards = new TreeMap<>();
     private int playtime;
     private int afktime;
 
@@ -39,9 +37,9 @@ public final class PlayerData {
     private void setNewStart() {
         FileConfiguration conf = this.getConfig();
 
-        conf.set("uuid", player.getUniqueId().toString());
-        conf.set("playername", player.getName());
-        conf.set("playtime", this.plugin.getLPRConfig().isCountAllPlaytime() ? new Long(player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE)) : 0);
+        conf.set("uuid", this.player.getUniqueId().toString());
+        conf.set("playername", this.player.getName());
+        conf.set("playtime", this.plugin.getLPRConfig().isCountAllPlaytime() ? new Long(this.player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE)) : 0);
         conf.set("afktime", 0);
         conf.set("rewards", new TreeMap<>());
 
@@ -55,45 +53,28 @@ public final class PlayerData {
 
         FileConfiguration conf = this.getConfig();
 
-        this.playtime = conf.getInt("playtime");
-        this.afktime = conf.getInt("afktime");
+        this.playtime = conf.getInt("playtime", 0);
+        this.afktime = conf.getInt("afktime", 0);
 
         //get rewards and check if config has untracked rewards
         ConfigurationSection rewardsSection = conf.getConfigurationSection("rewards");
-        Set<String> keys = rewardsSection != null ? rewardsSection.getKeys(false) : new HashSet<>();
-        this.plugin.getLPRConfig().getRewards().entrySet().stream().forEach(f -> {
-            if (keys.contains(f.getKey())) {
-                Reward reward = rewardsSection.getSerializable(f.getKey(), Reward.class);
-                if (reward != null) {
-                    this.rewards.put(f.getKey(), new Reward(f.getValue(), reward.getTimeTillNextReward(), reward.getAmountRedeemed(), reward.getAmountPending(), reward.isEligible()));
-                }
+        this.plugin.getRewards().getAll().entrySet().stream().forEach(f -> {
+            Reward reward;
+            if (rewardsSection != null && rewardsSection.contains(f.getKey())) {
+                Reward incompleteReward = (Reward) rewardsSection.get(f.getKey());
+                reward = new Reward(f.getValue(), incompleteReward.getTimeTillNextReward(), incompleteReward.getAmountRedeemed(), incompleteReward.getAmountPending(), incompleteReward.isEligible(), incompleteReward.isClaimedOldPlaytime());
             } else {
-                this.rewards.put(f.getKey(), new Reward(f.getValue()));
+                reward = new Reward(f.getValue());
             }
-        });
-        conf.set("rewards", this.rewards);
+            this.rewards.put(f.getKey(), reward);
 
-        conf.set("playername", player.getName());
+            this.checkOldPlaytime(reward);
+        });
+
+        conf.set("rewards", this.rewards);
+        conf.set("playername", this.player.getName());
 
         this.saveConfig();
-    }
-
-    public void setRewards(TreeMap<String, Reward> rewards, boolean save) {
-        FileConfiguration conf = this.getConfig();
-        conf.set("rewards", rewards);
-        this.rewards = rewards;
-        if (save) {
-            this.saveConfig();
-        }
-    }
-
-    public void replaceRewards(TreeMap<String, Reward> rewards, boolean save) {
-        FileConfiguration conf = this.getConfig();
-        rewards.entrySet().forEach(e -> this.rewards.replace(e.getKey().toLowerCase(), e.getValue()));
-        conf.set("rewards", this.rewards);
-        if (save) {
-            this.saveConfig();
-        }
     }
 
     public TreeMap<String, Reward> getRewards() {
@@ -130,38 +111,56 @@ public final class PlayerData {
         return this.player;
     }
 
-    public FileConfiguration getConfig() {
-        if (configuration == null) {
-            configuration = YamlConfiguration.loadConfiguration(getFile());
-            return configuration;
+    private void checkOldPlaytime(Reward reward) {
+        if (reward.getcReward().isCountAllPlaytime() && !reward.isClaimedOldPlaytime()) {
+            int total = 0;
+            int playtimeCopy = reward.getcReward().isCountAfkTime() ? this.playtime : Math.max(this.playtime - this.afktime, 0);
+            reward.resetTimeTillNextReward();
+            while (reward.isEligible() && playtimeCopy > reward.getTimeTillNextReward().get(0)) {
+                total += 1;
+                playtimeCopy -= reward.getTimeTillNextReward().get(0);
+                reward.removeFirstTimeTillNextReward();
+            }
+            if (reward.isEligible()) {
+                reward.setFirstTimeTillNextReward(reward.getTimeTillNextReward().get(0) - playtimeCopy);
+            }
+            reward.setAmountPending(Math.max(total - reward.getAmountRedeemed(), 0));
+            reward.setClaimedOldPlaytime(true);
         }
-        return configuration;
+    }
+
+    public FileConfiguration getConfig() {
+        if (this.configuration == null) {
+            this.configuration = YamlConfiguration.loadConfiguration(getFile());
+        }
+        return this.configuration;
     }
 
     public void saveConfig() {
         try {
-            configuration.save(this.getFile());
+            FileConfiguration conf = this.getConfig();
+            conf.save(this.getFile());
         } catch (IOException e) {
-            Bukkit.getLogger().log(Level.SEVERE, "Cannot save to {0}", file.getName());
+            Bukkit.getLogger().log(Level.SEVERE, "Cannot save to {0}", this.file.getName());
         }
     }
 
     private File getFile() {
-        if (file == null) {
-            this.file = new File(this.plugin.getDataFolder() + "/userdata/" + player.getUniqueId().toString() + ".yml");
+        if (this.file == null) {
+            this.file = new File(this.plugin.getDataFolder() + "/userdata/" + this.player.getUniqueId().toString() + ".yml");
             if (!this.file.exists()) {
                 try {
                     if (this.file.createNewFile()) {
                         this.setNewStart();
-                        Bukkit.getLogger().log(Level.INFO, "[LPR] File for player {0} has been created", player.getName());
+                        this.plugin.getLogger().log(Level.INFO, "File for player {0} has been created at {1}.", new Object[]{this.player.getName(), this.file.getPath()});
                     }
                 } catch (IOException e) {
-                    Bukkit.getLogger().log(Level.SEVERE, "[LPR] Cannot create data for {0}", player.getName());
+                    this.plugin.getLogger().log(Level.SEVERE, "Cannot create data for {0}.", this.player.getName());
                 }
             }
-            return file;
+            return this.file;
         }
-        return file;
+        return this.file;
     }
 
     public static boolean doesPlayerDataExists(OfflinePlayer plyr) {

@@ -1,17 +1,16 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
-import java.io.File;
+import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-public class LprCommand extends LitePlaytimeRewardsCommand {
+public class LPRCommand extends Commands {
 
-    public LprCommand(CommandSender cs, String[] args) {
+    public LPRCommand(CommandSender cs, String[] args) {
         super(cs, args);
     }
 
@@ -39,7 +38,7 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
 
                                 this.cs.sendMessage(this.plugin.getMessages().getReloadSuccess());
                             } else {
-                                this.sendUsageMessage(Commands.LPR_RELOAD);
+                                this.sendUsageMessage(Command.LPR_RELOAD);
                             }
                         }
                         break;
@@ -48,7 +47,7 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
                             if (this.args.length == 1) {
                                 this.sendHelpMessage(this.cs);
                             } else {
-                                this.sendUsageMessage(Commands.LPR_HELP);
+                                this.sendUsageMessage(Command.LPR_HELP);
                             }
                         }
                         break;
@@ -56,15 +55,15 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
                         if (this.checkPermission("reset")) {
                             if (this.args.length == 3) {
                                 //check if reward exists
-                                if (!plugin.getLPRConfig().getRewards().containsKey(args[1].toLowerCase())) {
-                                    cs.sendMessage(plugin.getMessages().getNoSuchReward(args[1]));
+                                if (!this.plugin.getRewards().getAll().containsKey(args[1].toLowerCase())) {
+                                    this.cs.sendMessage(plugin.getMessages().getNoSuchReward(args[1]));
                                     break;
                                 }
 
                                 //check if player online
                                 OfflinePlayer plyrReset = Bukkit.getOfflinePlayer(args[2]);
                                 if (!plyrReset.isOnline()) {
-                                    cs.sendMessage(plugin.getMessages().getNotOnline(plyrReset.getName()));
+                                    this.cs.sendMessage(plugin.getMessages().getNotOnline(plyrReset.getName()));
                                     break;
                                 }
 
@@ -72,12 +71,12 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
 
                                 this.cs.sendMessage(this.plugin.getMessages().getResetSuccess(plyrReset.getName(), args[1].toLowerCase()));
                             } else {
-                                this.sendUsageMessage(Commands.LPR_RESET);
+                                this.sendUsageMessage(Command.LPR_RESET);
                             }
                         }
                         break;
                     default:
-                        this.sendUsageMessage(Commands.LPR);
+                        this.sendUsageMessage(Command.LPR);
                         break;
                 }
                 break;
@@ -87,7 +86,7 @@ public class LprCommand extends LitePlaytimeRewardsCommand {
     private void sendHelpMessage(CommandSender cs) {
         List<String> helpMessage = new ArrayList<>();
         helpMessage.add("§8§m----------§6 LitePlaytimeRewards §fHelp §8§m----------");
-        Arrays.stream(Commands.values()).forEach(e -> helpMessage.add(e.getFancyVersion()));
+        Arrays.stream(Command.values()).forEach(e -> helpMessage.add(e.getFancyVersion()));
         helpMessage.add("§8§m------------------------------------------");
         cs.sendMessage(Arrays.stream(helpMessage.toArray()).toArray(String[]::new));
     }

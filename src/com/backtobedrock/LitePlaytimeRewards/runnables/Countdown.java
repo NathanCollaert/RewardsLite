@@ -79,14 +79,14 @@ public class Countdown extends BukkitRunnable {
 
     private void countDown(Reward value) {
         int timeNeededNew = value.getTimeTillNextReward().get(0) - this.loopTimer;
-        if (timeNeededNew <= 0) {
+        if (value.isEligible() && timeNeededNew <= 0) {
             value.removeFirstTimeTillNextReward();
-            value.setAmountPending(this.plugin.giveReward(value, this.plyr, true, 1));
+            value.setAmountPending(value.giveReward(this.plyr, true, 1));
             this.givenReward = true;
         } else {
             if (value.getAmountPending() > 0) {
                 int oldPending = value.getAmountPending();
-                value.setAmountPending(this.plugin.giveReward(value, this.plyr, true, 0));
+                value.setAmountPending(value.giveReward(this.plyr, true, 0));
                 if (oldPending != value.getAmountPending()) {
                     this.givenReward = true;
                 }

@@ -2,7 +2,7 @@ package com.backtobedrock.LitePlaytimeRewards;
 
 import com.backtobedrock.LitePlaytimeRewards.commands.AfktimeCommand;
 import com.backtobedrock.LitePlaytimeRewards.commands.GiverewardCommand;
-import com.backtobedrock.LitePlaytimeRewards.commands.LprCommand;
+import com.backtobedrock.LitePlaytimeRewards.commands.LPRCommand;
 import com.backtobedrock.LitePlaytimeRewards.commands.PlaytimeCommand;
 import com.backtobedrock.LitePlaytimeRewards.commands.RewardsCommand;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                 new GiverewardCommand(cs, args).run();
                 break;
             case "lpr":
-                new LprCommand(cs, args).run();
+                new LPRCommand(cs, args).run();
                 break;
             case "rewards":
                 new RewardsCommand(cs, args).run();
@@ -59,7 +59,7 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
         switch (cmnd.getName().toLowerCase()) {
             case "givereward":
                 if (args.length == 1) {
-                    StringUtil.copyPartialMatches(args[0].toLowerCase(), this.plugin.getLPRConfig().getRewards().keySet(), completions);
+                    StringUtil.copyPartialMatches(args[0].toLowerCase(), this.plugin.getRewards().getAll().keySet(), completions);
                     Collections.sort(completions);
                 }
                 if (args.length == 2) {
@@ -85,7 +85,7 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                 switch (args[0]) {
                     case "reset":
                         if (args.length == 2) {
-                            StringUtil.copyPartialMatches(args[1].toLowerCase(), this.plugin.getLPRConfig().getRewards().keySet(), completions);
+                            StringUtil.copyPartialMatches(args[1].toLowerCase(), this.plugin.getRewards().getAll().keySet(), completions);
                             Collections.sort(completions);
                         }
                         if (args.length == 3) {
