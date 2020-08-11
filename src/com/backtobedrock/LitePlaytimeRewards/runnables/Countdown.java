@@ -91,7 +91,7 @@ public class Countdown extends BukkitRunnable {
                     this.givenReward = true;
                 }
             }
-            if (value.isEligible()) {
+            if (value.isEligible() && value.hasPermission(this.plyr)) {
                 value.setFirstTimeTillNextReward(timeNeededNew);
             }
         }

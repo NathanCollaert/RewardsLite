@@ -30,7 +30,7 @@ public class Rewards {
     public void setConfig(FileConfiguration fc) {
         this.config = fc;
         this.rewards = null;
-        this.getAll();
+        this.plugin.getLogger().log(Level.INFO, "Loaded {0} rewards.", this.getAll().size());
     }
 
     public TreeMap<String, ConfigReward> getAll() {
