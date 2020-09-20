@@ -25,7 +25,6 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
     public LitePlaytimeRewardsCommands() {
         this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         Bukkit.getServer().getPluginCommand("givereward").setTabCompleter(this);
-        Bukkit.getServer().getPluginCommand("rewards").setTabCompleter(this);
         Bukkit.getServer().getPluginCommand("lpr").setTabCompleter(this);
     }
 
@@ -68,12 +67,6 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                 }
                 if (args.length == 4) {
                     StringUtil.copyPartialMatches(args[3].toLowerCase(), Arrays.asList("true", "false"), completions);
-                    Collections.sort(completions);
-                }
-                break;
-            case "rewards":
-                if (args.length == 1) {
-                    StringUtil.copyPartialMatches(args[0].toLowerCase(), this.plugin.getPlayerCache().get(((Player) sender).getUniqueId()).getRewards().keySet(), completions);
                     Collections.sort(completions);
                 }
                 break;

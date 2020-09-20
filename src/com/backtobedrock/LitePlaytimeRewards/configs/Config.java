@@ -5,12 +5,14 @@ import com.backtobedrock.LitePlaytimeRewards.enums.InventoryLayout;
 import com.backtobedrock.LitePlaytimeRewards.enums.RewardsOrder;
 import com.backtobedrock.LitePlaytimeRewards.models.ConfigReward;
 import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -50,7 +52,7 @@ public class Config {
     }
 
     public boolean isCountAllPlaytime() {
-        return this.plugin.isLegacy() ? false : this.config.getBoolean("CountAllPlaytime", true);
+        return !this.plugin.isLegacy() && this.config.getBoolean("CountAllPlaytime", true);
     }
 
     public List<String> getDisableGettingRewardsInWorlds() {

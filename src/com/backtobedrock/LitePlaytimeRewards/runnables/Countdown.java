@@ -36,7 +36,8 @@ public class Countdown extends BukkitRunnable {
     
     @Override
     public void run() {
-        int playtime = this.crud.getPlaytime(), afktime = this.crud.getAfktime();
+        int playtime = this.crud.getPlaytime();
+        int afktime = this.crud.getAfktime();
 
         //Check if user is afk and increment play/afk-time
         if (this.user == null) {
