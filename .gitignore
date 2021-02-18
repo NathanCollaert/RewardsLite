@@ -1,1 +1,4 @@
-target/
+target/*
+.idea/
+!target/**.jar
+**.iml
