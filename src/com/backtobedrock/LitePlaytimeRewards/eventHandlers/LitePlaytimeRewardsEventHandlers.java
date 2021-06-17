@@ -1,16 +1,14 @@
 package com.backtobedrock.LitePlaytimeRewards.eventHandlers;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
-import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
-import com.backtobedrock.LitePlaytimeRewards.configs.Config;
 import com.backtobedrock.LitePlaytimeRewards.commands.GiverewardCommand;
+import com.backtobedrock.LitePlaytimeRewards.configs.Config;
+import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
 import com.backtobedrock.LitePlaytimeRewards.enums.GUIType;
 import com.backtobedrock.LitePlaytimeRewards.guis.CustomHolder;
 import com.backtobedrock.LitePlaytimeRewards.guis.Icon;
 import com.backtobedrock.LitePlaytimeRewards.models.GUIReward;
 import com.backtobedrock.LitePlaytimeRewards.runnables.Countdown;
-import java.util.TreeMap;
-import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -32,6 +30,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.TreeMap;
+import java.util.UUID;
+
 public class LitePlaytimeRewardsEventHandlers implements Listener {
 
     private final LitePlaytimeRewards plugin;
@@ -44,6 +45,7 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
         this.config = this.plugin.getLPRConfig();
     }
 
+    @SuppressWarnings("deprecation")
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         //check if cached crud
@@ -122,9 +124,7 @@ public class LitePlaytimeRewardsEventHandlers implements Listener {
                 }
 
                 //Execute all the actions
-                icon.getClickActions().forEach(clickAction -> {
-                    clickAction.execute(player, event.getClick());
-                });
+                icon.getClickActions().forEach(clickAction -> clickAction.execute(player, event.getClick()));
             }
         }
     }

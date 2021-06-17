@@ -2,10 +2,6 @@ package com.backtobedrock.LitePlaytimeRewards.configs;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
-import java.io.File;
-import java.io.IOException;
-import java.util.TreeMap;
-import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
@@ -14,15 +10,18 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.TreeMap;
+import java.util.logging.Level;
+
 public final class PlayerData {
 
     private final LitePlaytimeRewards plugin;
-
+    private final OfflinePlayer player;
+    private final TreeMap<String, Reward> rewards = new TreeMap<>();
     private File file = null;
     private FileConfiguration configuration;
-    private final OfflinePlayer player;
-
-    private final TreeMap<String, Reward> rewards = new TreeMap<>();
     private int playtime;
     private int afktime;
 
@@ -34,12 +33,17 @@ public final class PlayerData {
         this.getData();
     }
 
+    public static boolean doesPlayerDataExists(OfflinePlayer plyr) {
+        File file = new File(JavaPlugin.getPlugin(LitePlaytimeRewards.class).getDataFolder() + "/userdata/" + plyr.getUniqueId().toString() + ".yml");
+        return file.exists();
+    }
+
     private void setNewStart() {
         FileConfiguration conf = this.getConfig();
 
         conf.set("uuid", this.player.getUniqueId().toString());
         conf.set("playername", this.player.getName());
-        conf.set("playtime", this.plugin.getLPRConfig().isCountAllPlaytime() ? new Long(this.player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE)) : 0);
+        conf.set("playtime", this.plugin.getLPRConfig().isCountAllPlaytime() ? (long) this.player.getPlayer().getStatistic(Statistic.PLAY_ONE_MINUTE) : 0);
         conf.set("afktime", 0);
         conf.set("rewards", new TreeMap<>());
 
@@ -58,7 +62,7 @@ public final class PlayerData {
 
         //get rewards and check if config has untracked rewards
         ConfigurationSection rewardsSection = conf.getConfigurationSection("rewards");
-        this.plugin.getRewards().getAll().entrySet().stream().forEach(f -> {
+        this.plugin.getRewards().getAll().entrySet().forEach(f -> {
             Reward reward;
             if (rewardsSection != null && rewardsSection.contains(f.getKey())) {
                 Reward incompleteReward = (Reward) rewardsSection.get(f.getKey());
@@ -175,10 +179,5 @@ public final class PlayerData {
             return this.file;
         }
         return this.file;
-    }
-
-    public static boolean doesPlayerDataExists(OfflinePlayer plyr) {
-        File file = new File(JavaPlugin.getPlugin(LitePlaytimeRewards.class).getDataFolder() + "/userdata/" + plyr.getUniqueId().toString() + ".yml");
-        return file.exists();
     }
 }

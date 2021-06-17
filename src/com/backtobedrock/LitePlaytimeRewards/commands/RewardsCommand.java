@@ -3,10 +3,11 @@ package com.backtobedrock.LitePlaytimeRewards.commands;
 import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import com.backtobedrock.LitePlaytimeRewards.guis.RewardsGUI;
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
+import org.bukkit.command.CommandSender;
+
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import org.bukkit.command.CommandSender;
 
 public class RewardsCommand extends Commands {
 

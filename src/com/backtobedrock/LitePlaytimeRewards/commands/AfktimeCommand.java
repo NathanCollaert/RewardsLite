@@ -1,7 +1,7 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
-import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
+import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -28,7 +28,7 @@ public class AfktimeCommand extends Commands {
                 //check for permission
                 if (this.checkPermission("afktime.other") && this.checkEssentials()) {
                     //check if player has played on server before
-                    OfflinePlayer plyrafkother = Bukkit.getOfflinePlayer(args[0]);
+                    @SuppressWarnings("deprecation") OfflinePlayer plyrafkother = Bukkit.getOfflinePlayer(args[0]);
 
                     if (!PlayerData.doesPlayerDataExists(plyrafkother)) {
                         cs.sendMessage(this.plugin.getMessages().getNoData(plyrafkother.getName()));

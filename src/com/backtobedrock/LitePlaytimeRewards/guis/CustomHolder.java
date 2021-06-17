@@ -1,9 +1,6 @@
 package com.backtobedrock.LitePlaytimeRewards.guis;
 
 import com.backtobedrock.LitePlaytimeRewards.enums.GUIType;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -11,20 +8,24 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class CustomHolder implements InventoryHolder {
 
     private final Map<Integer, Icon> icons = new HashMap<>();
 
     private final int size;
-    private String title;
     private final int rowAmount;
+    private final GUIType type;
+    private String title;
     private int currentRow = 1;
     private Inventory inventory = null;
-    private final GUIType type;
 
     public CustomHolder(int size, boolean hasBorder, GUIType type) {
         int amount = hasBorder ? (int) (Math.ceil((double) size / 7) * 9) + 18 : (int) (Math.ceil((double) size / 9) * 9);
-        this.size = amount > 54 ? 54 : amount;
+        this.size = Math.min(amount, 54);
         this.rowAmount = this.getSize() / 9;
         this.type = type;
     }
@@ -120,9 +121,7 @@ public class CustomHolder implements InventoryHolder {
         if (this.inventory == null) {
             this.inventory = Bukkit.createInventory(this, this.size, this.title);
 
-            this.icons.entrySet().forEach((entry) -> {
-                this.inventory.setItem(entry.getKey(), entry.getValue().itemStack);
-            });
+            this.icons.forEach((key, value) -> this.inventory.setItem(key, value.itemStack));
         }
         return this.inventory;
     }

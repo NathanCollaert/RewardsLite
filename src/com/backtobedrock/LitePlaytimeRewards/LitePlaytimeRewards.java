@@ -1,22 +1,14 @@
 package com.backtobedrock.LitePlaytimeRewards;
 
-import com.backtobedrock.LitePlaytimeRewards.configs.Config;
-import com.backtobedrock.LitePlaytimeRewards.configs.Messages;
-import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
-import com.backtobedrock.LitePlaytimeRewards.configs.Rewards;
-import com.backtobedrock.LitePlaytimeRewards.configs.ServerData;
+import com.backtobedrock.LitePlaytimeRewards.configs.*;
 import com.backtobedrock.LitePlaytimeRewards.eventHandlers.LitePlaytimeRewardsEventHandlers;
 import com.backtobedrock.LitePlaytimeRewards.guis.GiveRewardGUI;
-import com.backtobedrock.LitePlaytimeRewards.utils.UpdateChecker;
 import com.backtobedrock.LitePlaytimeRewards.models.GUIReward;
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
 import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUpdater;
 import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUtils;
 import com.backtobedrock.LitePlaytimeRewards.utils.Metrics;
-import java.io.File;
-import java.util.Arrays;
-import java.util.TreeMap;
-import java.util.UUID;
+import com.backtobedrock.LitePlaytimeRewards.utils.UpdateChecker;
 import net.ess3.api.IEssentials;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -25,24 +17,26 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.TreeMap;
+import java.util.UUID;
+
 public class LitePlaytimeRewards extends JavaPlugin implements Listener {
-
-    private boolean oldVersion = false;
-    public IEssentials ess;
-    private boolean legacy;
-
-    //configs
-    private Config config;
-    private Messages messages;
-    private Rewards rewards;
-    private ServerData serverData;
-
-    private LitePlaytimeRewardsCommands commands;
 
     private final TreeMap<UUID, Integer> runnableCache = new TreeMap<>();
     private final TreeMap<UUID, PlayerData> playerCache = new TreeMap<>();
     private final TreeMap<UUID, GiveRewardGUI> GUICache = new TreeMap<>();
     private final TreeMap<UUID, GUIReward> isGivingReward = new TreeMap<>();
+    public IEssentials ess;
+    private boolean oldVersion = false;
+    private boolean legacy;
+    //configs
+    private Config config;
+    private Messages messages;
+    private Rewards rewards;
+    private ServerData serverData;
+    private LitePlaytimeRewardsCommands commands;
 
     @Override
     public void onEnable() {
@@ -65,7 +59,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         //save players
-        this.playerCache.entrySet().forEach(e -> e.getValue().saveConfig());
+        this.playerCache.forEach((key, value) -> value.saveConfig());
 
         //remove all runnables from plugin
         Bukkit.getScheduler().cancelTasks(this);
@@ -149,7 +143,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
             }
             //check for old rewards
             ConfigUtils.convertOldRewards();
-            ConfigUpdater.update(this, "config.yml", configFile, Arrays.asList());
+            ConfigUpdater.update(this, "config.yml", configFile, Collections.emptyList());
             configFile = new File(this.getDataFolder(), "config.yml");
             this.config = new Config(configFile);
         }
@@ -196,9 +190,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
     }
 
     public void checkForOldVersion() {
-        new UpdateChecker(71784).getVersion(version -> {
-            this.oldVersion = !this.getDescription().getVersion().equalsIgnoreCase(version);
-        });
+        new UpdateChecker(71784).getVersion(version -> this.oldVersion = !this.getDescription().getVersion().equalsIgnoreCase(version));
     }
 
     public boolean isLegacy() {

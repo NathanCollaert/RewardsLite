@@ -2,23 +2,23 @@ package com.backtobedrock.LitePlaytimeRewards.configs;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.models.ConfigReward;
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.logging.Level;
+
 public class Rewards {
 
     private final File rewardFile;
-    private FileConfiguration config;
     private final LitePlaytimeRewards plugin;
-
+    private FileConfiguration config;
     private TreeMap<String, ConfigReward> rewards;
 
     public Rewards(File rewardFile) {
@@ -56,9 +56,7 @@ public class Rewards {
 
     public void saveRewards() {
         TreeMap<String, Map<String, Object>> crewards = new TreeMap<>();
-        this.getAll().entrySet().stream().forEach(e -> {
-            crewards.put(e.getKey(), e.getValue().serialize());
-        });
+        this.getAll().entrySet().forEach(e -> crewards.put(e.getKey(), e.getValue().serialize()));
         this.config.set("Rewards", crewards);
 
         this.saveConfig();

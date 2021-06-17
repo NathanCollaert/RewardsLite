@@ -1,23 +1,23 @@
 package com.backtobedrock.LitePlaytimeRewards.configs;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
-import java.io.File;
-import java.io.IOException;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.logging.Level;
+
 public class ServerData {
 
     private final File serverFile;
-    private FileConfiguration config;
     private final LitePlaytimeRewards plugin;
-
+    private FileConfiguration config;
     private int totalPlaytime = -1;
     private TreeMap<UUID, Integer> topPlayers = null;
 

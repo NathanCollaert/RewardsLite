@@ -3,15 +3,16 @@ package com.backtobedrock.LitePlaytimeRewards.models;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.enums.NotificationType;
 import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUtils;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class ConfigReward {
 
@@ -54,6 +55,45 @@ public class ConfigReward {
 
     public ConfigReward(ConfigReward config) {
         this(config.id, config.displayName, config.displayItem, config.displayDescription, config.playtimeNeeded, config.countAfkTime, config.countAllPlaytime, config.slotsNeeded, config.loop, config.disabledWorlds, config.usePermission, config.notificationType, config.notification, config.broadcastNotification, config.commands);
+    }
+
+    public static ConfigReward deserialize(String id, ConfigurationSection reward) {
+        LitePlaytimeRewards plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
+
+        String displayName = reward.getString("DisplayName", id);
+        Material displayItem = Material.CHEST;
+        List<String> displayDescription = reward.getStringList("DisplayDescription");
+        List<Integer> playtimeNeeded = ConfigUtils.getNumbersFromString(reward.getString("PlaytimeNeeded", ""));
+        boolean countAfkTime = reward.getBoolean("CountAfkTime", true);
+        boolean countAllPlaytime = reward.getBoolean("CountAllPlaytime", false);
+        int slotsNeeded = ConfigUtils.checkMin(reward.getInt("SlotsNeeded", 0), 0, 0);
+        boolean loop = reward.getBoolean("Loop", false);
+        List<String> disabledWorlds = reward.getStringList("DisabledWorlds");
+        boolean usePermission = reward.getBoolean("UsePermission", false);
+        NotificationType notificationType = ConfigUtils.getNotificationType("NotificationType", reward.getString("NotificationType", "bossbar"), NotificationType.BOSSBAR);
+        String notification = ChatColor.translateAlternateColorCodes('&', reward.getString("Notification", ""));
+        String broadcastNotification = ChatColor.translateAlternateColorCodes('&', reward.getString("BroadcastNotification", ""));
+        List<String> commands = reward.getStringList("Commands");
+
+        Material m = Material.matchMaterial(reward.getString("DisplayItem", "chest"));
+        if (m != null && m != Material.AIR && m.isItem()) {
+            displayItem = m;
+        } else {
+            plugin.getLogger().log(Level.WARNING, "{0}: {1} is not an item in game. Default DisplayItem used.", new Object[]{id, m.name()});
+        }
+
+        if (playtimeNeeded.isEmpty()) {
+            plugin.getLogger().log(Level.SEVERE, "{0}: PlaytimeNeeded can not be empty. Reward was not loaded.", id);
+            return null;
+        } else if (slotsNeeded < 0) {
+            plugin.getLogger().log(Level.SEVERE, "{0}: slotsNeeded can not be lower then 0. Reward was not loaded.", id);
+            return null;
+        } else if (commands.isEmpty()) {
+            plugin.getLogger().log(Level.SEVERE, "{0}: Commands can not be empty. Reward was not loaded.", id);
+            return null;
+        } else {
+            return new ConfigReward(id.toLowerCase(), displayName, displayItem, displayDescription, playtimeNeeded, countAfkTime, countAllPlaytime, slotsNeeded, loop, disabledWorlds, usePermission, notificationType, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
+        }
     }
 
     public String getDisplayName() {
@@ -130,45 +170,6 @@ public class ConfigReward {
         description.add("§6§oShift right click §e§oto decrease amount");
 
         return description;
-    }
-
-    public static ConfigReward deserialize(String id, ConfigurationSection reward) {
-        LitePlaytimeRewards plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
-
-        String displayName = reward.getString("DisplayName", id);
-        Material displayItem = Material.CHEST;
-        List<String> displayDescription = reward.getStringList("DisplayDescription");
-        List<Integer> playtimeNeeded = ConfigUtils.getNumbersFromString(reward.getString("PlaytimeNeeded", ""));
-        boolean countAfkTime = reward.getBoolean("CountAfkTime", true);
-        boolean countAllPlaytime = reward.getBoolean("CountAllPlaytime", false);
-        int slotsNeeded = ConfigUtils.checkMin(reward.getInt("SlotsNeeded", 0), 0, 0);
-        boolean loop = reward.getBoolean("Loop", false);
-        List<String> disabledWorlds = reward.getStringList("DisabledWorlds");
-        boolean usePermission = reward.getBoolean("UsePermission", false);
-        NotificationType notificationType = ConfigUtils.getNotificationType("NotificationType", reward.getString("NotificationType", "bossbar"), NotificationType.BOSSBAR);
-        String notification = ChatColor.translateAlternateColorCodes('&', reward.getString("Notification", ""));
-        String broadcastNotification = ChatColor.translateAlternateColorCodes('&', reward.getString("BroadcastNotification", ""));
-        List<String> commands = reward.getStringList("Commands");
-
-        Material m = Material.matchMaterial(reward.getString("DisplayItem", "chest"));
-        if (m != null && m != Material.AIR && m.isItem()) {
-            displayItem = m;
-        } else {
-            plugin.getLogger().log(Level.WARNING, "{0}: {1} is not an item in game. Default DisplayItem used.", new Object[]{id, m.name()});
-        }
-
-        if (playtimeNeeded.isEmpty()) {
-            plugin.getLogger().log(Level.SEVERE, "{0}: PlaytimeNeeded can not be empty. Reward was not loaded.", id);
-            return null;
-        } else if (slotsNeeded < 0) {
-            plugin.getLogger().log(Level.SEVERE, "{0}: slotsNeeded can not be lower then 0. Reward was not loaded.", id);
-            return null;
-        } else if (commands.isEmpty()) {
-            plugin.getLogger().log(Level.SEVERE, "{0}: Commands can not be empty. Reward was not loaded.", id);
-            return null;
-        } else {
-            return new ConfigReward(id.toLowerCase(), displayName, displayItem, displayDescription, playtimeNeeded, countAfkTime, countAllPlaytime, slotsNeeded, loop, disabledWorlds, usePermission, notificationType, notification.replaceAll("&", "§"), broadcastNotification.replaceAll("&", "§"), commands);
-        }
     }
 
     public Map<String, Object> serialize() {

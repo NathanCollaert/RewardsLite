@@ -2,10 +2,9 @@ package com.backtobedrock.LitePlaytimeRewards.guis;
 
 import com.backtobedrock.LitePlaytimeRewards.guis.clickActions.ClickAction;
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
-import java.util.List;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
 
 public class Icon {
 

@@ -1,21 +1,58 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
-import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
+import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import com.backtobedrock.LitePlaytimeRewards.guis.GiveRewardGUI;
 import com.backtobedrock.LitePlaytimeRewards.models.ConfigReward;
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
-import java.util.TreeMap;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.TreeMap;
+
 public class GiverewardCommand extends Commands {
 
     public GiverewardCommand(CommandSender cs, String[] args) {
         super(cs, args);
+    }
+
+    public static boolean giveRewardCommand(CommandSender cs, String rewardName, String playerName, boolean broadcast, int amount) {
+        LitePlaytimeRewards plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
+
+        //check if reward exists
+        if (!plugin.getRewards().doesRewardExist(rewardName)) {
+            cs.sendMessage(plugin.getMessages().getNoSuchReward(rewardName));
+            return false;
+        }
+
+        //check if amount is bigger then 1
+        if (amount < 1) {
+            cs.sendMessage(plugin.getMessages().getNotANumber());
+            return false;
+        }
+
+        //check if player has data on server
+        @SuppressWarnings("deprecation") OfflinePlayer plyr = Bukkit.getOfflinePlayer(playerName);
+        if (!PlayerData.doesPlayerDataExists(plyr)) {
+            cs.sendMessage(plugin.getMessages().getNoData(plyr.getName()));
+            return false;
+        }
+
+        PlayerData crud = plyr.isOnline() ? plugin.getPlayerCache().get(plyr.getUniqueId()) : new PlayerData(plyr);
+
+        //get reward
+        Reward reward = crud.getRewards().get(rewardName.toLowerCase());
+
+        if (reward != null) {
+            //give reward and set pending
+            reward.setAmountPending(reward.giveReward(plyr, broadcast, amount));
+            crud.saveConfig();
+        }
+
+        return true;
     }
 
     @Override
@@ -79,42 +116,6 @@ public class GiverewardCommand extends Commands {
             cs.sendMessage(this.plugin.getMessages().getNotANumber());
             return false;
         }
-        return true;
-    }
-
-    public static boolean giveRewardCommand(CommandSender cs, String rewardName, String playerName, boolean broadcast, int amount) {
-        LitePlaytimeRewards plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
-
-        //check if reward exists
-        if (!plugin.getRewards().doesRewardExist(rewardName)) {
-            cs.sendMessage(plugin.getMessages().getNoSuchReward(rewardName));
-            return false;
-        }
-
-        //check if amount is bigger then 1
-        if (amount < 1) {
-            cs.sendMessage(plugin.getMessages().getNotANumber());
-            return false;
-        }
-
-        //check if player has data on server
-        OfflinePlayer plyr = Bukkit.getOfflinePlayer(playerName);
-        if (!PlayerData.doesPlayerDataExists(plyr)) {
-            cs.sendMessage(plugin.getMessages().getNoData(plyr.getName()));
-            return false;
-        }
-
-        PlayerData crud = plyr.isOnline() ? plugin.getPlayerCache().get(plyr.getUniqueId()) : new PlayerData(plyr);
-
-        //get reward
-        Reward reward = crud.getRewards().get(rewardName.toLowerCase());
-
-        if (reward != null) {
-            //give reward and set pending
-            reward.setAmountPending(reward.giveReward(plyr, broadcast, amount));
-            crud.saveConfig();
-        }
-
         return true;
     }
 

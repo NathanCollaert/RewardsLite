@@ -1,12 +1,11 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
-import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
+import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class PlaytimeCommand extends Commands {
 
@@ -32,10 +31,10 @@ public class PlaytimeCommand extends Commands {
             case 1:
                 //check for permission
                 if (this.checkPermission("playtime.other")) {
-                    OfflinePlayer plyrplayother = Bukkit.getOfflinePlayer(args[0]);
+                    @SuppressWarnings("deprecation") OfflinePlayer plyrplayother = Bukkit.getOfflinePlayer(args[0]);
 
                     if (this.plugin.getLPRConfig().isCountAllPlaytime() && plyrplayother.isOnline()) {
-                        this.cs.sendMessage(this.plugin.getMessages().getPlaytimeOther(((Player) plyrplayother).getStatistic(Statistic.PLAY_ONE_MINUTE), plyrplayother.getName()));
+                        this.cs.sendMessage(this.plugin.getMessages().getPlaytimeOther(plyrplayother.getStatistic(Statistic.PLAY_ONE_MINUTE), plyrplayother.getName()));
                         break;
                     }
 

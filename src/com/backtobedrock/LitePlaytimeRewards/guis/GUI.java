@@ -2,8 +2,6 @@ package com.backtobedrock.LitePlaytimeRewards.guis;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.configs.Config;
-import java.util.Arrays;
-import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -11,6 +9,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Collections;
+import java.util.List;
 
 public abstract class GUI {
 
@@ -35,7 +36,7 @@ public abstract class GUI {
         for (int i = 0; i < this.customHolder.getSize(); i++) {
             int calc = i % 9;
             if (i < 9 || i >= (this.customHolder.getRowAmount() - 1) * 9 || calc == 0 || calc == 8) {
-                this.customHolder.setIcon(i, new Icon(borderItem, Arrays.asList(), null));
+                this.customHolder.setIcon(i, new Icon(borderItem, Collections.emptyList(), null));
             }
         }
     }

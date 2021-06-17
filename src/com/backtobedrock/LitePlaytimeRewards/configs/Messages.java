@@ -1,14 +1,15 @@
 package com.backtobedrock.LitePlaytimeRewards.configs;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class Messages {
 
@@ -17,9 +18,7 @@ public class Messages {
 
     public Messages(File messagesFile) {
         this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
-        YamlConfiguration.loadConfiguration(messagesFile).getValues(true).entrySet().forEach((e) -> {
-            this.messages.put(e.getKey(), e.getValue());
-        });
+        YamlConfiguration.loadConfiguration(messagesFile).getValues(true).forEach((key, value) -> this.messages.put(key, value));
     }
 
     //<editor-fold desc="RewardsGUI" defaultstate="collapsed">
@@ -98,12 +97,12 @@ public class Messages {
                 .replaceAll("%rewardname%", rewardname)
                 .replaceAll("%player%", player));
     }
-    
-    public String getReloadSuccess(){
+
+    public String getReloadSuccess() {
         return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("ReloadSuccess", "&aConfig and messages reloaded successfully.").toString());
     }
-    
-    public String getResetSuccess(String player, String rewardname){
+
+    public String getResetSuccess(String player, String rewardname) {
         return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("ResetSuccess", "&a%rewardname% for player %player% was successfully reset.").toString()
                 .replaceAll("%rewardname%", rewardname)
                 .replaceAll("%player%", player));

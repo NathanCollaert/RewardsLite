@@ -1,7 +1,7 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
-import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
+import com.backtobedrock.LitePlaytimeRewards.enums.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;

@@ -16,23 +16,23 @@ GiveRewardInventoryTitle: "&2Available Rewards"
 #Each list item will be a new line.
 #Reward information displayed under reward name when executing /rewards.
 RewardInfo:
-- "&a(redeemed: &2%redeemed%&a, pending: &2%pending%&a)"
+  - "&a(redeemed: &2%redeemed%&a, pending: &2%pending%&a)"
 
 #Available placeholders: %total_in_seconds% - %total_in_minutes% - %total_in_hours% - %total_in_days% - %seconds% - %minutes% - %hours% - %days%
 #The following placeholders should be used together: %seconds% - %minutes% - %hours% - %days%
 #Each list item will be a new line.
 #Info displayed under reward description when executing /rewards if available and time left.
 NextReward:
-- "&eNext reward in &6"
-- "&6%days% days, %hours% hours, %minutes% mins, %seconds% secs"
+  - "&eNext reward in &6"
+  - "&6%days% days, %hours% hours, %minutes% mins, %seconds% secs"
 
 #Info displayed under reward description when executing /rewards if player can't claim reward anymore.
 NextRewardNever:
-- "&cAlready earned this reward."
+  - "&cAlready earned this reward."
 
 #Info displayed under reward description when executing /rewards if no permission for it but claimed or pending at least once.
 NextRewardNoPermission:
-- "&cYou can't earn this reward."
+  - "&cYou can't earn this reward."
 
 #Available placeholders: %player% - %rewardname% - %world%
 #Notification send to players if they have a reward pending cause in an unclaimable world.

@@ -5,20 +5,21 @@ import com.backtobedrock.LitePlaytimeRewards.enums.InventoryLayout;
 import com.backtobedrock.LitePlaytimeRewards.enums.NotificationType;
 import com.backtobedrock.LitePlaytimeRewards.enums.RewardsOrder;
 import com.backtobedrock.LitePlaytimeRewards.models.ConfigReward;
+import org.bukkit.Material;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import org.bukkit.Material;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class ConfigUtils {
 
     public static List<Integer> getNumbersFromString(String numbers) {
         try {
-            return Arrays.asList(numbers.split(",")).stream().map(e -> (Integer.parseInt(e) > 1789569 ? 1789569 : Integer.parseInt(e)) * 1200).collect(Collectors.toList());
+            return Arrays.stream(numbers.split(",")).map(e -> (Math.min(Integer.parseInt(e), 1789569)) * 1200).collect(Collectors.toList());
         } catch (NumberFormatException e) {
             return new ArrayList<>();
         }
@@ -46,9 +47,7 @@ public class ConfigUtils {
 
         TreeMap<String, ConfigReward> rewards = plugin.getLPRConfig().getRewards();
         if (!rewards.isEmpty()) {
-            rewards.entrySet().forEach(e -> {
-                plugin.getRewards().getAll().putIfAbsent(e.getKey(), e.getValue());
-            });
+            rewards.forEach((key, value) -> plugin.getRewards().getAll().putIfAbsent(key, value));
             plugin.getRewards().saveRewards();
             JavaPlugin.getPlugin(LitePlaytimeRewards.class).getLogger().log(Level.SEVERE, "Found rewards in config.yml, moved to rewards.yml.");
         }

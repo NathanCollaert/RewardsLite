@@ -5,10 +5,11 @@ import com.backtobedrock.LitePlaytimeRewards.guis.clickActions.ClickAction;
 import com.backtobedrock.LitePlaytimeRewards.guis.clickActions.GiveRewardClickAction;
 import com.backtobedrock.LitePlaytimeRewards.models.ConfigReward;
 import com.backtobedrock.LitePlaytimeRewards.models.GUIReward;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
-import org.bukkit.inventory.ItemStack;
 
 public class GiveRewardGUI extends PagedGUI {
 
@@ -24,7 +25,7 @@ public class GiveRewardGUI extends PagedGUI {
 
     @Override
     protected void setData() {
-        this.rewards.entrySet().stream().collect(Collectors.toList()).subList((this.currentPage - 1) * 28, this.currentPage * 28 > this.rewards.size() ? this.rewards.size() : this.currentPage * 28).forEach(e -> {
+        new ArrayList<>(this.rewards.entrySet()).subList((this.currentPage - 1) * 28, Math.min(this.currentPage * 28, this.rewards.size())).forEach(e -> {
             GUIReward reward = this.GUIRewards.getOrDefault(e.getKey(), new GUIReward(e.getKey()));
             ItemStack item = this.createGUIItem(e.getValue().getDisplayName(), e.getValue().getGiveRewardGUIDescription(reward), false, e.getValue().getDisplayItem());
             this.customHolder.addIcon(new Icon(item, Arrays.asList(new ClickAction[]{new GiveRewardClickAction(this, reward)}), null));

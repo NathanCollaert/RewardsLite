@@ -2,12 +2,6 @@ package com.backtobedrock.LitePlaytimeRewards.models;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.runnables.NotifyBossBar;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -18,6 +12,9 @@ import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @SerializableAs("Reward")
 public class Reward implements ConfigurationSerializable {
@@ -32,7 +29,7 @@ public class Reward implements ConfigurationSerializable {
     private ConfigReward cReward;
 
     public Reward(ConfigReward cReward, List<Integer> timeTillNextReward, int amountRedeemed, int amountPending, boolean eligible, boolean claimedOldPlaytime) {
-        this(timeTillNextReward.isEmpty() ? new ArrayList(cReward.getPlaytimeNeeded()) : timeTillNextReward, amountRedeemed < 0 ? 0 : amountRedeemed, amountPending < 0 ? 0 : amountPending, cReward.isLoop() ? true : eligible, claimedOldPlaytime);
+        this(timeTillNextReward.isEmpty() ? new ArrayList(cReward.getPlaytimeNeeded()) : timeTillNextReward, Math.max(amountRedeemed, 0), Math.max(amountPending, 0), cReward.isLoop() || eligible, claimedOldPlaytime);
         this.cReward = cReward;
     }
 
@@ -49,6 +46,22 @@ public class Reward implements ConfigurationSerializable {
     //new reward only
     public Reward(ConfigReward cReward) {
         this(cReward, new ArrayList(cReward.getPlaytimeNeeded()), 0, 0, true, false);
+    }
+
+    public static Reward deserialize(Map<String, Object> map) {
+        List<Integer> timeTillNextReward = (List<Integer>) map.getOrDefault("timeTillNextReward", new ArrayList<>());
+        int amountRedeemed = (int) map.getOrDefault("amountRedeemed", 0);
+        int amountPending = (int) map.getOrDefault("amountPending", 0);
+        boolean eligible = (boolean) map.getOrDefault("eligible", true);
+        boolean claimedOldPlaytime = (boolean) map.getOrDefault("claimedOldPlaytime", false);
+
+        //old userdata conversion (-1 to empty list)
+        if (!timeTillNextReward.isEmpty() && timeTillNextReward.get(0) == -1) {
+            eligible = false;
+            timeTillNextReward = new ArrayList<>();
+        }
+
+        return new Reward(timeTillNextReward, amountRedeemed, amountPending, eligible, claimedOldPlaytime);
     }
 
     public ConfigReward getcReward() {
@@ -81,12 +94,12 @@ public class Reward implements ConfigurationSerializable {
         this.timeTillNextReward = new ArrayList(this.cReward.getPlaytimeNeeded());
     }
 
-    public void setFirstTimeTillNextReward(int time) {
-        this.timeTillNextReward.set(0, time);
-    }
-
     public int getFirstTimeTillNextReward() {
         return this.timeTillNextReward.get(0);
+    }
+
+    public void setFirstTimeTillNextReward(int time) {
+        this.timeTillNextReward.set(0, time);
     }
 
     public int getAmountRedeemed() {
@@ -118,7 +131,7 @@ public class Reward implements ConfigurationSerializable {
     }
 
     public List<String> getRewardsGUIDescription(OfflinePlayer player) {
-        List<String> description = (this.cReward.getDisplayDescription().stream().collect(Collectors.toList()));
+        List<String> description = (new ArrayList<>(this.cReward.getDisplayDescription()));
 
         if (description.size() > 0) {
             description.add(0, "§f----");
@@ -239,9 +252,7 @@ public class Reward implements ConfigurationSerializable {
                     if (!notification.isEmpty()) {
                         players.remove(plyr);
                     }
-                    players.stream().forEach(e -> {
-                        ((Player) e).spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(broadcastNotification).create());
-                    });
+                    players.forEach(e -> e.spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(broadcastNotification).create()));
                 }
                 if (!notification.isEmpty()) {
                     plyr.spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(notification).create());
@@ -261,21 +272,5 @@ public class Reward implements ConfigurationSerializable {
         map.put("claimedOldPlaytime", this.claimedOldPlaytime);
 
         return map;
-    }
-
-    public static Reward deserialize(Map<String, Object> map) {
-        List<Integer> timeTillNextReward = (List<Integer>) map.getOrDefault("timeTillNextReward", new ArrayList<>());
-        int amountRedeemed = (int) map.getOrDefault("amountRedeemed", 0);
-        int amountPending = (int) map.getOrDefault("amountPending", 0);
-        boolean eligible = (boolean) map.getOrDefault("eligible", true);
-        boolean claimedOldPlaytime = (boolean) map.getOrDefault("claimedOldPlaytime", false);
-
-        //old userdata conversion (-1 to empty list)
-        if (!timeTillNextReward.isEmpty() && timeTillNextReward.get(0) == -1) {
-            eligible = false;
-            timeTillNextReward = new ArrayList<>();
-        }
-
-        return new Reward(timeTillNextReward, amountRedeemed, amountPending, eligible, claimedOldPlaytime);
     }
 }

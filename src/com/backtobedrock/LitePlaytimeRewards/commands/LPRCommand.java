@@ -1,12 +1,13 @@
 package com.backtobedrock.LitePlaytimeRewards.commands;
 
 import com.backtobedrock.LitePlaytimeRewards.enums.Command;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class LPRCommand extends Commands {
 
@@ -31,7 +32,7 @@ public class LPRCommand extends Commands {
                                 this.plugin.initialize();
 
                                 //save all cruds and redo rewards
-                                this.plugin.getPlayerCache().entrySet().stream().forEach(e -> {
+                                this.plugin.getPlayerCache().entrySet().forEach(e -> {
                                     e.getValue().saveConfig();
                                     e.getValue().getData();
                                 });
@@ -61,7 +62,7 @@ public class LPRCommand extends Commands {
                                 }
 
                                 //check if player online
-                                OfflinePlayer plyrReset = Bukkit.getOfflinePlayer(args[2]);
+                                @SuppressWarnings("deprecation") OfflinePlayer plyrReset = Bukkit.getOfflinePlayer(args[2]);
                                 if (!plyrReset.isOnline()) {
                                     this.cs.sendMessage(plugin.getMessages().getNotOnline(plyrReset.getName()));
                                     break;

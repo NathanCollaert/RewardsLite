@@ -1,6 +1,7 @@
 package com.backtobedrock.LitePlaytimeRewards.enums;
 
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
+
 import java.util.Comparator;
 
 public enum RewardsOrder {

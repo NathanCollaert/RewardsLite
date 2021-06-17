@@ -4,25 +4,24 @@ import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.configs.PlayerData;
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
 import com.earth2me.essentials.User;
-import java.util.Map;
-import java.util.TreeMap;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 public class Countdown extends BukkitRunnable {
-    
+
     private final int loopTimer;
-    private int saveCounter = 0;
-    private boolean givenReward = false;
-    
-    PlayerData crud;
-    
     private final LitePlaytimeRewards plugin;
     private final Player plyr;
     private final TreeMap<String, Reward> rewards;
+    PlayerData crud;
+    private int saveCounter = 0;
+    private boolean givenReward = false;
     private User user = null;
-    
+
     public Countdown(int looptimer, Player plyr) {
         this.plugin = JavaPlugin.getPlugin(LitePlaytimeRewards.class);
         this.loopTimer = looptimer;
@@ -33,7 +32,7 @@ public class Countdown extends BukkitRunnable {
             this.user = plugin.ess.getUser(plyr);
         }
     }
-    
+
     @Override
     public void run() {
         int playtime = this.crud.getPlaytime();
@@ -65,19 +64,19 @@ public class Countdown extends BukkitRunnable {
             this.givenReward = false;
         }
     }
-    
+
     private void checkRewards(boolean isAfk) {
         this.rewards.entrySet().stream()
                 .filter((Map.Entry<String, Reward> r) -> r.getValue().getAmountPending() > 0
-                || (r.getValue().isEligible()
-                && (r.getValue().hasPermission(this.plyr))
-                && !r.getValue().getcReward().getDisabledWorlds().contains(this.plyr.getLocation().getWorld().getName().toLowerCase())
-                && (r.getValue().getcReward().isCountAfkTime() || !isAfk)))
+                        || (r.getValue().isEligible()
+                        && (r.getValue().hasPermission(this.plyr))
+                        && !r.getValue().getcReward().getDisabledWorlds().contains(this.plyr.getLocation().getWorld().getName().toLowerCase())
+                        && (r.getValue().getcReward().isCountAfkTime() || !isAfk)))
                 .forEach((entry) -> {
                     this.countDown(entry.getValue());
                 });
     }
-    
+
     private void countDown(Reward value) {
         int timeNeededNew = value.getTimeTillNextReward().get(0) - this.loopTimer;
         if (value.isEligible() && timeNeededNew <= 0) {

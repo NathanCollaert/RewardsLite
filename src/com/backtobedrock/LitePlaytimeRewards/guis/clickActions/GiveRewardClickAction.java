@@ -42,14 +42,14 @@ public class GiveRewardClickAction extends ClickAction {
             //if left click, give reward
             case LEFT:
                 this.plugin.getIsGiving().put(player.getUniqueId(), this.reward);
-                Bukkit.getScheduler().runTask(this.plugin, () -> player.closeInventory());
+                Bukkit.getScheduler().runTask(this.plugin, player::closeInventory);
                 player.spigot().sendMessage(new ComponentBuilder("Who do you want to give the reward to?").color(ChatColor.AQUA).create());
                 player.spigot().sendMessage(new ComponentBuilder("Please Send the playername in chat (").color(ChatColor.AQUA).append("!cancel").color(ChatColor.DARK_AQUA).append(" to cancel).").color(ChatColor.AQUA).create());
                 break;
         }
     }
-    
-    public void updateInventory(Player player){
+
+    public void updateInventory(Player player) {
         this.gui.initialize();
         Bukkit.getScheduler().runTask(this.plugin, () -> player.openInventory(this.gui.getInventory()));
     }

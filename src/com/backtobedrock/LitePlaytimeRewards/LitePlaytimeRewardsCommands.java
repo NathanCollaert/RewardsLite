@@ -1,22 +1,19 @@
 package com.backtobedrock.LitePlaytimeRewards;
 
-import com.backtobedrock.LitePlaytimeRewards.commands.AfktimeCommand;
-import com.backtobedrock.LitePlaytimeRewards.commands.GiverewardCommand;
-import com.backtobedrock.LitePlaytimeRewards.commands.LPRCommand;
-import com.backtobedrock.LitePlaytimeRewards.commands.PlaytimeCommand;
-import com.backtobedrock.LitePlaytimeRewards.commands.RewardsCommand;
+import com.backtobedrock.LitePlaytimeRewards.commands.*;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.StringUtil;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.StringUtil;
 
 public class LitePlaytimeRewardsCommands implements TabCompleter {
 
@@ -62,7 +59,7 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                     Collections.sort(completions);
                 }
                 if (args.length == 2) {
-                    StringUtil.copyPartialMatches(args[1].toLowerCase(), this.plugin.getServer().getOnlinePlayers().stream().map(e -> e.getName()).collect(Collectors.toList()), completions);
+                    StringUtil.copyPartialMatches(args[1].toLowerCase(), this.plugin.getServer().getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()), completions);
                     Collections.sort(completions);
                 }
                 if (args.length == 4) {
@@ -82,7 +79,7 @@ public class LitePlaytimeRewardsCommands implements TabCompleter {
                             Collections.sort(completions);
                         }
                         if (args.length == 3) {
-                            StringUtil.copyPartialMatches(args[2].toLowerCase(), this.plugin.getServer().getOnlinePlayers().stream().map(e -> e.getName()).collect(Collectors.toList()), completions);
+                            StringUtil.copyPartialMatches(args[2].toLowerCase(), this.plugin.getServer().getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()), completions);
                             Collections.sort(completions);
                         }
                         break;

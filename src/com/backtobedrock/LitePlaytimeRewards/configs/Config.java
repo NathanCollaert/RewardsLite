@@ -5,6 +5,12 @@ import com.backtobedrock.LitePlaytimeRewards.enums.InventoryLayout;
 import com.backtobedrock.LitePlaytimeRewards.enums.RewardsOrder;
 import com.backtobedrock.LitePlaytimeRewards.models.ConfigReward;
 import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,18 +19,11 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
-
 public class Config {
 
     private final File configFile;
-    private FileConfiguration config;
     private final LitePlaytimeRewards plugin;
+    private FileConfiguration config;
 
     public Config(File configFile) {
         this.configFile = configFile;
