@@ -9,11 +9,13 @@ import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUpdater;
 import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUtils;
 import com.backtobedrock.LitePlaytimeRewards.utils.Metrics;
 import com.backtobedrock.LitePlaytimeRewards.utils.UpdateChecker;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.ess3.api.IEssentials;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,7 +39,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
     private Rewards rewards;
     private ServerData serverData;
     private LitePlaytimeRewardsCommands commands;
-    private boolean papiEnabled = false;
+    private static boolean papiEnabled = false;
 
     @Override
     public void onEnable() {
@@ -47,7 +49,7 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         // Small check to make sure that PlaceholderAPI is installed
         if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             this.getLogger().info("Placeholder API found, placeholders supported.");
-            papiEnabled = true;
+            LitePlaytimeRewards.papiEnabled = true;
         } else {
             this.getLogger().info("PlaceholderAPI not found.");
         }
@@ -63,6 +65,20 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
         metrics.addCustomChart(new Metrics.SimplePie("reward_count", () -> Integer.toString(this.rewards.getAll().size())));
 
         super.onEnable();
+    }
+
+    /**
+     * Resolves PAPI placeholders.
+     *
+     * @param player The player object.
+     * @param text The text which may contain placeholders.
+     * @return The final text.
+     */
+    public static String replacePlaceholders(Player player, String text) {
+        if(papiEnabled) {
+            return PlaceholderAPI.setPlaceholders(player, text);
+        }
+        return text;
     }
 
     @Override

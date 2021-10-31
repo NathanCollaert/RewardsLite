@@ -2,7 +2,6 @@ package com.backtobedrock.LitePlaytimeRewards.models;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.runnables.NotifyBossBar;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -133,21 +132,21 @@ public class Reward implements ConfigurationSerializable {
 
     public List<String> getRewardsGUIDescription(OfflinePlayer player) {
         List<String> description = (new ArrayList<>(this.cReward.getDisplayDescription()));
-        description = description.stream().map(l -> PlaceholderAPI.setPlaceholders(player, l)).collect(Collectors.toList());
+        description = description.stream().map(l -> LitePlaytimeRewards.replacePlaceholders(player.getPlayer(), l)).collect(Collectors.toList());
 
         if (description.size() > 0) {
             description.add(0, "§f----");
         }
 
         description.addAll(0, this.plugin.getMessages().getRewardInfo(this.getAmountRedeemed(), this.getAmountPending())
-                .stream().map(l -> PlaceholderAPI.setPlaceholders(player, l)).collect(Collectors.toList()));
+                .stream().map(l -> LitePlaytimeRewards.replacePlaceholders(player.getPlayer(), l)).collect(Collectors.toList()));
         description.add("§f----");
         int nextReward = this.getTimeTillNextReward().get(0);
         description.addAll(player.isOnline() && (((Player) player).hasPermission("liteplaytimerewards.reward." + this.cReward.getId()) || !this.cReward.isUsePermission())
                 ? this.isEligible()
-                ? this.plugin.getMessages().getNextReward(nextReward).stream().map(l -> PlaceholderAPI.setPlaceholders(player, l)).collect(Collectors.toList())
-                : this.plugin.getMessages().getNextRewardNever().stream().map(l -> PlaceholderAPI.setPlaceholders(player, l)).collect(Collectors.toList())
-                : this.plugin.getMessages().getNextRewardNoPermission().stream().map(l -> PlaceholderAPI.setPlaceholders(player, l)).collect(Collectors.toList()));
+                ? this.plugin.getMessages().getNextReward(nextReward).stream().map(l -> LitePlaytimeRewards.replacePlaceholders(player.getPlayer(), l)).collect(Collectors.toList())
+                : this.plugin.getMessages().getNextRewardNever().stream().map(l -> LitePlaytimeRewards.replacePlaceholders(player.getPlayer(), l)).collect(Collectors.toList())
+                : this.plugin.getMessages().getNextRewardNoPermission().stream().map(l -> LitePlaytimeRewards.replacePlaceholders(player.getPlayer(), l)).collect(Collectors.toList()));
 
         Bukkit.getLogger().info(">>>> --------- DESCRIPTION ---------- <<<<");
         description.forEach(d -> Bukkit.getLogger().info(">>>> " + d));
@@ -189,7 +188,7 @@ public class Reward implements ConfigurationSerializable {
                     pending++;
                 } else {
                     this.cReward.getCommands().forEach(j -> {
-                        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), PlaceholderAPI.setPlaceholders(player, j));
+                        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), LitePlaytimeRewards.replacePlaceholders(player, j));
                     });
 
                     this.setAmountRedeemed(this.amountRedeemed + 1);
@@ -202,7 +201,7 @@ public class Reward implements ConfigurationSerializable {
                 }
             }
 
-            message = PlaceholderAPI.setPlaceholders(player, message);
+            message = LitePlaytimeRewards.replacePlaceholders(player, message);
             if (!message.equals("") && amount > 0) {
                 switch (this.cReward.getNotificationType()) {
                     case CHAT:
@@ -226,8 +225,8 @@ public class Reward implements ConfigurationSerializable {
     }
 
     private void notifyUsers(Player plyr, boolean broadcast) {
-        String notification = PlaceholderAPI.setPlaceholders(plyr, this.cReward.getNotification());
-        String broadcastNotification = PlaceholderAPI.setPlaceholders(plyr, this.cReward.getBroadcastNotification());
+        String notification = LitePlaytimeRewards.replacePlaceholders(plyr, this.cReward.getNotification());
+        String broadcastNotification = LitePlaytimeRewards.replacePlaceholders(plyr, this.cReward.getBroadcastNotification());
 
         Collection<Player> players = new ArrayList<>();
 
