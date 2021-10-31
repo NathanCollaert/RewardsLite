@@ -148,9 +148,6 @@ public class Reward implements ConfigurationSerializable {
                 : this.plugin.getMessages().getNextRewardNever().stream().map(l -> LitePlaytimeRewards.replacePlaceholders(player.getPlayer(), l)).collect(Collectors.toList())
                 : this.plugin.getMessages().getNextRewardNoPermission().stream().map(l -> LitePlaytimeRewards.replacePlaceholders(player.getPlayer(), l)).collect(Collectors.toList()));
 
-        Bukkit.getLogger().info(">>>> --------- DESCRIPTION ---------- <<<<");
-        description.forEach(d -> Bukkit.getLogger().info(">>>> " + d));
-
         return description;
     }
 
