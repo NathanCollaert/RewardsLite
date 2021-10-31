@@ -37,11 +37,20 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
     private Rewards rewards;
     private ServerData serverData;
     private LitePlaytimeRewardsCommands commands;
+    private boolean papiEnabled = false;
 
     @Override
     public void onEnable() {
         //register Reward for serialization
         ConfigurationSerialization.registerClass(Reward.class);
+
+        // Small check to make sure that PlaceholderAPI is installed
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            this.getLogger().info("Placeholder API found, placeholders supported.");
+            papiEnabled = true;
+        } else {
+            this.getLogger().info("PlaceholderAPI not found.");
+        }
 
         //initialize plugin
         this.initialize();

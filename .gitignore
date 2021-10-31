@@ -2,3 +2,5 @@ target/*
 .idea/
 !target/**.jar
 **.iml
+/.idea/
+/target/
