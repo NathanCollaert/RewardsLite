@@ -5,10 +5,10 @@ import com.backtobedrock.LitePlaytimeRewards.eventHandlers.LitePlaytimeRewardsEv
 import com.backtobedrock.LitePlaytimeRewards.guis.GiveRewardGUI;
 import com.backtobedrock.LitePlaytimeRewards.models.GUIReward;
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
-import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUpdater;
 import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUtils;
 import com.backtobedrock.LitePlaytimeRewards.utils.Metrics;
 import com.backtobedrock.LitePlaytimeRewards.utils.UpdateChecker;
+import com.tchristofferson.configupdater.ConfigUpdater;
 import net.ess3.api.IEssentials;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -18,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -130,23 +131,31 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 //            this.saveResource("server.yml", false);
 //        }
 
+        try {
+            //Update config file if old
+            if (wasOld) {
+                if (wasNew) {
+                    this.rewards.getAll().clear();
+                }
+                //check for old rewards
+                ConfigUtils.convertOldRewards();
+                ConfigUpdater.update(this, "config.yml", configFile, Collections.emptyList());
+
+                configFile = new File(this.getDataFolder(), "config.yml");
+            }
+
+            //messages.yml
+            ConfigUpdater.update(this, "messages.yml", messagesFile, Collections.emptyList());
+            messagesFile = new File(this.getDataFolder(), "messages.yml");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         //initialize configs
         this.config = new Config(configFile);
         this.messages = new Messages(messagesFile);
         this.rewards = new Rewards(rewardsFile);
 //        this.serverData = new ServerData(serverFile);
-
-        //Update config file if old
-        if (wasOld) {
-            if (wasNew) {
-                this.rewards.getAll().clear();
-            }
-            //check for old rewards
-            ConfigUtils.convertOldRewards();
-            ConfigUpdater.update(this, "config.yml", configFile, Collections.emptyList());
-            configFile = new File(this.getDataFolder(), "config.yml");
-            this.config = new Config(configFile);
-        }
     }
 
     private void checkDependencies() {

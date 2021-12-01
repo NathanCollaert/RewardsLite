@@ -17,11 +17,11 @@ TimeKeepDataInCache: 5
 #This requires Spigot/Paper v1.13+
 CountAllPlaytime: true
 
-  #Should claiming rewards be disabled in any worlds?
-  #Rewards that require claiming will be put into pending state until in allowed world.
-  #DisableGettingRewardsInWorlds:
-  #- world
-  #- world_nether
+#Should claiming rewards be disabled in any worlds?
+#Rewards that require claiming will be put into pending state until in allowed world.
+#DisableGettingRewardsInWorlds:
+#- world
+#- world_nether
 #- world_the_end
 DisableGettingRewardsInWorlds: [ ]
 
@@ -35,23 +35,23 @@ DisableGettingRewardsInWorlds: [ ]
 #What material should the border in GUIs be made out of?
 BorderMaterial: "white_stained_glass_pane"
 
-  #How should the plugin layout the rewards GUI?
-  #Options:
-  #"fill" -> Fill the inventory from left to right.
+#How should the plugin layout the rewards GUI?
+#Options:
+#"fill" -> Fill the inventory from left to right.
 #"centered" -> Center the rewards in the inventory.
 InventoryLayout: "centered"
 
-  #How should the plugin order the rewards in the rewards GUI?
-  #Options:
-  #id -> Alphanumeric ordering by ID.
-  #id_reversed -> Unalphanumeric ordering by ID.
-  #name -> Alphanumeric ordering by name.
-  #name_reversed -> Unalphanumeric ordering by name.
-  #time -> Ascending by time till next reward.
-  #time_reversed -> Descending by time till next reward.
-  #pending -> Ascending by amount pending.
-  #pending_reversed -> Descending by amount pending.
-  #redeemed -> Ascending by amount redeemed.
+#How should the plugin order the rewards in the rewards GUI?
+#Options:
+#id -> Alphanumeric ordering by ID.
+#id_reversed -> Unalphanumeric ordering by ID.
+#name -> Alphanumeric ordering by name.
+#name_reversed -> Unalphanumeric ordering by name.
+#time -> Ascending by time till next reward.
+#time_reversed -> Descending by time till next reward.
+#pending -> Ascending by amount pending.
+#pending_reversed -> Descending by amount pending.
+#redeemed -> Ascending by amount redeemed.
 #redeemed_reversed -> Descending by amount redeemed.
 RewardsOrder: "id"
 
