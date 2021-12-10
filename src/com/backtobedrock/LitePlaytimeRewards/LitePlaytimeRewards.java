@@ -5,7 +5,6 @@ import com.backtobedrock.LitePlaytimeRewards.eventHandlers.LitePlaytimeRewardsEv
 import com.backtobedrock.LitePlaytimeRewards.guis.GiveRewardGUI;
 import com.backtobedrock.LitePlaytimeRewards.models.GUIReward;
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
-import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUtils;
 import com.backtobedrock.LitePlaytimeRewards.utils.Metrics;
 import com.backtobedrock.LitePlaytimeRewards.utils.UpdateChecker;
 import com.tchristofferson.configupdater.ConfigUpdater;
@@ -100,12 +99,9 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
         //get config.yml and make if not exists
         File configFile = new File(this.getDataFolder(), "config.yml");
-        boolean wasOld = false;
         if (!configFile.exists()) {
             this.getLogger().info("Creating config.yml file.");
             this.saveResource("config.yml", false);
-        } else {
-            wasOld = true;
         }
 
         //get messages.yml and make if not exists
@@ -117,11 +113,9 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 
         //get rewards.yml and make if not exists
         File rewardsFile = new File(this.getDataFolder(), "rewards.yml");
-        boolean wasNew = false;
         if (!rewardsFile.exists()) {
             this.getLogger().info("Creating rewards.yml file.");
             this.saveResource("rewards.yml", false);
-            wasNew = true;
         }
 
 //        //get server.yml and make if not exists
@@ -132,23 +126,15 @@ public class LitePlaytimeRewards extends JavaPlugin implements Listener {
 //        }
 
         try {
-            //Update config file if old
-            if (wasOld) {
-                if (wasNew) {
-                    this.rewards.getAll().clear();
-                }
-                //check for old rewards
-                ConfigUtils.convertOldRewards();
-                ConfigUpdater.update(this, "config.yml", configFile, Collections.emptyList());
-
-                configFile = new File(this.getDataFolder(), "config.yml");
-            }
+            //config.yml
+            ConfigUpdater.update(this, "config.yml", configFile, Collections.emptyList());
+            configFile = new File(this.getDataFolder(), "config.yml");
 
             //messages.yml
             ConfigUpdater.update(this, "messages.yml", messagesFile, Collections.emptyList());
             messagesFile = new File(this.getDataFolder(), "messages.yml");
         } catch (IOException e) {
-            e.printStackTrace();
+            //ignore
         }
 
         //initialize configs
