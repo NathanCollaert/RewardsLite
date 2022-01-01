@@ -7,6 +7,7 @@ import com.backtobedrock.LitePlaytimeRewards.models.GUIReward;
 import com.backtobedrock.LitePlaytimeRewards.models.Reward;
 import com.backtobedrock.LitePlaytimeRewards.utils.Metrics;
 import com.backtobedrock.LitePlaytimeRewards.utils.UpdateChecker;
+import com.tchristofferson.configupdater.ConfigUpdater;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.ess3.api.IEssentials;
 import org.bukkit.Bukkit;
