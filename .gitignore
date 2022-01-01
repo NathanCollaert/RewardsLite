@@ -73,3 +73,7 @@ fabric.properties
 
 target
 dependency-reduced-pom.xml
+
+.idea/compiler.xml
+.idea/misc.xml
+
