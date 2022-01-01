@@ -120,8 +120,7 @@ public class CustomHolder implements InventoryHolder {
     public Inventory getInventory() {
         if (this.inventory == null) {
             this.inventory = Bukkit.createInventory(this, this.size, this.title);
-
-            this.icons.forEach((key, value) -> this.inventory.setItem(key, value.itemStack));
+            this.icons.forEach((key, value) -> this.inventory.setItem(key, Icon.cloneForGUI(value.itemStack)));
         }
         return this.inventory;
     }
