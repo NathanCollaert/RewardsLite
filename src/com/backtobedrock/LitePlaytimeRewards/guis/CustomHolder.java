@@ -120,7 +120,6 @@ public class CustomHolder implements InventoryHolder {
     public Inventory getInventory() {
         if (this.inventory == null) {
             this.inventory = Bukkit.createInventory(this, this.size, this.title);
-
             this.icons.forEach((key, value) -> this.inventory.setItem(key, value.itemStack));
         }
         return this.inventory;
@@ -128,7 +127,9 @@ public class CustomHolder implements InventoryHolder {
 
     public void updateRewards(Player player) {
         this.icons.entrySet().stream().filter(e -> e.getValue().hasReward()).forEach((entry) -> {
-            this.updateInventoryItem(this.inventory.getItem(entry.getKey()), entry.getValue(), player);
+            if (this.inventory != null && this.inventory.getItem(entry.getKey()) != null) {
+                this.updateInventoryItem(this.inventory.getItem(entry.getKey()), entry.getValue(), player);
+            }
         });
     }
 

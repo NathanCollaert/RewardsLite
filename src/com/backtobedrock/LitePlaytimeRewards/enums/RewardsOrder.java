@@ -16,13 +16,13 @@ public enum RewardsOrder {
     REDEEMED(Comparator.comparingInt(Reward::getAmountRedeemed)),
     REDEEMED_REVERSED(Comparator.comparingInt(Reward::getAmountRedeemed).reversed());
 
-    private final Comparator comparator;
+    private final Comparator<Reward> comparator;
 
-    RewardsOrder(Comparator comparator) {
+    RewardsOrder(Comparator<Reward> comparator) {
         this.comparator = comparator;
     }
 
-    public Comparator getComparator() {
+    public Comparator<Reward> getComparator() {
         return this.comparator;
     }
 }
