@@ -2,7 +2,6 @@ package com.backtobedrock.LitePlaytimeRewards.configs;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.utils.HexUtils;
-
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 

@@ -26,6 +26,10 @@ public abstract class GUI {
     }
 
     protected void initialize() {
+        this.createBorder();
+    }
+
+    protected void createBorder() {
         ItemStack borderItem = new ItemStack(this.config.getBorderMaterial());
         ItemMeta im = borderItem.getItemMeta();
         if (im != null) {
@@ -55,6 +59,8 @@ public abstract class GUI {
         }
         return item;
     }
+
+    protected abstract void setData();
 
     public Inventory getInventory() {
         return this.customHolder.getInventory();

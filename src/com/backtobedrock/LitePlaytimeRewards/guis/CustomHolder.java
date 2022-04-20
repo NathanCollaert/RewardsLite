@@ -2,6 +2,7 @@ package com.backtobedrock.LitePlaytimeRewards.guis;
 
 import com.backtobedrock.LitePlaytimeRewards.enums.GUIType;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -112,8 +113,9 @@ public class CustomHolder implements InventoryHolder {
         return type;
     }
 
-    public void clearContent() {
+    public void reset() {
         this.icons.clear();
+        this.currentRow = 1;
     }
 
     @Override
@@ -123,6 +125,15 @@ public class CustomHolder implements InventoryHolder {
             this.icons.forEach((key, value) -> this.inventory.setItem(key, value.itemStack));
         }
         return this.inventory;
+    }
+
+    public void updateInvent() {
+        if (this.inventory != null) {
+            for (int i = 0; i < this.size; i++) {
+                Icon icon = this.icons.get(i);
+                this.getInventory().setItem(i, icon == null ? new ItemStack(Material.AIR) : icon.itemStack);
+            }
+        }
     }
 
     public void updateRewards(Player player) {

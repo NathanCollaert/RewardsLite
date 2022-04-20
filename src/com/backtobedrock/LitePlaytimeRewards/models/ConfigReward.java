@@ -4,7 +4,6 @@ import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.enums.NotificationType;
 import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUtils;
 import com.backtobedrock.LitePlaytimeRewards.utils.HexUtils;
-
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;

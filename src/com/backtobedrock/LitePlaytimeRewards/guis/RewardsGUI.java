@@ -16,7 +16,7 @@ public class RewardsGUI extends PagedGUI {
     private final TreeMap<String, Reward> rewards;
 
     public RewardsGUI(PlayerData data, TreeMap<String, Reward> rewards) {
-        super(new CustomHolder(data.getRewards().size(), true, GUIType.REWARDS), (int) Math.ceil((double) data.getRewards().size() / 28));
+        super(new CustomHolder(data.getRewards().size(), true, GUIType.REWARDS), data.getRewards().size());
         this.customHolder.setTitle(this.plugin.getMessages().getRewardsInventoryTitle());
         this.rewards = rewards;
         this.data = data;
@@ -24,7 +24,18 @@ public class RewardsGUI extends PagedGUI {
     }
 
     @Override
+    public void initialize() {
+        super.initialize();
+        this.setData();
+    }
+
+    @Override
     public void setData() {
+        super.setData();
+        this.setRewards();
+    }
+
+    public void setRewards() {
         List<Reward> orderedRewards = this.rewards.values().stream().sorted(this.plugin.getLPRConfig().getRewardsOrder().getComparator()).collect(Collectors.toList());
         List<Icon> icons = new ArrayList<>();
 
