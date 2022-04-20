@@ -1,7 +1,8 @@
 package com.backtobedrock.LitePlaytimeRewards.configs;
 
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
-import net.md_5.bungee.api.ChatColor;
+import com.backtobedrock.LitePlaytimeRewards.utils.HexUtils;
+
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -59,14 +60,14 @@ public class Messages {
     }
 
     public String getPendingNotificationWrongWorld(String player, String rewardname, String world) {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("PendingNotificationWrongWorld", "&eYou have a playtime reward pending but can't claim it in this world.").toString()
+        return HexUtils.applyColor(this.messages.getOrDefault("PendingNotificationWrongWorld", "&eYou have a playtime reward pending but can't claim it in this world.").toString()
                 .replaceAll("%player%", player)
                 .replaceAll("%rewardname%", rewardname)
                 .replaceAll("%world%", world));
     }
 
     public String getPendingNotificationNotEnoughInventory(String player, String rewardname, int inventoryNeeded) {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("PendingNotificationNotEnoughInventory", "&eYou need &6%inventory_spaces_needed% &efree inventory spaces to claim a pending playtime reward.").toString()
+        return HexUtils.applyColor(this.messages.getOrDefault("PendingNotificationNotEnoughInventory", "&eYou need &6%inventory_spaces_needed% &efree inventory spaces to claim a pending playtime reward.").toString()
                 .replaceAll("%player%", player)
                 .replaceAll("%rewardname%", rewardname)
                 .replaceAll("%inventory_spaces_needed%", Integer.toString(inventoryNeeded)));
@@ -75,35 +76,35 @@ public class Messages {
 
     //<editor-fold desc="Commands" defaultstate="collapsed">
     public String getPlaytime(int time) {
-        return ChatColor.translateAlternateColorCodes('&', this.timeToString(time, this.messages.getOrDefault("Playtime", "&6You have played for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds on this server.").toString()));
+        return HexUtils.applyColor(this.timeToString(time, this.messages.getOrDefault("Playtime", "&6You have played for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds on this server.").toString()));
     }
 
     public String getPlaytimeOther(int time, String player) {
-        return ChatColor.translateAlternateColorCodes('&', this.timeToString(time, this.messages.getOrDefault("PlaytimeOther", "&6%player% has played on this server for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds.").toString())
+        return HexUtils.applyColor(this.timeToString(time, this.messages.getOrDefault("PlaytimeOther", "&6%player% has played on this server for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds.").toString())
                 .replaceAll("%player%", player));
     }
 
     public String getAFKTime(int time) {
-        return ChatColor.translateAlternateColorCodes('&', this.timeToString(time, this.messages.getOrDefault("AFKTime", "&6You have AFK'd for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds on this server.").toString()));
+        return HexUtils.applyColor(this.timeToString(time, this.messages.getOrDefault("AFKTime", "&6You have AFK'd for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds on this server.").toString()));
     }
 
     public String getAFKTimeOther(int time, String player) {
-        return ChatColor.translateAlternateColorCodes('&', this.timeToString(time, this.messages.getOrDefault("AFKTimeOther", "&6%player% has AFK'd on this server for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds.").toString())
+        return HexUtils.applyColor(this.timeToString(time, this.messages.getOrDefault("AFKTimeOther", "&6%player% has AFK'd on this server for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds.").toString())
                 .replaceAll("%player%", player));
     }
 
     public String getRewardGiven(String player, String rewardname) {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("RewardGiven", "&aThe %rewardname% reward has been given to %player%.").toString()
+        return HexUtils.applyColor(this.messages.getOrDefault("RewardGiven", "&aThe %rewardname% reward has been given to %player%.").toString()
                 .replaceAll("%rewardname%", rewardname)
                 .replaceAll("%player%", player));
     }
 
     public String getReloadSuccess() {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("ReloadSuccess", "&aConfig and messages reloaded successfully.").toString());
+        return HexUtils.applyColor(this.messages.getOrDefault("ReloadSuccess", "&aConfig and messages reloaded successfully.").toString());
     }
 
     public String getResetSuccess(String player, String rewardname) {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("ResetSuccess", "&a%rewardname% for player %player% was successfully reset.").toString()
+        return HexUtils.applyColor(this.messages.getOrDefault("ResetSuccess", "&a%rewardname% for player %player% was successfully reset.").toString()
                 .replaceAll("%rewardname%", rewardname)
                 .replaceAll("%player%", player));
     }
@@ -111,45 +112,45 @@ public class Messages {
 
     //<editor-fold desc="Errors" defaultstate="collapsed">
     public String getNeedToBeOnline() {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("NeedToBeOnline", "&4You will need to log in to use this command.").toString());
+        return HexUtils.applyColor(this.messages.getOrDefault("NeedToBeOnline", "&4You will need to log in to use this command.").toString());
     }
 
     public String getServerDoesntKeepTrackOfAFK() {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("ServerDoesntKeepTrackOfAFK", "&4This server does not keep track of AFK time.").toString());
+        return HexUtils.applyColor(this.messages.getOrDefault("ServerDoesntKeepTrackOfAFK", "&4This server does not keep track of AFK time.").toString());
     }
 
     public String getNoRewardsConfigured() {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("NoRewardsConfigured", "&4No rewards configured in the config file.").toString());
+        return HexUtils.applyColor(this.messages.getOrDefault("NoRewardsConfigured", "&4No rewards configured in the config file.").toString());
     }
 
     public String getNoRewardsAvailable() {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("NoRewardsAvailable", "&4There are no rewards available for you.").toString());
+        return HexUtils.applyColor(this.messages.getOrDefault("NoRewardsAvailable", "&4There are no rewards available for you.").toString());
     }
 
     public String getNoPermission() {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("NoPermission", "&4You do not have permission to perform this command.").toString());
+        return HexUtils.applyColor(this.messages.getOrDefault("NoPermission", "&4You do not have permission to perform this command.").toString());
     }
 
     public String getNoData(String player) {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("NoData", "&4%player% has no data on this server yet.").toString()
+        return HexUtils.applyColor(this.messages.getOrDefault("NoData", "&4%player% has no data on this server yet.").toString()
                 .replaceAll("%player%", player));
     }
 
     public String getNoSuchReward(String rewardname) {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("NoSuchReward", "&4%rewardname% is not an available reward.").toString()
+        return HexUtils.applyColor(this.messages.getOrDefault("NoSuchReward", "&4%rewardname% is not an available reward.").toString()
                 .replaceAll("%rewardname%", rewardname));
     }
 
     public String getNotANumber() {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("NotANumber", "&4Amount must be a positive number greater then 0.").toString());
+        return HexUtils.applyColor(this.messages.getOrDefault("NotANumber", "&4Amount must be a positive number greater then 0.").toString());
     }
 
     public String getNotABoolean() {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("NotABoolean", "&4Broadcast must be true or false.").toString());
+        return HexUtils.applyColor(this.messages.getOrDefault("NotABoolean", "&4Broadcast must be true or false.").toString());
     }
 
     public String getNotOnline(String player) {
-        return ChatColor.translateAlternateColorCodes('&', this.messages.getOrDefault("NotOnline", "&4The player %player% is not online.").toString()
+        return HexUtils.applyColor(this.messages.getOrDefault("NotOnline", "&4The player %player% is not online.").toString()
                 .replaceAll("%player%", player));
     }
     //</editor-fold>

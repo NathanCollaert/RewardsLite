@@ -3,7 +3,8 @@ package com.backtobedrock.LitePlaytimeRewards.models;
 import com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards;
 import com.backtobedrock.LitePlaytimeRewards.enums.NotificationType;
 import com.backtobedrock.LitePlaytimeRewards.utils.ConfigUtils;
-import net.md_5.bungee.api.ChatColor;
+import com.backtobedrock.LitePlaytimeRewards.utils.HexUtils;
+
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 public class ConfigReward {
 
@@ -71,8 +71,8 @@ public class ConfigReward {
         List<String> disabledWorlds = reward.getStringList("DisabledWorlds");
         boolean usePermission = reward.getBoolean("UsePermission", false);
         NotificationType notificationType = ConfigUtils.getNotificationType("NotificationType", reward.getString("NotificationType", "bossbar"), NotificationType.BOSSBAR);
-        String notification = ChatColor.translateAlternateColorCodes('&', reward.getString("Notification", ""));
-        String broadcastNotification = ChatColor.translateAlternateColorCodes('&', reward.getString("BroadcastNotification", ""));
+        String notification = HexUtils.applyColor(reward.getString("Notification", ""));
+        String broadcastNotification = HexUtils.applyColor(reward.getString("BroadcastNotification", ""));
         List<String> commands = reward.getStringList("Commands");
 
         Material m = Material.matchMaterial(reward.getString("DisplayItem", "chest"));
@@ -97,7 +97,7 @@ public class ConfigReward {
     }
 
     public String getDisplayName() {
-        return ChatColor.translateAlternateColorCodes('&', displayName);
+        return HexUtils.applyColor(displayName);
     }
 
     public List<Integer> getPlaytimeNeeded() {
@@ -145,7 +145,7 @@ public class ConfigReward {
     }
 
     public List<String> getDisplayDescription() {
-        return displayDescription.stream().map(e -> ChatColor.translateAlternateColorCodes('&', e)).collect(Collectors.toList());
+        return HexUtils.applyColor(displayDescription);
     }
 
     public String getId() {
