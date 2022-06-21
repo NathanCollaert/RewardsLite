@@ -56,7 +56,7 @@ public class Rewards {
 
     public void saveRewards() {
         TreeMap<String, Map<String, Object>> crewards = new TreeMap<>();
-        this.getAll().entrySet().forEach(e -> crewards.put(e.getKey(), e.getValue().serialize()));
+        this.getAll().forEach((key, value) -> crewards.put(key, value.serialize()));
         this.config.set("Rewards", crewards);
 
         this.saveConfig();

@@ -45,7 +45,7 @@ public class Reward implements ConfigurationSerializable {
 
     //new reward only
     public Reward(ConfigReward cReward) {
-        this(cReward, new ArrayList(cReward.getPlaytimeNeeded()), 0, 0, true, false);
+        this(cReward, new ArrayList<>(cReward.getPlaytimeNeeded()), 0, 0, true, false);
     }
 
     public static Reward deserialize(Map<String, Object> map) {
@@ -86,12 +86,12 @@ public class Reward implements ConfigurationSerializable {
             if (!this.cReward.isLoop()) {
                 this.eligible = false;
             }
-            this.timeTillNextReward = new ArrayList(this.cReward.getPlaytimeNeeded());
+            this.timeTillNextReward = new ArrayList<>(this.cReward.getPlaytimeNeeded());
         }
     }
 
     public void resetTimeTillNextReward() {
-        this.timeTillNextReward = new ArrayList(this.cReward.getPlaytimeNeeded());
+        this.timeTillNextReward = new ArrayList<>(this.cReward.getPlaytimeNeeded());
     }
 
     public int getFirstTimeTillNextReward() {
@@ -182,9 +182,7 @@ public class Reward implements ConfigurationSerializable {
                     message = this.plugin.getMessages().getPendingNotificationNotEnoughInventory(plyr.getName(), this.cReward.getDisplayName(), this.cReward.getSlotsNeeded());
                     pending++;
                 } else {
-                    this.cReward.getCommands().forEach(j -> {
-                        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), j.replaceAll("%player%", plyr.getName()));
-                    });
+                    this.cReward.getCommands().forEach(j -> Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), j.replaceAll("%player%", player.getName())));
 
                     this.setAmountRedeemed(this.amountRedeemed + 1);
 
