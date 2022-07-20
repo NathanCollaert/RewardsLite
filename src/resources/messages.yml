@@ -1,46 +1,46 @@
-#Essentials color codes can be used in all messages (without needing essentials on your server) -> https://wiki.ess3.net/mc/
-
 ############################################################
 # +------------------------------------------------------+ #
-# |                      RewardsGUI                      | #
+# |                        Notes                         | #
 # +------------------------------------------------------+ #
 ############################################################
 
-#The title of the inventory when executing the command /rewards.
-RewardsInventoryTitle: "&3Your Rewards"
+#Color codes & HEX colors can be used in all messages: https://wiki.ess3.net/mc/.
 
-#The title of the inventory when executing the command /givereward.
-GiveRewardInventoryTitle: "&2Available Rewards"
 
-#Available placeholder: %redeemed% - %pending%
-#Each list item will be a new line.
-#Reward information displayed under reward name when executing /rewards.
-RewardInfo:
-  - "&a(redeemed: &2%redeemed%&a, pending: &2%pending%&a)"
+############################################################
+# +------------------------------------------------------+ #
+# |                    Translations                      | #
+# +------------------------------------------------------+ #
+############################################################
 
-#Available placeholders: %total_in_seconds% - %total_in_minutes% - %total_in_hours% - %total_in_days% - %seconds% - %minutes% - %hours% - %days%
-#The following placeholders should be used together: %seconds% - %minutes% - %hours% - %days%
-#Each list item will be a new line.
-#Info displayed under reward description when executing /rewards if available and time left.
-NextReward:
-  - "&eNext reward in &6"
-  - "&6%days% days, %hours% hours, %minutes% mins, %seconds% secs"
+#Time
+days: "days"
+hours: "hours"
+minutes: "minutes"
+seconds: "seconds"
+day: "day"
+hour: "hour"
+minute: "minute"
+second: "second"
 
-#Info displayed under reward description when executing /rewards if player can't claim reward anymore.
-NextRewardNever:
-  - "&cAlready earned this reward."
+#Miscellaneous
+everyone: "everyone"
+allRewards: "all rewards"
 
-#Info displayed under reward description when executing /rewards if no permission for it but claimed or pending at least once.
-NextRewardNoPermission:
-  - "&cYou can't earn this reward."
 
-#Available placeholders: %player% - %rewardname% - %world%
-#Notification send to players if they have a reward pending cause in an unclaimable world.
-PendingNotificationWrongWorld: "&eYou have a playtime reward pending but can't claim it in this world."
+############################################################
+# +------------------------------------------------------+ #
+# |                        Rewards                       | #
+# +------------------------------------------------------+ #
+############################################################
 
-#Available placeholders: %player% - %rewardname% - %inventory_spaces_needed%
-#Notification send to players if they have a reward pending cause not enough inventory space left.
-PendingNotificationNotEnoughInventory: "&eYou need &6%inventory_spaces_needed% &efree inventory spaces to claim a pending playtime reward."
+#Warning given to player if eligible for a reward but inventory is too full to claim.
+#Placholders: %reward_title% - %disabled_world%
+disabledWorldRedeemWarning: "&eThe %reward_title% reward cannot be redeemed in this world."
+
+#Warning given to player if eligible for a reward but inventory is too full to claim.
+#Placholders: %reward_title% - %required_spaces%
+inventoryFullRedeemWarning: "&eThe %reward_title% reward requires %required_spaces% free inventory spaces to be redeemed."
 
 
 ############################################################
@@ -49,73 +49,47 @@ PendingNotificationNotEnoughInventory: "&eYou need &6%inventory_spaces_needed% &
 # +------------------------------------------------------+ #
 ############################################################
 
-#Available placeholders: %total_in_seconds% - %total_in_minutes% - %total_in_hours% - %total_in_days% - %seconds% - %minutes% - %hours% - %days%
-#The following placeholders should be used together: %seconds% - %minutes% - %hours% - %days%
-#Shown when executing the command /playtime.
-Playtime: "&6You have played for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds on this server."
+#Error given when you need to be online to use this command.
+requireOnlinePlayerError: "&cYou will need to log in to use this command."
 
-#Available placeholders: %player% - %total_in_seconds% - %total_in_minutes% - %total_in_hours% - %total_in_days% - %seconds% - %minutes% - %hours% - %days%
-#The following placeholders should be used together: %seconds% - %minutes% - %hours% - %days%
-#Shown when executing the command /playtime <player>
-PlaytimeOther: "&6%player% has played on this server for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds."
+#Error given when targeted player is not online.
+#Placeholders: %player%
+targetNotOnlineError: "&c%player% is currently not online."
 
-#Available placeholders: %total_in_seconds% - %total_in_minutes% - %total_in_hours% - %total_in_days% - %seconds% - %minutes% - %hours% - %days%
-#The following placeholders should be used together: %seconds% - %minutes% - %hours% - %days%
-#Shown when executing the command /afktime
-AFKTime: "&6You have AFK'd for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds on this server."
+#Error given when targeted player has not played on the server before.
+#Placeholders: %player%
+targetNotPlayedBeforeError: "&c%player% has not played on the server before."
 
-#Available placeholders: %player% - %total_in_seconds% - %total_in_minutes% - %total_in_hours% - %total_in_days% - %seconds% - %minutes% - %hours% - %days%
-#The following placeholders should be used together: %seconds% - %minutes% - %hours% - %days%
-#Shown when executing the command /afktime <player>
-AFKTimeOther: "&6%player% has AFK'd on this server for %days% days, %hours% hours, %minutes% minutes and %seconds% seconds."
+#Error given when trying to give reward that does not exist on the server.
+#Placeholders: %reward%
+rewardDoesNotExist: "&c%reward% does not exist on this server."
 
-#Available placeholders: %player% - %rewardname%
-#Shown to player executing the command /givereward if the reward has been successfully given to player.
-RewardGiven: "&aThe %rewardname% reward has been given to %player%."
+#Header message when displaying a command usage.
+commandUsageHeader: "&8&m--------------&6 Command &fUsage &8&m--------------"
 
-#Shown to player if executing the command /lpr reload was successful.
-ReloadSuccess: "&aConfig and messages reloaded successfully."
+#Footer message when displaying a command usage.
+commandUsageFooter: "&8&m------------------------------------------"
 
-#Available placeholders: %player% - %rewardname%
-#Shown to player if executing the command /lpr reset <reward> <player> was successful.
-ResetSuccess: "&a%rewardname% for player %player% was successfully reset."
+#Header message when using the help command.
+#Placeholders: %plugin_name%
+commandHelpHeader: "&8&m----------&6 %plugin_name% &fHelp &8&m----------"
 
+#Footer message when using the help command.
+#Placeholders: %plugin_name%
+commandHelpFooter: "&8&m-----------------------------------"
 
-############################################################
-# +------------------------------------------------------+ #
-# |                        Errors                        | #
-# +------------------------------------------------------+ #
-############################################################
+#Message send to the player upon successfully reloading the plugin.
+#Placeholders: %plugin_name%
+reloadSuccess: "&aSuccessfully reloaded %plugin_name%."
 
-#Error thrown if command requires to be executed by an online player.
-NeedToBeOnline: "&cYou will need to log in to use this command."
+#Message send to the player upon successfully giving a reward.
+#Placeholders: %reward% - %player% - %amount%
+giveRewardSuccess: "&aSuccessfully given %reward% to %player% (x%amount%)."
 
-#Error thrown when executing the command /afktime or /afktime <player> and if server hasn't got essentials installed.
-ServerDoesntKeepTrackOfAFK: "&cThis server does not keep track of AFK time."
+#Message send to the player upon successfully resetting a reward for a player.
+#Placeholders: %reward% - %player%
+resetSuccess: "&aSuccessfully reset %reward% for %player%."
 
-#Error thrown when executing the command /givereward and no rewards are configured in the config file.
-NoRewardsConfigured: "&cNo rewards configured in the config file."
-
-#Error thrown when executing the command /rewards and there are no rewards available for the player.
-NoRewardsAvailable: "&cThere are no rewards available for you."
-
-#Error thrown if player has no permission to use the command.
-NoPermission: "&cYou do not have permission to perform this command."
-
-#Available placeholders: %player%
-#Error thrown if command requires player data but player has no data on the server.
-NoData: "&c%player% has no data on this server yet."
-
-#Available placeholders: %rewardname%
-#Error thrown when executing /givereward <reward> <playername> [amount] [broadcast] and reward isn't configured on the server.
-NoSuchReward: "&c%rewardname% is not an available reward."
-
-#Error thrown when executing /givereward <reward> <playername> [amount] [broadcast] and amount is not a number greater then 0.
-NotANumber: "&cAmount must be a positive number greater then 0."
-
-#Error thrown when executing /givereward <reward> <playername> [amount] [broadcast] and broadcast is not true or false.
-NotABoolean: "&cBroadcast must be true or false."
-
-#Available placeholders: %player%
-#Error thrown if command requires receiving player to be online but isn't.
-NotOnline: "&cThe player %player% is not online."
+#Message send to the player upon executing the /playtime command.
+#Placeholders: %player% - %playtime% - %afk_time%
+playtime: "&e%player% has played for &6%playtime%&e of which &6%afk_time%&e were AFK."

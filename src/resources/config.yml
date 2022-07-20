@@ -1,66 +1,91 @@
 ############################################################
 # +------------------------------------------------------+ #
-# |                         DATA                         | #
+# |                        Data                          | #
 # +------------------------------------------------------+ #
 ############################################################
 
-#After how much playtime should the player data be autosaved?
-#In minutes, minimum is 1.
-AutoSave: 1
+#YAML or MySQL
+storageType: "YAML"
 
-#How long should the plugin save the playerdata in cache after logout?
-#This will save performance for RAM.
-#In minutes, minimum is 0.
-TimeKeepDataInCache: 5
-
-#Should the plugin keep track of all playtime, including the playtime gained before this plugin was installed?
-#This requires Spigot/Paper v1.13+
-CountAllPlaytime: true
-
-#Should claiming rewards be disabled in any worlds?
-#Rewards that require claiming will be put into pending state until in allowed world.
-#DisableGettingRewardsInWorlds:
-#- world
-#- world_nether
-#- world_the_end
-DisableGettingRewardsInWorlds: [ ]
+#Only necessary if using MySQL
+connection:
+  hostname: "localhost"
+  port: "3306"
+  database: "minecraft"
+  username: "root"
+  password: "root"
 
 
 ############################################################
 # +------------------------------------------------------+ #
-# |                        GUIs                          | #
+# |                       General                        | #
 # +------------------------------------------------------+ #
 ############################################################
 
-#What material should the border in GUIs be made out of?
-BorderMaterial: "white_stained_glass_pane"
+#Should all playtime (even from before this plugin was installed) be counted in the /playtime command?
+#This feature is limited to the playtime saved in Minecraft's player-data files.
+#Requires Minecraft 1.13+.
+countPreviousTowardsPlaytime: true
 
-#How should the plugin layout the rewards GUI?
+#What rewards should be included in the GUI?
 #Options:
-#"fill" -> Fill the inventory from left to right.
-#"centered" -> Center the rewards in the inventory.
-InventoryLayout: "centered"
-
-#How should the plugin order the rewards in the rewards GUI?
-#Options:
-#id -> Alphanumeric ordering by ID.
-#id_reversed -> Unalphanumeric ordering by ID.
-#name -> Alphanumeric ordering by name.
-#name_reversed -> Unalphanumeric ordering by name.
-#time -> Ascending by time till next reward.
-#time_reversed -> Descending by time till next reward.
-#pending -> Ascending by amount pending.
-#pending_reversed -> Descending by amount pending.
-#redeemed -> Ascending by amount redeemed.
-#redeemed_reversed -> Descending by amount redeemed.
-RewardsOrder: "id"
+#   ELIGIBLE: All rewards the player is eligible for.
+#   FINISHED: All rewards the player has already claimed and cannot earn again.
+#   INELIGIBLE: All rewards the player is ineligible for.
+includedRewards:
+  - "ELIGIBLE"
+  - "FINISHED"
 
 
 ############################################################
 # +------------------------------------------------------+ #
-# |                    MISCELLANEOUS                     | #
+# |                         GUIs                         | #
 # +------------------------------------------------------+ #
 ############################################################
 
-#Should the plugin check for updates?
-UpdateChecker: true
+#======================--- TITLES ---=======================
+
+#What title should the /rewards GUI have?
+#Placeholders: %player%
+rewardsInterfaceTitle: "%player% Rewards"
+
+
+#======================--- ITEMS ---========================
+
+#What should the filler item for GUI's look like?
+fillerDisplay:
+  material: "gray_stained_glass_pane"
+  name: " "
+  lore: [ ]
+  amount: 1
+
+#What should the accent item for GUI's look like?
+accentDisplay:
+  material: "light_blue_stained_glass_pane"
+  name: " "
+  lore: [ ]
+  amount: 1
+
+#What should the next button for paged GUI's look like?
+nextPageDisplay:
+  material: "arrow"
+  #Placeholders: %current_page% - %total_pages% - %next_page%
+  name: "&eNext Page &6&l>>"
+  lore: [ ]
+  amount: 1
+
+#What should the next button for paged GUI's look like?
+previousPageDisplay:
+  material: "arrow"
+  #Placeholders: %current_page% - %total_pages% - %previous_page%
+  name: "&6&l<< &ePrevious Page"
+  lore: [ ]
+  amount: 1
+
+#What should the page information item for paged GUI's look like?
+pageInformationDisplay:
+  material: "paper"
+  #Placeholders: %current_page% - %total_pages%
+  name: "&ePage &6%current_page% &eof &6%total_pages%"
+  lore: [ ]
+  amount: 1

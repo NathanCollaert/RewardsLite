@@ -1,0 +1,129 @@
+#How much playtime does a player need in order to be eligible to redeem this reward?
+#In minutes, minimum is 1
+requiredTime: 60
+
+#Should this reward loop infinitely?
+loop: true
+
+#Should AFK time be counted towards this reward?
+#Requires essentialsX
+countAfk: false
+
+#What previous playtime should be counted towards this reward?
+#NONE -> None of the previous playtime should be counted towards this reward.
+#PLUGIN -> Count the playtime gathered from when this plugin was installed towards this reward.
+#ALL -> Count all playtime, even from before this plugin was installed (requires Minecraft 1.13+) towards this reward.
+countPrevious: NONE
+
+#Which commands should be executed when claiming this reward?
+#Placeholders: %player% - %player_uuid%
+rewards:
+  - "give %player% snowball 1"
+  - "give %player% poppy 1"
+
+#What should this reward look like in the GUI?
+#Placeholders: %total_time% - %time_left% - %%redeemed% - %pending%
+display:
+  material: "chest"
+  name: "&6Default &eReward"
+  lore:
+    - "&eRedeemed: &6%redeemed% &f| &ePending: &6%pending%"
+    - ""
+    - "This is the default test reward."
+    - ""
+    - "&eTime till next reward"
+    - "&6%time_left%"
+
+#What should this reward look like in the GUI when it has a pending claim?
+#Placeholders: %total_time% - %time_left% - %%redeemed% - %pending%
+displayPending:
+  material: "beehive"
+  name: "&6Default &eReward"
+  glow: true
+  amount: 2
+  lore:
+    - "&eRedeemed: &6%redeemed% &f| &ePending: &6%pending%"
+    - ""
+    - "This is the default test reward."
+    - ""
+    - "&eTime till next reward"
+    - "&6%time_left%"
+
+#What should this reward look like in the GUI when the player has already claimed a reward which does not loop?
+#Placeholders: %total_time% - %time_left% - %%redeemed% - %pending%
+displayClaimed:
+  material: "chest"
+  name: "&6Default &eReward (claimed)"
+  lore:
+    - "You have already received this reward."
+
+#What should this reward look like in the GUI when the player is ineligible to gain this reward?
+#Placeholders: %total_time% - %time_left% - %%redeemed% - %pending%
+displayIneligible:
+  material: "barrier"
+  name: "&6Default &eReward (locked)"
+  lore:
+    - "You are unable to receive this reward."
+
+#What type of notification should be sent to the player upon redeeming this reward?
+notification:
+  actionbar:
+    enabled: false
+    configuration:
+      text: "You have received the default reward!"
+  bossbar:
+    enabled: true
+    configuration:
+      text: "You have received the default reward!"
+      color: "red"
+      style: "solid"
+  chat:
+    enabled: true
+    configuration:
+      text: "You have received the default reward!"
+  title:
+    enabled: false
+    configuration:
+      title: ""
+      subtitle: "You have received the default reward!"
+
+#What type of notification should broadcast to the online players when someone redeems this reward?
+broadcastNotification:
+  chat:
+    enabled: true
+    configuration:
+      text: "%player% has received the default reward!"
+
+#What type of notification should be sent to the player when the reward is ready to be redeemed manually?
+pendingNotification:
+  bossbar:
+    enabled: true
+    configuration:
+      text: "&eThe default reward is ready to be redeemed manually!"
+      color: "yellow"
+      style: "solid"
+
+#How many inventory slots should be empty in order to claim this reward?
+inventorySlotsNeeded: 2
+
+#Should a permission be required in order to gain playtime towards this reward?
+usePermission: true
+
+#Should the reward be claimed manually?
+manualClaim: false
+
+#How many times can this reward be pending before it stops counting playtime towards this reward?
+#Minimum is 1, -1 is unlimited
+maximumAmountPending: -1
+
+#How many times can this reward be redeemed?
+#Minimum is 1, -1 is unlimited
+maximumAmountRedeemed: -1
+
+#In which worlds should playtime not count towards this reward?
+disableGainingPlaytimeInWorlds:
+  - "world_nether"
+  - "world_the_end"
+
+#In which worlds should be claiming this reward not be possible?
+disableRedeemingInWorlds: [ ]

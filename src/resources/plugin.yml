@@ -1,50 +1,50 @@
-name: LitePlaytimeRewards
-version: ${project.version}
-description: A lightweight plugin that gives rewards based on playtime
-author: Nathan
-website: www.backtobedrock.com
-main: com.backtobedrock.LitePlaytimeRewards.LitePlaytimeRewards
-prefix: LitePlaytimeRewards
+name: RewardsLite
+version: '${project.version}'
+main: com.backtobedrock.rewardslite.Rewardslite
 api-version: 1.13
-softdepend: [ Essentials ]
-
+prefix: RewardsLite
+softdepend: [ Essentials, PlaceholderAPI ]
+authors: [ Nathan ]
+description: Enhance your server with fully configurable playtime rewards
+website: backtobedrock.com
+libraries:
+  - com.zaxxer:HikariCP:5.0.1
 commands:
-  afktime:
-    description: Check your current AFK time.
-    permission: liteplaytimerewards.afktime
-    usage: /<command> [player]
-  givereward:
-    description: Force give one of the rewards to a player.
-    permission: liteplaytimerewards.givereward
-    usage: /<command> <reward> <player> [amount] [true|false]
-  lpr:
-    description: LPR commands.
-    usage: /<command> [help|reload|reset]
   playtime:
-    description: Check your current playtime.
-    permission: liteplaytimerewards.playtime
+    description: Check your current playtime and AFK time
+    aliases:
+      - pt
+    permission: rewardslite.playtime
     usage: /<command> [player]
   rewards:
-    description: Check info on all your available rewards or a single one.
-    permission: liteplaytimerewards.rewards
-    usage: /<command> [reward]
-
+    description: View your available rewards
+    aliases:
+      - rwds
+    permission: rewardslite.rewards
+    usage: /<command> [player]
+  rewardslite:
+    description: General RewardsLite commands
+    permission: rewardslite.help
+    aliases:
+      - rl
+      - reli
+    usage: /<command> (convert | give | help | reload | reset)
 permissions:
-  liteplaytimerewards.afktime:
+  rewardslite.playtime:
     default: op
-  liteplaytimerewards.afktime.other:
+  rewardslite.playtime.other:
     default: op
-  liteplaytimerewards.givereward:
-    deafult: op
-  liteplaytimerewards.playtime:
+  rewardslite.rewards:
     default: op
-  liteplaytimerewards.playtime.other:
+  rewardslite.rewards.other:
     default: op
-  liteplaytimerewards.rewards:
+  rewardslite.reload:
     default: op
-  liteplaytimerewards.reset:
+  rewardslite.convert:
     default: op
-  liteplaytimerewards.reload:
+  rewardslite.help:
     default: op
-  liteplaytimerewards.help:
+  rewardslite.givereward:
+    default: op
+  rewardslite.reset:
     default: op
