@@ -54,8 +54,7 @@ public abstract class AbstractCommand {
     }
 
     protected CompletableFuture<Boolean> hasTarget(String playerName) {
-        return CompletableFuture
-                .supplyAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
                     @SuppressWarnings("deprecation") OfflinePlayer player = this.plugin.getServer().getOfflinePlayer(playerName);
 //                    if (!player.hasPlayedBefore()) {
 //                        this.cs.sendMessage(this.plugin.getMessages().getTargetNotPlayedBeforeError(player.getName()));
@@ -71,6 +70,7 @@ public abstract class AbstractCommand {
     }
 
     public void sendUsageMessage() {
-        this.cs.sendMessage(new String[]{this.plugin.getMessages().getCommandUsageHeader(), CommandUtils.getFancyVersion(this.command), this.plugin.getMessages().getCommandUsageFooter()});
+        String[] message = new String[]{this.plugin.getMessages().getCommandUsageHeader(), CommandUtils.getFancyVersion(this.command), this.plugin.getMessages().getCommandUsageFooter()};
+        this.cs.sendMessage(message);
     }
 }

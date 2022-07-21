@@ -81,7 +81,7 @@ public class PlayerRepository {
     private PlayerData getFromDataAndCache(OfflinePlayer player, PlayerData playerData) {
         if (playerData == null) {
             playerData = new PlayerData(player);
-            if (player.hasPlayedBefore()) {
+            if (player.hasPlayedBefore() || player.isOnline()) {
                 this.mapper.updatePlayerData(playerData);
             }
         }
