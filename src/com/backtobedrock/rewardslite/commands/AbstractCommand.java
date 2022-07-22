@@ -95,7 +95,7 @@ public abstract class AbstractCommand {
     }
 
     protected boolean hasPlayedBefore(String playerName) {
-        OfflinePlayer player = Arrays.stream(this.plugin.getServer().getOfflinePlayers()).filter(e -> e.getName() != null && e.getName().equals(playerName)).findFirst().orElse(this.plugin.getServer().getPlayer(playerName));
+        OfflinePlayer player = Arrays.stream(this.plugin.getServer().getOfflinePlayers()).filter(e -> e.getName() != null && e.getName().equalsIgnoreCase(playerName)).findFirst().orElse(this.plugin.getServer().getPlayer(playerName));
         if (player == null) {
             this.cs.sendMessage(this.plugin.getMessages().getTargetNotPlayedBeforeError(playerName));
             return false;
