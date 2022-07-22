@@ -47,7 +47,7 @@ public class CommandRewardsLite extends AbstractCommand {
     }
 
     private void executeReset() {
-        if (!this.cs.hasPermission("rewardslite.reset")) {
+        if (!this.cs.hasPermission(String.format("%s.reset", this.plugin.getName().toLowerCase()))) {
             return;
         }
 
@@ -80,21 +80,19 @@ public class CommandRewardsLite extends AbstractCommand {
                 this.cs.sendMessage(this.plugin.getMessages().getResetSuccess(finalRewards.size() > 1 ? this.plugin.getMessages().getAllRewards() : finalRewards.get(0).getPermissionId(), this.plugin.getMessages().getEveryone()));
             });
         } else {
-            this.hasTarget(this.args[1]).thenAcceptAsync(hasTarget -> {
-                if (!hasTarget) {
-                    return;
-                }
+            if (!this.hasPlayedBefore(this.args[1])) {
+                return;
+            }
 
-                this.plugin.getPlayerRepository().getByPlayer(this.target).thenAcceptAsync(playerData -> {
-                    playerData.resetRewards(finalRewards);
-                    this.cs.sendMessage(this.plugin.getMessages().getResetSuccess(finalRewards.size() > 1 ? this.plugin.getMessages().getAllRewards() : finalRewards.get(0).getPermissionId(), this.target.getName()));
-                });
+            this.plugin.getPlayerRepository().getByPlayer(this.target).thenAcceptAsync(playerData -> {
+                playerData.resetRewards(finalRewards);
+                this.cs.sendMessage(this.plugin.getMessages().getResetSuccess(finalRewards.size() > 1 ? this.plugin.getMessages().getAllRewards() : finalRewards.get(0).getPermissionId(), this.target.getName()));
             });
         }
     }
 
     private void executeGive() {
-        if (!this.cs.hasPermission("rewardslite.givereward")) {
+        if (!this.cs.hasPermission(String.format("%s.givereward", this.plugin.getName().toLowerCase()))) {
             return;
         }
 
@@ -103,47 +101,41 @@ public class CommandRewardsLite extends AbstractCommand {
             return;
         }
 
-        this.hasTarget(this.args[1]).thenAcceptAsync(hasTarget -> {
-                    if (!hasTarget) {
-                        return;
-                    }
+        if (!this.hasPlayedBefore(this.args[1])) {
+            return;
+        }
 
-                    Player targetPlayer = this.isTargetOnline();
-                    if (targetPlayer == null) {
-                        return;
-                    }
+        Player targetPlayer = this.isTargetOnline();
+        if (targetPlayer == null) {
+            return;
+        }
 
-                    Reward reward = this.plugin.getRewardsRepository().getByPermission(this.args[2]);
-                    if (reward == null) {
-                        this.cs.sendMessage(this.plugin.getMessages().getRewardDoesNotExist(this.args[2]));
-                        return;
-                    }
+        Reward reward = this.plugin.getRewardsRepository().getByPermission(this.args[2]);
+        if (reward == null) {
+            this.cs.sendMessage(this.plugin.getMessages().getRewardDoesNotExist(this.args[2]));
+            return;
+        }
 
-                    this.plugin.getPlayerRepository().getByPlayer(this.target).thenAcceptAsync(playerData -> {
-                        RewardData rewardData = playerData.getRewardData(reward);
-                        if (rewardData == null) {
-                            return;
-                        }
+        this.plugin.getPlayerRepository().getByPlayer(this.target).thenAcceptAsync(playerData -> {
+            RewardData rewardData = playerData.getRewardData(reward);
+            if (rewardData == null) {
+                return;
+            }
 
-                        int amount = CommandUtils.getPositiveNumberFromString(this.cs, this.args.length > 3 ? this.args[3] : "1");
-                        if (amount == -1) {
-                            return;
-                        }
+            int amount = CommandUtils.getPositiveNumberFromString(this.cs, this.args.length > 3 ? this.args[3] : "1");
+            if (amount == -1) {
+                return;
+            }
 
-                        Bukkit.getScheduler().runTask(this.plugin, () -> {
-                            rewardData.decreaseTimeLeft(amount * reward.getRequiredTime() * 1200L, targetPlayer, true);
-                            this.cs.sendMessage(this.plugin.getMessages().getGiveRewardSuccess(reward.getPermissionId(), targetPlayer.getName(), amount));
-                        });
-                    });
-                })
-                .exceptionally(ex -> {
-                    ex.printStackTrace();
-                    return null;
-                });
+            Bukkit.getScheduler().runTask(this.plugin, () -> {
+                rewardData.decreaseTimeLeft(amount * reward.getRequiredTime() * 1200L, targetPlayer, true);
+                this.cs.sendMessage(this.plugin.getMessages().getGiveRewardSuccess(reward.getPermissionId(), targetPlayer.getName(), amount));
+            });
+        });
     }
 
     private void executeConvert() {
-        if (!this.cs.hasPermission("rewardslite.convert")) {
+        if (!this.cs.hasPermission(String.format("%s.convert", this.plugin.getName().toLowerCase()))) {
             return;
         }
 
@@ -155,7 +147,7 @@ public class CommandRewardsLite extends AbstractCommand {
     }
 
     private void executeReload() {
-        if (!this.cs.hasPermission("rewardslite.reload")) {
+        if (!this.cs.hasPermission(String.format("%s.reload", this.plugin.getName().toLowerCase()))) {
             return;
         }
 
@@ -164,7 +156,7 @@ public class CommandRewardsLite extends AbstractCommand {
     }
 
     private void executeHelp() {
-        if (!this.cs.hasPermission("rewardslite.help")) {
+        if (!this.cs.hasPermission(String.format("%s.help", this.plugin.getName().toLowerCase()))) {
             return;
         }
 

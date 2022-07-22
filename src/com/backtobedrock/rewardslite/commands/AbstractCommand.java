@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.Arrays;
 
 public abstract class AbstractCommand {
 
@@ -53,20 +53,14 @@ public abstract class AbstractCommand {
         return this.target.getPlayer();
     }
 
-    protected CompletableFuture<Boolean> hasTarget(String playerName) {
-        return CompletableFuture.supplyAsync(() -> {
-                    @SuppressWarnings("deprecation") OfflinePlayer player = this.plugin.getServer().getOfflinePlayer(playerName);
-//                    if (!player.hasPlayedBefore()) {
-//                        this.cs.sendMessage(this.plugin.getMessages().getTargetNotPlayedBeforeError(player.getName()));
-//                        return false;
-//                    }
-                    this.target = player;
-                    return true;
-                })
-                .exceptionally(ex -> {
-                    ex.printStackTrace();
-                    return null;
-                });
+    protected Boolean hasPlayedBefore(String playerName) {
+        OfflinePlayer player = Arrays.stream(this.plugin.getServer().getOfflinePlayers()).filter(e -> e.getName() != null && e.getName().equals(playerName)).findFirst().orElse(this.plugin.getServer().getPlayer(playerName));
+        if (player == null) {
+            this.cs.sendMessage(this.plugin.getMessages().getTargetNotPlayedBeforeError(playerName));
+            return false;
+        }
+        this.target = player;
+        return true;
     }
 
     public void sendUsageMessage() {

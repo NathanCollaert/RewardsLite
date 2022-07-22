@@ -28,34 +28,27 @@ public class CommandPlaytime extends AbstractCommand {
 
             this.showPlaytime(this.sender, MinecraftVersion.get());
         } else if (this.args.length == 1) {
-            if (!this.cs.hasPermission("rewardslite.playtime.other")) {
+            if (!this.cs.hasPermission(String.format("%s.playtime.other", this.plugin.getName().toLowerCase()))) {
                 return;
             }
 
-            this.hasTarget(this.args[0])
-                    .thenAcceptAsync(hasTarget -> {
-                        if (!hasTarget) {
-                            return;
-                        }
+            if (!this.hasPlayedBefore(this.args[0])) {
+                return;
+            }
 
-                        //Player has to be online in 1.15 and below
-                        MinecraftVersion minecraftVersion = MinecraftVersion.get();
-                        if (minecraftVersion != null && minecraftVersion.lessThanOrEqualTo(MinecraftVersion.v1_15)) {
-                            Player onlineTarget = this.isTargetOnline();
-                            if (onlineTarget == null) {
-                                return;
-                            }
+            //Player has to be online in 1.15 and below
+            MinecraftVersion minecraftVersion = MinecraftVersion.get();
+            if (minecraftVersion != null && minecraftVersion.lessThanOrEqualTo(MinecraftVersion.v1_15)) {
+                Player onlineTarget = this.isTargetOnline();
+                if (onlineTarget == null) {
+                    return;
+                }
 
-                            this.showPlaytime(onlineTarget, minecraftVersion);
-                            return;
-                        }
+                this.showPlaytime(onlineTarget, minecraftVersion);
+                return;
+            }
 
-                        this.showPlaytime(this.target, minecraftVersion);
-                    })
-                    .exceptionally(ex -> {
-                        ex.printStackTrace();
-                        return null;
-                    });
+            this.showPlaytime(this.target, minecraftVersion);
         }
     }
 

@@ -36,6 +36,8 @@ permissions:
     default: op
   rewardslite.rewards:
     default: op
+  rewardslite.reward.*:
+    default: op
   rewardslite.rewards.other:
     default: op
   rewardslite.reload:

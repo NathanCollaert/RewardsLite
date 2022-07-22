@@ -24,7 +24,7 @@ public class CommandRewards extends AbstractCommand {
 
             this.openRewardsGUI(this.sender);
         } else if (this.args.length == 1) {
-            if (!this.cs.hasPermission("rewardslite.rewards.other")) {
+            if (!this.cs.hasPermission(String.format("%s.rewards.other", this.plugin.getName().toLowerCase()))) {
                 return;
             }
 
@@ -32,18 +32,11 @@ public class CommandRewards extends AbstractCommand {
                 return;
             }
 
-            this.hasTarget(this.args[0])
-                    .thenAcceptAsync(hasTarget -> {
-                        if (!hasTarget) {
-                            return;
-                        }
+            if (!this.hasPlayedBefore(this.args[0])) {
+                return;
+            }
 
-                        this.openRewardsGUI(this.target);
-                    })
-                    .exceptionally(ex -> {
-                        ex.printStackTrace();
-                        return null;
-                    });
+            this.openRewardsGUI(this.target);
         }
     }
 
