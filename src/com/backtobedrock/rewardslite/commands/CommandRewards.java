@@ -12,31 +12,10 @@ public class CommandRewards extends AbstractCommand {
     }
 
     @Override
-    public void run() {
-        if (this.args.length == 0) {
-            if (!this.hasPermission()) {
-                return;
-            }
-
-            if (!this.isPlayer()) {
-                return;
-            }
-
+    public void execute() {
+        this.setCommandParameters(true, false, 0, 1, this.args.length == 1 ? String.format("%s.rewards.other", this.plugin.getName().toLowerCase()) : null, 0);
+        if (canExecute()) {
             this.openRewardsGUI(this.sender);
-        } else if (this.args.length == 1) {
-            if (!this.cs.hasPermission(String.format("%s.rewards.other", this.plugin.getName().toLowerCase()))) {
-                return;
-            }
-
-            if (!this.isPlayer()) {
-                return;
-            }
-
-            if (!this.hasPlayedBefore(this.args[0])) {
-                return;
-            }
-
-            this.openRewardsGUI(this.target);
         }
     }
 

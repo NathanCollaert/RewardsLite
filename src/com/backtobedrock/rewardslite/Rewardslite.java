@@ -82,7 +82,7 @@ public final class Rewardslite extends JavaPlugin {
     }
 
     private void initializeUpdateChecker() {
-        if (this.updateChecker != null) {
+        if (this.updateChecker == null) {
             this.updateChecker = new UpdateChecker();
             this.updateChecker.start();
         }
@@ -230,5 +230,9 @@ public final class Rewardslite extends JavaPlugin {
 
     public RewardRepository getRewardsRepository() {
         return rewardsRepository;
+    }
+
+    public UpdateChecker getUpdateChecker() {
+        return updateChecker;
     }
 }

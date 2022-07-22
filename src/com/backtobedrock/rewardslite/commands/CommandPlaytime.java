@@ -16,39 +16,11 @@ public class CommandPlaytime extends AbstractCommand {
     }
 
     @Override
-    public void run() {
-        if (this.args.length == 0) {
-            if (!this.hasPermission()) {
-                return;
-            }
-
-            if (!this.isPlayer()) {
-                return;
-            }
-
-            this.showPlaytime(this.sender, MinecraftVersion.get());
-        } else if (this.args.length == 1) {
-            if (!this.cs.hasPermission(String.format("%s.playtime.other", this.plugin.getName().toLowerCase()))) {
-                return;
-            }
-
-            if (!this.hasPlayedBefore(this.args[0])) {
-                return;
-            }
-
-            //Player has to be online in 1.15 and below
-            MinecraftVersion minecraftVersion = MinecraftVersion.get();
-            if (minecraftVersion != null && minecraftVersion.lessThanOrEqualTo(MinecraftVersion.v1_15)) {
-                Player onlineTarget = this.isTargetOnline();
-                if (onlineTarget == null) {
-                    return;
-                }
-
-                this.showPlaytime(onlineTarget, minecraftVersion);
-                return;
-            }
-
-            this.showPlaytime(this.target, minecraftVersion);
+    public void execute() {
+        MinecraftVersion minecraftVersion = MinecraftVersion.get();
+        this.setCommandParameters(this.args.length == 0, minecraftVersion != null && minecraftVersion.lessThanOrEqualTo(MinecraftVersion.v1_15), 0, 1, this.args.length == 1 ? String.format("%s.playtime.other", this.plugin.getName().toLowerCase()) : null, 0);
+        if (this.canExecute()) {
+            this.showPlaytime(this.args.length == 0 ? this.sender : minecraftVersion != null && minecraftVersion.lessThanOrEqualTo(MinecraftVersion.v1_15) ? this.onlineTarget : this.target, MinecraftVersion.get());
         }
     }
 

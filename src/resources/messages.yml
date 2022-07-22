@@ -34,7 +34,7 @@ allRewards: "all rewards"
 # +------------------------------------------------------+ #
 ############################################################
 
-#Warning given to player if eligible for a reward but inventory is too full to claim.
+#Warning given to player if eligible for a reward but cannot be claimed in the current world.
 #Placholders: %reward_title% - %disabled_world%
 disabledWorldRedeemWarning: "&eThe %reward_title% reward cannot be redeemed in this world."
 

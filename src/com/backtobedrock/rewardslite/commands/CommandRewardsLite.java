@@ -10,7 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommandYamlParser;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -22,40 +21,46 @@ public class CommandRewardsLite extends AbstractCommand {
     }
 
     @Override
-    public void run() {
+    public void execute() {
         if (this.args.length == 0) {
             this.executeHelp();
         } else {
             switch (this.args[0].toLowerCase()) {
                 case "reload":
-                    this.executeReload();
+                    this.setCommandParameters(false, false, 1, 1, String.format("%s.reload", this.plugin.getName().toLowerCase()), -1);
+                    if (canExecute()) {
+                        this.executeReload();
+                    }
                     break;
                 case "help":
-                    this.executeHelp();
+                    this.setCommandParameters(false, false, 1, 1, String.format("%s.help", this.plugin.getName().toLowerCase()), -1);
+                    if (canExecute()) {
+                        this.executeHelp();
+                    }
                     break;
                 case "convert":
-                    this.executeConvert();
+                    this.setCommandParameters(true, false, 1, 1, String.format("%s.convert", this.plugin.getName().toLowerCase()), -1);
+                    if (canExecute()) {
+                        this.executeConvert();
+                    }
                     break;
                 case "give":
-                    this.executeGive();
+                    this.setCommandParameters(false, true, 3, 4, String.format("%s.givereward", this.plugin.getName().toLowerCase()), 1);
+                    if (canExecute()) {
+                        this.executeGive();
+                    }
                     break;
                 case "reset":
-                    this.executeReset();
+                    this.setCommandParameters(false, false, 3, 3, String.format("%s.reset", this.plugin.getName().toLowerCase()), this.args.length > 1 && this.args[1].equals("*") ? -1 : 1);
+                    if (canExecute()) {
+                        this.executeReset();
+                    }
                     break;
             }
         }
     }
 
     private void executeReset() {
-        if (!this.cs.hasPermission(String.format("%s.reset", this.plugin.getName().toLowerCase()))) {
-            return;
-        }
-
-        if (this.args.length < 3) {
-            this.sendUsageMessage();
-            return;
-        }
-
         List<Reward> rewards = new ArrayList<>();
         if (!this.args[2].equals("*")) {
             Reward reward = this.plugin.getRewardsRepository().getByPermission(this.args[2]);
@@ -80,10 +85,6 @@ public class CommandRewardsLite extends AbstractCommand {
                 this.cs.sendMessage(this.plugin.getMessages().getResetSuccess(finalRewards.size() > 1 ? this.plugin.getMessages().getAllRewards() : finalRewards.get(0).getPermissionId(), this.plugin.getMessages().getEveryone()));
             });
         } else {
-            if (!this.hasPlayedBefore(this.args[1])) {
-                return;
-            }
-
             this.plugin.getPlayerRepository().getByPlayer(this.target).thenAcceptAsync(playerData -> {
                 playerData.resetRewards(finalRewards);
                 this.cs.sendMessage(this.plugin.getMessages().getResetSuccess(finalRewards.size() > 1 ? this.plugin.getMessages().getAllRewards() : finalRewards.get(0).getPermissionId(), this.target.getName()));
@@ -92,24 +93,6 @@ public class CommandRewardsLite extends AbstractCommand {
     }
 
     private void executeGive() {
-        if (!this.cs.hasPermission(String.format("%s.givereward", this.plugin.getName().toLowerCase()))) {
-            return;
-        }
-
-        if (this.args.length < 3) {
-            this.sendUsageMessage();
-            return;
-        }
-
-        if (!this.hasPlayedBefore(this.args[1])) {
-            return;
-        }
-
-        Player targetPlayer = this.isTargetOnline();
-        if (targetPlayer == null) {
-            return;
-        }
-
         Reward reward = this.plugin.getRewardsRepository().getByPermission(this.args[2]);
         if (reward == null) {
             this.cs.sendMessage(this.plugin.getMessages().getRewardDoesNotExist(this.args[2]));
@@ -122,44 +105,28 @@ public class CommandRewardsLite extends AbstractCommand {
                 return;
             }
 
-            int amount = CommandUtils.getPositiveNumberFromString(this.cs, this.args.length > 3 ? this.args[3] : "1");
+            int amount = CommandUtils.getPositiveNumberFromString(this.cs, this.args.length == 4 ? this.args[3] : "1");
             if (amount == -1) {
                 return;
             }
 
             Bukkit.getScheduler().runTask(this.plugin, () -> {
-                rewardData.decreaseTimeLeft(amount * reward.getRequiredTime() * 1200L, targetPlayer, true);
-                this.cs.sendMessage(this.plugin.getMessages().getGiveRewardSuccess(reward.getPermissionId(), targetPlayer.getName(), amount));
+                rewardData.decreaseTimeLeft(amount * reward.getRequiredTime() * 1200L, this.onlineTarget, true);
+                this.cs.sendMessage(this.plugin.getMessages().getGiveRewardSuccess(reward.getPermissionId(), this.onlineTarget.getName(), amount));
             });
         });
     }
 
     private void executeConvert() {
-        if (!this.cs.hasPermission(String.format("%s.convert", this.plugin.getName().toLowerCase()))) {
-            return;
-        }
-
-        if (!this.isPlayer()) {
-            return;
-        }
-
         PlayerUtils.openInventory(this.sender, new InterfaceConversion());
     }
 
     private void executeReload() {
-        if (!this.cs.hasPermission(String.format("%s.reload", this.plugin.getName().toLowerCase()))) {
-            return;
-        }
-
         this.plugin.initialize();
         this.cs.sendMessage(this.plugin.getMessages().getReloadSuccess());
     }
 
     private void executeHelp() {
-        if (!this.cs.hasPermission(String.format("%s.help", this.plugin.getName().toLowerCase()))) {
-            return;
-        }
-
         List<String> helpMessage = new ArrayList<>();
 
         helpMessage.add(this.plugin.getMessages().getCommandHelpHeader());

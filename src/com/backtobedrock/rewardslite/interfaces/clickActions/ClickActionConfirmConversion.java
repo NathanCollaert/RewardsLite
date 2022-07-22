@@ -1,5 +1,6 @@
 package com.backtobedrock.rewardslite.interfaces.clickActions;
 
+import com.backtobedrock.rewardslite.domain.data.PlayerData;
 import com.backtobedrock.rewardslite.interfaces.InterfaceConversion;
 import com.backtobedrock.rewardslite.utilities.ConversionUtils;
 import org.bukkit.entity.Player;
@@ -13,7 +14,12 @@ public class ClickActionConfirmConversion extends AbstractClickAction {
 
     @Override
     public void execute(Player player) {
-        this.plugin.getServer().getOnlinePlayers().forEach(p -> this.plugin.getPlayerRepository().getByPlayerSync(p).getPlaytimeRunnable().stop());
+        this.plugin.getServer().getOnlinePlayers().forEach(p -> {
+            PlayerData playerData = this.plugin.getPlayerRepository().getByPlayerSync(p);
+            if (playerData.getPlaytimeRunnable() != null) {
+                playerData.getPlaytimeRunnable().stop();
+            }
+        });
         if (this.interfaceConversion.isConvertRewards()) {
             ConversionUtils.convertLitePlaytimeRewardsRewards(player);
         }

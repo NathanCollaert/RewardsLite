@@ -30,23 +30,23 @@ commands:
       - reli
     usage: /<command> (convert | give | help | reload | reset)
 permissions:
+  rewardslite.convert:
+    default: op
+  rewardslite.givereward:
+    default: op
+  rewardslite.help:
+    default: op
   rewardslite.playtime:
     default: op
   rewardslite.playtime.other:
     default: op
-  rewardslite.rewards:
+  rewardslite.reload:
+    default: op
+  rewardslite.reset:
     default: op
   rewardslite.reward.*:
     default: op
+  rewardslite.rewards:
+    default: op
   rewardslite.rewards.other:
-    default: op
-  rewardslite.reload:
-    default: op
-  rewardslite.convert:
-    default: op
-  rewardslite.help:
-    default: op
-  rewardslite.givereward:
-    default: op
-  rewardslite.reset:
     default: op

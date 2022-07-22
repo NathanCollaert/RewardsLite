@@ -35,13 +35,13 @@ public class Commands implements TabCompleter {
     public boolean onCommand(CommandSender cs, Command cmnd, String alias, String[] args) {
         switch (cmnd.getName().toLowerCase()) {
             case "playtime":
-                new CommandPlaytime(cs, cmnd, args).run();
+                new CommandPlaytime(cs, cmnd, args).execute();
                 break;
             case "rewards":
-                new CommandRewards(cs, cmnd, args).run();
+                new CommandRewards(cs, cmnd, args).execute();
                 break;
             case "rewardslite":
-                new CommandRewardsLite(cs, cmnd, args).run();
+                new CommandRewardsLite(cs, cmnd, args).execute();
                 break;
         }
         return true;

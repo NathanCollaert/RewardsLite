@@ -18,6 +18,15 @@ public abstract class AbstractCommand {
     protected final String[] args;
     protected Player sender = null;
     protected OfflinePlayer target = null;
+    protected Player onlineTarget = null;
+
+    protected boolean requiresOnlineSender;
+    protected boolean requiresOnlineTarget;
+    protected int minRequiredArguments;
+    protected int maxRequiredArguments;
+
+    protected String externalPermission;
+    protected int targetArgumentPosition;
 
     public AbstractCommand(CommandSender cs, Command command, String[] args) {
         this.plugin = JavaPlugin.getPlugin(Rewardslite.class);
@@ -26,13 +35,43 @@ public abstract class AbstractCommand {
         this.args = args;
     }
 
-    public abstract void run();
+    public void setCommandParameters(boolean requiresOnlineSender, boolean requiresOnlineTarget, int minRequiredArguments, int maxRequiredArguments, String externalPermission, int targetArgumentPosition) {
+        this.requiresOnlineSender = requiresOnlineSender;
+        this.requiresOnlineTarget = requiresOnlineTarget;
+        this.minRequiredArguments = minRequiredArguments;
+        this.maxRequiredArguments = maxRequiredArguments;
+        this.externalPermission = externalPermission;
+        this.targetArgumentPosition = targetArgumentPosition;
+    }
+
+    public boolean canExecute() {
+        if ((this.externalPermission != null && !this.cs.hasPermission(this.externalPermission)) || !this.hasPermission()) {
+            return false;
+        }
+
+        if (this.requiresOnlineSender && !this.isSenderOnline()) {
+            return false;
+        }
+
+        if (this.args.length < this.minRequiredArguments && this.args.length > this.maxRequiredArguments) {
+            this.sendUsageMessage();
+            return false;
+        }
+
+        if (this.targetArgumentPosition != -1 && this.args.length > this.targetArgumentPosition && !this.hasPlayedBefore(this.args[this.targetArgumentPosition])) {
+            return false;
+        }
+
+        return !this.requiresOnlineTarget || this.isTargetOnline();
+    }
+
+    public abstract void execute();
 
     protected boolean hasPermission() {
         return this.command.testPermission(this.cs);
     }
 
-    protected boolean isPlayer() {
+    protected boolean isSenderOnline() {
         if (!(this.cs instanceof Player)) {
             this.cs.sendMessage(this.plugin.getMessages().getRequireOnlinePlayerError());
             return false;
@@ -41,19 +80,21 @@ public abstract class AbstractCommand {
         return true;
     }
 
-    protected Player isTargetOnline() {
+    protected boolean isTargetOnline() {
         if (this.target == null) {
-            return null;
+            return false;
         }
 
         if (this.target.getPlayer() == null) {
             this.cs.sendMessage(this.plugin.getMessages().getTargetNotOnlineError(this.target.getName()));
+            return false;
         }
 
-        return this.target.getPlayer();
+        this.onlineTarget = this.target.getPlayer();
+        return true;
     }
 
-    protected Boolean hasPlayedBefore(String playerName) {
+    protected boolean hasPlayedBefore(String playerName) {
         OfflinePlayer player = Arrays.stream(this.plugin.getServer().getOfflinePlayers()).filter(e -> e.getName() != null && e.getName().equals(playerName)).findFirst().orElse(this.plugin.getServer().getPlayer(playerName));
         if (player == null) {
             this.cs.sendMessage(this.plugin.getMessages().getTargetNotPlayedBeforeError(playerName));

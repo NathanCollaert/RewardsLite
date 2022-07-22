@@ -28,6 +28,29 @@ countPrevious: NONE
 #Placeholders: %player% - %player_uuid%
 rewards: [ ]
 
+#How many inventory slots should be empty in order to claim this reward?
+inventorySlotsNeeded: -1
+
+#Should a permission be required in order to gain playtime towards this reward?
+usePermission: false
+
+#Should the reward be claimed manually?
+manualClaim: false
+
+#How many times can this reward be pending before it stops counting playtime towards this reward?
+#Minimum is 1, -1 is unlimited
+maximumAmountPending: -1
+
+#How many times can this reward be redeemed?
+#Minimum is 1, -1 is unlimited
+maximumAmountRedeemed: -1
+
+#In which worlds should playtime not count towards this reward?
+disableGainingPlaytimeInWorlds: [ ]
+
+#In which worlds should be claiming this reward not be possible?
+disableRedeemingInWorlds: [ ]
+
 #What should this reward look like in the GUI?
 #Placeholders: %total_time% - %time_left% - %%redeemed% - %pending%
 display:
@@ -129,26 +152,3 @@ pendingNotification:
     configuration:
       title: ""
       subtitle: ""
-
-#How many inventory slots should be empty in order to claim this reward?
-inventorySlotsNeeded: -1
-
-#Should a permission be required in order to gain playtime towards this reward?
-usePermission: false
-
-#Should the reward be claimed manually?
-manualClaim: false
-
-#How many times can this reward be pending before it stops counting playtime towards this reward?
-#Minimum is 1, -1 is unlimited
-maximumAmountPending: -1
-
-#How many times can this reward be redeemed?
-#Minimum is 1, -1 is unlimited
-maximumAmountRedeemed: -1
-
-#In which worlds should playtime not count towards this reward?
-disableGainingPlaytimeInWorlds: [ ]
-
-#In which worlds should be claiming this reward not be possible?
-disableRedeemingInWorlds: [ ]

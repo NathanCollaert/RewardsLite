@@ -76,7 +76,9 @@ public class ConversionUtils {
                             }
                         }).collect(Collectors.toList()));
                         PlayerData playerData = convertLitePlaytimeRewardsPlayerData(UUID.fromString(id), YamlConfiguration.loadConfiguration(file));
-                        plugin.getPlayerRepository().setInPlayerCache(playerData);
+                        if (plugin.getPlayerRepository().doesCacheContainPlayer(playerData.getPlayer().getUniqueId())) {
+                            plugin.getPlayerRepository().setInPlayerCache(playerData);
+                        }
                         plugin.getPlayerRepository().updatePlayerData(playerData);
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -100,9 +102,6 @@ public class ConversionUtils {
         playerData = new YAMLPlayerMapper().getAllSync();
         playerData.forEach(p -> {
             if (plugin.getPlayerRepository().doesCacheContainPlayer(p.getPlayer().getUniqueId())) {
-                if (plugin.getPlayerRepository().getByPlayerSync(p.getPlayer()).getPlaytimeRunnable() != null) {
-                    plugin.getPlayerRepository().getByPlayerSync(p.getPlayer()).getPlaytimeRunnable().stop();
-                }
                 plugin.getPlayerRepository().setInPlayerCache(p);
             }
             MySQLPlayerMapper.getInstance().updatePlayerData(p);
