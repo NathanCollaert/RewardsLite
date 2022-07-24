@@ -53,7 +53,7 @@ public abstract class AbstractCommand {
             return false;
         }
 
-        if (this.args.length < this.minRequiredArguments && this.args.length > this.maxRequiredArguments) {
+        if (this.args.length < this.minRequiredArguments || this.args.length > this.maxRequiredArguments) {
             this.sendUsageMessage();
             return false;
         }

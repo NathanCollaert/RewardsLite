@@ -99,7 +99,7 @@ public class CommandRewardsLite extends AbstractCommand {
             return;
         }
 
-        this.plugin.getPlayerRepository().getByPlayer(this.target).thenAcceptAsync(playerData -> {
+        this.plugin.getPlayerRepository().getByPlayer(this.onlineTarget).thenAcceptAsync(playerData -> {
             RewardData rewardData = playerData.getRewardData(reward);
             if (rewardData == null) {
                 return;
