@@ -13,7 +13,7 @@ public class CommandRewards extends AbstractCommand {
 
     @Override
     public void execute() {
-        this.setCommandParameters(true, false, 0, 1, this.args.length == 1 ? String.format("%s.rewards.other", this.plugin.getName().toLowerCase()) : null, 1);
+        this.setCommandParameters(true, false, 0, 1, this.args.length == 1 ? String.format("%s.rewards.other", this.plugin.getName().toLowerCase()) : null, 0);
         if (canExecute()) {
             this.openRewardsGUI(this.args.length == 1 ? this.target : this.sender);
         }
