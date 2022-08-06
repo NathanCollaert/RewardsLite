@@ -54,7 +54,7 @@ public class PlayerData {
     }
 
     public void onJoin(Player player) {
-        this.rewards.forEach(r -> r.countPrevious(player, this));
+        this.getRewards().forEach(r -> r.countPrevious(player, this));
         if (this.playtimeRunnable != null) {
             this.playtimeRunnable.stop();
         }
@@ -129,7 +129,7 @@ public class PlayerData {
     }
 
     public List<RewardData> getRewards() {
-        return this.rewards;
+        return this.rewards.stream().sorted(Comparator.comparingLong(RewardData::getRequiredTime)).collect(Collectors.toList());
     }
 
     public void registerObserver(Player player, AbstractInterface iface) {

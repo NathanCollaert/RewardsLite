@@ -132,6 +132,10 @@ public class PlayerRepository {
     }
 
     public void setInPlayerCache(PlayerData playerData) {
+        PlayerData playerDataCached = this.playerCache.get(playerData.getPlayer().getUniqueId());
+        if (playerDataCached != null && playerDataCached.getPlaytimeRunnable() != null) {
+            playerDataCached.getPlaytimeRunnable().stop();
+        }
         this.playerCache.put(playerData.getPlayer().getUniqueId(), playerData);
     }
 
