@@ -29,6 +29,14 @@ commands:
       - rl
       - reli
     usage: /<command> (convert | give | help | reload | reset)
+  playtop:
+    description: View the top leaderboards for playtime
+    permission: rewardslite.playtop
+    usage: /<command> [includeAFKTime]
+  afktop:
+    description: View the top leaderboards for AFK time
+    permission: rewardslite.afktop
+    usage: /<command>
 permissions:
   rewardslite.convert:
     default: op
@@ -49,4 +57,8 @@ permissions:
   rewardslite.rewards:
     default: op
   rewardslite.rewards.other:
+    default: op
+  rewardslite.playtop:
+    default: op
+  rewardslite.afktop:
     default: op

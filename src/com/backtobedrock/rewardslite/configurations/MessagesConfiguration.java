@@ -1,6 +1,7 @@
 package com.backtobedrock.rewardslite.configurations;
 
 import com.backtobedrock.rewardslite.Rewardslite;
+import com.backtobedrock.rewardslite.domain.enumerations.TimePattern;
 import com.backtobedrock.rewardslite.utilities.MessageUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -159,6 +160,43 @@ public class MessagesConfiguration {
             put("afk_time", afkTime);
         }};
         return MessageUtils.replacePlaceholders(this.messages.getString("playtime", "&e%player% have played for &6%playtime%&e of which &6%afk_time%&e were AFK."), placeholders);
+    }
+
+
+    public String getTopPlaytimeTitle(int limit) {
+        Map<String, String> placeholders = new HashMap<String, String>() {{
+            put("entries_amount", Integer.toString(limit));
+        }};
+        return MessageUtils.replacePlaceholders(this.messages.getString("topPlaytimeTitle", "&eTop &6%entries_amount% &eplayers &6playtime&e:"), placeholders);
+    }
+
+    public String getTopAfkTimeTitle(int limit) {
+        Map<String, String> placeholders = new HashMap<String, String>() {{
+            put("entries_amount", Integer.toString(limit));
+        }};
+        return MessageUtils.replacePlaceholders(this.messages.getString("topAfkTimeTitle", "&eTop &6%entries_amount% &eplayers &6AFK time&e:"), placeholders);
+    }
+
+    public String getTopPlaytimeLine(int position, String player, long playtime) {
+        Map<String, String> placeholders = new HashMap<String, String>() {{
+            put("position", Integer.toString(position));
+            put("player", player);
+            put("playtime_long", MessageUtils.getTimeFromTicks(playtime, TimePattern.LONG));
+            put("playtime_short", MessageUtils.getTimeFromTicks(playtime, TimePattern.SHORT));
+            put("playtime_digital", MessageUtils.getTimeFromTicks(playtime, TimePattern.DIGITAL));
+        }};
+        return MessageUtils.replacePlaceholders(this.messages.getString("topPlaytimeLine", "&9%position%. &b%player%: &e%playtime_short%"), placeholders);
+    }
+
+    public String getTopAfkTimeLine(int position, String player, long afkTime) {
+        Map<String, String> placeholders = new HashMap<String, String>() {{
+            put("position", Integer.toString(position));
+            put("player", player);
+            put("afk_time_long", MessageUtils.getTimeFromTicks(afkTime, TimePattern.LONG));
+            put("afk_time_short", MessageUtils.getTimeFromTicks(afkTime, TimePattern.SHORT));
+            put("afk_time_digital", MessageUtils.getTimeFromTicks(afkTime, TimePattern.DIGITAL));
+        }};
+        return MessageUtils.replacePlaceholders(this.messages.getString("topAfkTimeLine", "&9%position%. &b%player%: &e%afk_time_short%"), placeholders);
     }
     //</editor-fold>
 }

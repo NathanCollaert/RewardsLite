@@ -4,15 +4,14 @@ import com.backtobedrock.rewardslite.domain.Reward;
 import com.backtobedrock.rewardslite.domain.RewardData;
 import com.backtobedrock.rewardslite.domain.data.PlayerData;
 import com.backtobedrock.rewardslite.mappers.AbstractMapper;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -91,6 +90,96 @@ public class MySQLPlayerMapper extends AbstractMapper implements IPlayerMapper {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public CompletableFuture<Map<String, Long>> getTopPlaytime(int limit) {
+        return CompletableFuture.supplyAsync(() -> this.getTopPlaytimeSync(limit))
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
+    }
+
+    @Override
+    public CompletableFuture<Map<String, Long>> getTopTotalTime(int limit) {
+        return CompletableFuture.supplyAsync(() -> this.getTopTotalTimeSync(limit))
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
+    }
+
+    @Override
+    public CompletableFuture<Map<String, Long>> getTopAfkTime(int limit) {
+        return CompletableFuture.supplyAsync(() -> this.getTopAfkTimeSync(limit))
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
+    }
+
+    @Override
+    public Map<String, Long> getTopPlaytimeSync(int limit) {
+        try (Connection connection = this.database.getDataSource().getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(this.getTopPlaytime())) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Map<String, Long> topMap = new LinkedHashMap<>();
+            while (resultSet.next()) {
+                String playerName = Bukkit.getOfflinePlayer(UUID.fromString(resultSet.getString("player_uuid"))).getName();
+                topMap.put(playerName == null ? resultSet.getString("player_uuid") : playerName, resultSet.getLong("playtime"));
+            }
+            return getSortedMap(limit, topMap);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public Map<String, Long> getTopTotalTimeSync(int limit) {
+        try (Connection connection = this.database.getDataSource().getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(this.getTopTotalTime())) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Map<String, Long> topMap = new LinkedHashMap<>();
+            while (resultSet.next()) {
+                String playerName = Bukkit.getOfflinePlayer(UUID.fromString(resultSet.getString("player_uuid"))).getName();
+                topMap.put(playerName == null ? resultSet.getString("player_uuid") : playerName, resultSet.getLong("playtime") + resultSet.getLong("afk_time"));
+            }
+            return getSortedMap(limit, topMap);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public Map<String, Long> getTopAfkTimeSync(int limit) {
+        try (Connection connection = this.database.getDataSource().getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(this.getTopAfkTime())) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Map<String, Long> topMap = new LinkedHashMap<>();
+            while (resultSet.next()) {
+                String playerName = Bukkit.getOfflinePlayer(UUID.fromString(resultSet.getString("player_uuid"))).getName();
+                topMap.put(playerName == null ? resultSet.getString("player_uuid") : playerName, resultSet.getLong("afk_time"));
+            }
+            return getSortedMap(limit, topMap);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private Map<String, Long> getSortedMap(int limit, Map<String, Long> map) {
+        List<Map.Entry<String, Long>> list = new ArrayList<>(map.entrySet());
+        list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+        Map<String, Long> topMapLimit = new LinkedHashMap<>();
+        int limitPosition = 1;
+        for (Map.Entry<String, Long> entry : list) {
+            topMapLimit.put(entry.getKey(), entry.getValue());
+            if (limitPosition == limit) {
+                break;
+            }
+            limitPosition++;
+        }
+        return topMapLimit;
     }
 
     private PlayerData getPlayerData(OfflinePlayer player) {
@@ -231,6 +320,21 @@ public class MySQLPlayerMapper extends AbstractMapper implements IPlayerMapper {
         return "SELECT p.*, r.reward_uuid, r.time_left, r.redeemed, r.pending, r.active, r.counted_previous "
                 + "FROM rl_player AS p "
                 + "LEFT JOIN rl_reward AS r ON p.player_uuid = r.player_uuid;";
+    }
+
+    private String getTopPlaytime() {
+        return "SELECT player_uuid, playtime "
+                + "FROM rl_player;";
+    }
+
+    private String getTopTotalTime() {
+        return "SELECT player_uuid, playtime, afk_time "
+                + "FROM rl_player;";
+    }
+
+    private String getTopAfkTime() {
+        return "SELECT player_uuid, afk_time "
+                + "FROM rl_player;";
     }
 
     private String deletePlayerSQL() {

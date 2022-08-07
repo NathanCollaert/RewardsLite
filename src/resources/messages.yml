@@ -93,3 +93,19 @@ resetSuccess: "&aSuccessfully reset %reward% for %player%."
 #Message send to the player upon executing the /playtime command.
 #Placeholders: %player% - %playtime% - %afk_time%
 playtime: "&e%player% has played for &6%playtime%&e of which &6%afk_time%&e were AFK."
+
+#How should the title of the top playtime command look like?
+#Placeholders: %entries_amount%
+topPlaytimeTitle: "&eTop &6%entries_amount% &eplayers &6playtime&e:"
+
+#How should the title of the top afk time command look like?
+#Placeholders: %entries_amount%
+topAfkTimeTitle: "&eTop &6%entries_amount% &eplayers &6AFK time&e:"
+
+#How should a single line of the top playtime command look like?
+#Placeholders: %position% - %player% - %playtime_long% - %playtime_short% - %playtime_digital%
+topPlaytimeLine: "&9%position%. &b%player%: &e%playtime_short%"
+
+#How should a single line of the top afk time command look like?
+#Placeholders: %position% - %player% - %afk_time_long% - %afk_time_short% - %afk_time_digital%
+topAfkTimeLine: "&9%position%. &b%player%: &e%afk_time_short%"

@@ -5,6 +5,7 @@ import com.backtobedrock.rewardslite.domain.data.PlayerData;
 import org.bukkit.OfflinePlayer;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public interface IPlayerMapper {
@@ -16,6 +17,18 @@ public interface IPlayerMapper {
     CompletableFuture<List<PlayerData>> getAll();
 
     List<PlayerData> getAllSync();
+
+    CompletableFuture<Map<String, Long>> getTopPlaytime(int limit);
+
+    CompletableFuture<Map<String, Long>> getTopTotalTime(int limit);
+
+    CompletableFuture<Map<String, Long>> getTopAfkTime(int limit);
+
+    Map<String, Long> getTopPlaytimeSync(int limit);
+
+    Map<String, Long> getTopTotalTimeSync(int limit);
+
+    Map<String, Long> getTopAfkTimeSync(int limit);
 
     //Update
     void updatePlayerData(PlayerData data);

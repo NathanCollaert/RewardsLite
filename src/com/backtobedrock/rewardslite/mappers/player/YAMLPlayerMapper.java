@@ -78,6 +78,105 @@ public class YAMLPlayerMapper implements IPlayerMapper {
     }
 
     @Override
+    public CompletableFuture<Map<String, Long>> getTopPlaytime(int limit) {
+        return CompletableFuture.supplyAsync(() -> this.getTopPlaytimeSync(limit))
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
+    }
+
+    @Override
+    public CompletableFuture<Map<String, Long>> getTopTotalTime(int limit) {
+        return CompletableFuture.supplyAsync(() -> this.getTopTotalTimeSync(limit))
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
+    }
+
+    @Override
+    public CompletableFuture<Map<String, Long>> getTopAfkTime(int limit) {
+        return CompletableFuture.supplyAsync(() -> this.getTopAfkTimeSync(limit))
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
+    }
+
+    @Override
+    public Map<String, Long> getTopPlaytimeSync(int limit) {
+        Map<String, Long> topMap = new HashMap<>();
+        File playerDataDirectory = new File(this.plugin.getDataFolder(), "userdata");
+        if (playerDataDirectory.exists()) {
+            try (Stream<Path> walk = Files.walk(playerDataDirectory.toPath())) {
+                List<Path> result = walk.filter(Files::isRegularFile).collect(Collectors.toList());
+                result.forEach(e -> {
+                    FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(e.toFile());
+                    String playerName = Bukkit.getOfflinePlayer(UUID.fromString(e.getFileName().toString().replaceAll(".yml", ""))).getName();
+                    topMap.put(playerName == null ? e.getFileName().toString().replaceAll(".yml", "") : playerName, fileConfiguration.getLong("playtime", 0));
+                });
+            } catch (IOException e) {
+                this.plugin.getLogger().log(Level.SEVERE, e.getMessage());
+            }
+        }
+        return this.getSortedMap(limit, topMap);
+    }
+
+    @Override
+    public Map<String, Long> getTopTotalTimeSync(int limit) {
+        Map<String, Long> topMap = new HashMap<>();
+        File playerDataDirectory = new File(this.plugin.getDataFolder(), "userdata");
+        if (playerDataDirectory.exists()) {
+            try (Stream<Path> walk = Files.walk(playerDataDirectory.toPath())) {
+                List<Path> result = walk.filter(Files::isRegularFile).collect(Collectors.toList());
+                result.forEach(e -> {
+                    FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(e.toFile());
+                    String playerName = Bukkit.getOfflinePlayer(UUID.fromString(e.getFileName().toString().replaceAll(".yml", ""))).getName();
+                    topMap.put(playerName == null ? e.getFileName().toString().replaceAll(".yml", "") : playerName, fileConfiguration.getLong("playtime", 0) + fileConfiguration.getLong("afkTime", 0));
+                });
+            } catch (IOException e) {
+                this.plugin.getLogger().log(Level.SEVERE, e.getMessage());
+            }
+        }
+        return this.getSortedMap(limit, topMap);
+    }
+
+    @Override
+    public Map<String, Long> getTopAfkTimeSync(int limit) {
+        Map<String, Long> topMap = new HashMap<>();
+        File playerDataDirectory = new File(this.plugin.getDataFolder(), "userdata");
+        if (playerDataDirectory.exists()) {
+            try (Stream<Path> walk = Files.walk(playerDataDirectory.toPath())) {
+                List<Path> result = walk.filter(Files::isRegularFile).collect(Collectors.toList());
+                result.forEach(e -> {
+                    FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(e.toFile());
+                    String playerName = Bukkit.getOfflinePlayer(UUID.fromString(e.getFileName().toString().replaceAll(".yml", ""))).getName();
+                    topMap.put(playerName == null ? e.getFileName().toString().replaceAll(".yml", "") : playerName, fileConfiguration.getLong("afkTime", 0));
+                });
+            } catch (IOException e) {
+                this.plugin.getLogger().log(Level.SEVERE, e.getMessage());
+            }
+        }
+        return this.getSortedMap(limit, topMap);
+    }
+
+    private Map<String, Long> getSortedMap(int limit, Map<String, Long> map) {
+        List<Map.Entry<String, Long>> list = new ArrayList<>(map.entrySet());
+        list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+        Map<String, Long> topMapLimit = new LinkedHashMap<>();
+        int limitPosition = 1;
+        for (Map.Entry<String, Long> entry : list) {
+            topMapLimit.put(entry.getKey(), entry.getValue());
+            if (limitPosition == limit) {
+                break;
+            }
+            limitPosition++;
+        }
+        return topMapLimit;
+    }
+
+    @Override
     public void updatePlayerData(PlayerData playerData) {
         if (this.plugin.isStopping()) {
             this.upsertPlayerData(playerData);

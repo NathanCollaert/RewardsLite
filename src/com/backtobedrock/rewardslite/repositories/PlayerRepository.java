@@ -143,7 +143,15 @@ public class PlayerRepository {
         return this.mapper.getAll();
     }
 
-    public List<PlayerData> getAllSync() {
-        return this.mapper.getAllSync();
+    public CompletableFuture<Map<String, Long>> getTopPlaytime(int limit) {
+        return this.mapper.getTopPlaytime(limit);
+    }
+
+    public CompletableFuture<Map<String, Long>> getTopTotalTime(int limit) {
+        return this.mapper.getTopTotalTime(limit);
+    }
+
+    public CompletableFuture<Map<String, Long>> getTopAfkTime(int limit) {
+        return this.mapper.getTopAfkTime(limit);
     }
 }

@@ -22,7 +22,7 @@ public class Commands implements TabCompleter {
 
     public Commands() {
         this.plugin = JavaPlugin.getPlugin(Rewardslite.class);
-        Collections.singletonList("rewardslite").forEach(this::registerPluginCommand);
+        Arrays.asList("rewardslite", "playtop").forEach(this::registerPluginCommand);
     }
 
     private void registerPluginCommand(String command) {
@@ -42,6 +42,12 @@ public class Commands implements TabCompleter {
                 break;
             case "rewardslite":
                 new CommandRewardsLite(cs, cmnd, args).execute();
+                break;
+            case "playtop":
+                new CommandPlayTop(cs, cmnd, args).execute();
+                break;
+            case "afktop":
+                new CommandAfkTop(cs, cmnd, args).execute();
                 break;
         }
         return true;
@@ -78,8 +84,13 @@ public class Commands implements TabCompleter {
                         break;
                 }
                 break;
+            case "playtop":
+                if (args.length == 1) {
+                    StringUtil.copyPartialMatches(args[0].toLowerCase(), Arrays.asList("false", "true"), completions);
+                    Collections.sort(completions);
+                }
+                break;
         }
-
         return completions;
     }
 }

@@ -36,6 +36,9 @@ includedRewards:
   - "ELIGIBLE"
   - "FINISHED"
 
+#How many players should be included in the top playtime and top afk time commands?
+topCommandsLimit: 10
+
 
 ############################################################
 # +------------------------------------------------------+ #

@@ -10,18 +10,22 @@ import java.util.stream.Collectors;
 public class ConfigurationGeneral {
     private final boolean countPreviousTowardsPlaytime;
     private final List<RewardStatus> includedRewards;
-//    private final List<Predicate<?>> rewardsOrder;
+    //    private final List<Predicate<?>> rewardsOrder;
+    private final int topCommandsLimit;
 
-    public ConfigurationGeneral(boolean countPreviousTowardsPlaytime, List<RewardStatus> includedRewards) {
+    public ConfigurationGeneral(boolean countPreviousTowardsPlaytime, List<RewardStatus> includedRewards, int topCommandsLimit) {
         this.countPreviousTowardsPlaytime = countPreviousTowardsPlaytime;
         this.includedRewards = includedRewards;
+        this.topCommandsLimit = topCommandsLimit;
     }
 
     public static ConfigurationGeneral deserialize(ConfigurationSection section) {
         boolean cCountPreviousTowardsPlaytime = section.getBoolean("countPreviousTowardsPlaytime", true);
         List<RewardStatus> cIncludedRewards = section.getStringList("includedRewards").stream().map(s -> ConfigUtils.getRewardStatus("includedRewards", s)).collect(Collectors.toList());
 //        List<Predicate<?>> cRewardsOrder = section.getStringList("rewardsOrder");
-        return new ConfigurationGeneral(cCountPreviousTowardsPlaytime, cIncludedRewards);
+        int cTopCommandLimit = section.getInt("topCommandsLimit", 10);
+
+        return new ConfigurationGeneral(cCountPreviousTowardsPlaytime, cIncludedRewards, cTopCommandLimit);
     }
 
     public boolean isCountPreviousTowardsPlaytime() {
@@ -30,5 +34,9 @@ public class ConfigurationGeneral {
 
     public List<RewardStatus> getIncludedRewards() {
         return includedRewards;
+    }
+
+    public int getTopCommandsLimit() {
+        return topCommandsLimit;
     }
 }
