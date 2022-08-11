@@ -39,9 +39,9 @@ public class ActionBarNotification extends AbstractNotification {
     }
 
     @Override
-    public void notify(Player player) {
+    public void notify(Player player, String playerName) {
         Map<String, String> placeholders = new HashMap<String, String>() {{
-            put("player", player.getName());
+            put("player", playerName);
         }};
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(MessageUtils.replacePlaceholders(this.text, placeholders)));
     }

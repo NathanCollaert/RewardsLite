@@ -45,9 +45,9 @@ public class TitleNotification extends AbstractNotification {
     }
 
     @Override
-    public void notify(Player player) {
+    public void notify(Player player, String playerName) {
         Map<String, String> placeholders = new HashMap<String, String>() {{
-            put("player", player.getName());
+            put("player", playerName);
         }};
         player.sendTitle(MessageUtils.replacePlaceholders(this.title, placeholders), MessageUtils.replacePlaceholders(this.subTitle, placeholders), 10, 70, 20);
     }

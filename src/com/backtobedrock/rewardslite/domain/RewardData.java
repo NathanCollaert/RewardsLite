@@ -110,7 +110,7 @@ public class RewardData extends Reward {
         while (this.timeLeft <= 0 && (ignorePredicate || this.active)) {
             if (super.isManualClaim() || !super.redeemReward(player, false)) {
                 this.pending++;
-                this.getPendingNotification().getNotifications().forEach(n -> n.notify(player));
+                this.getPendingNotification().getNotifications().forEach(n -> n.notify(player, player.getName()));
             } else {
                 this.redeemed++;
             }

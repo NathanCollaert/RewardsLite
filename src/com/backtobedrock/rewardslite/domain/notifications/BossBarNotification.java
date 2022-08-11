@@ -60,7 +60,7 @@ public class BossBarNotification extends AbstractNotification {
     }
 
     @Override
-    public void notify(Player player) {
-        new BossBarNotificationTask(player, this).start();
+    public void notify(Player player, String playerName) {
+        new BossBarNotificationTask(player, playerName, this).start();
     }
 }

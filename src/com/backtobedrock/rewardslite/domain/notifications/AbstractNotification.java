@@ -11,10 +11,10 @@ public abstract class AbstractNotification {
         this.enabled = enabled;
     }
 
-    public abstract void notify(Player player);
+    public abstract void notify(Player player, String playerName);
 
-    public void notify(List<Player> players) {
-        players.forEach(this::notify);
+    public void notify(List<Player> players, String playerName) {
+        players.forEach(p -> this.notify(p, playerName));
     }
 
     public boolean isEnabled() {

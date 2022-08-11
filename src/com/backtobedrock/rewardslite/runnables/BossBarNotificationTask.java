@@ -19,11 +19,11 @@ public class BossBarNotificationTask extends BukkitRunnable {
     private final int time;
     private int timer;
 
-    public BossBarNotificationTask(Player player, BossBarNotification bossBarNotification) {
+    public BossBarNotificationTask(Player player, String playerName, BossBarNotification bossBarNotification) {
         this.plugin = JavaPlugin.getPlugin(Rewardslite.class);
         this.player = player;
         Map<String, String> placeholders = new HashMap<String, String>() {{
-            put("player", player.getName());
+            put("player", playerName);
         }};
         this.bossBar = Bukkit.createBossBar(MessageUtils.replacePlaceholders(bossBarNotification.getText(), placeholders), bossBarNotification.getColor(), bossBarNotification.getStyle());
         this.time = 5 * 20;

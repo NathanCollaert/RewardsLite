@@ -35,9 +35,9 @@ public class ChatNotification extends AbstractNotification {
     }
 
     @Override
-    public void notify(Player player) {
+    public void notify(Player player, String playerName) {
         Map<String, String> placeholders = new HashMap<String, String>() {{
-            put("player", player.getName());
+            put("player", playerName);
         }};
         player.sendMessage(MessageUtils.replacePlaceholders(this.text, placeholders));
     }

@@ -124,9 +124,9 @@ public class Reward {
 
     private void notify(Player player) {
         if (this.notification != null)
-            this.notification.getNotifications().forEach(n -> n.notify(player));
+            this.notification.getNotifications().forEach(n -> n.notify(player, player.getName()));
         if (this.broadcastNotification != null)
-            this.broadcastNotification.getNotifications().forEach(n -> n.notify(new ArrayList<>(this.plugin.getServer().getOnlinePlayers())));
+            this.broadcastNotification.getNotifications().forEach(n -> n.notify(new ArrayList<>(this.plugin.getServer().getOnlinePlayers()), player.getName()));
     }
 
     public boolean isUsePermission() {
