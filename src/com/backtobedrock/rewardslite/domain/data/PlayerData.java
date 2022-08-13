@@ -103,13 +103,18 @@ public class PlayerData {
         return afkTime;
     }
 
-    public List<RewardData> getViewableRewards(Player player) {
+    public List<RewardData> getViewableRewards() {
+        Comparator<RewardData> rewardDataComparator = null;
+        for (Comparator<RewardData> comparator : this.plugin.getConfigurations().getGeneralConfiguration().getRewardsOrdering().stream().map(r -> r.getComparator(this.player)).collect(Collectors.toList())) {
+            if (rewardDataComparator == null) {
+                rewardDataComparator = comparator;
+            } else {
+                rewardDataComparator = rewardDataComparator.thenComparing(comparator);
+            }
+        }
         return this.rewards.stream()
-                .filter(r -> this.plugin.getConfigurations().getGeneralConfiguration().getIncludedRewards().contains(RewardStatus.getRewardStatus(r, player)))
-                .sorted(Comparator.comparingInt(RewardData::getPending).reversed()
-                        .thenComparing(r -> RewardStatus.getRewardStatus(r, player))
-                        .thenComparingLong(RewardData::getTimeLeft)
-                        .thenComparing(r -> r.getDisplay().getName()))
+                .filter(r -> this.plugin.getConfigurations().getGeneralConfiguration().getIncludedRewards().contains(RewardStatus.getRewardStatus(r, this.player)))
+                .sorted(rewardDataComparator)
                 .collect(Collectors.toList());
     }
 

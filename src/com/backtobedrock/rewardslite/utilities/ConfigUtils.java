@@ -134,6 +134,17 @@ public class ConfigUtils {
         return null;
     }
 
+    public static RewardsOrder getRewardOrder(String id, String rewardOrder) {
+        try {
+            if (rewardOrder != null) {
+                return RewardsOrder.valueOf(rewardOrder.toUpperCase());
+            }
+        } catch (IllegalArgumentException e) {
+            sendErrorMessage(String.format("%s: %s is not an existing reward order option.", id, rewardOrder));
+        }
+        return null;
+    }
+
     private static void sendErrorMessage(String message) {
         Rewardslite plugin = JavaPlugin.getPlugin(Rewardslite.class);
         plugin.getLogger().log(Level.SEVERE, message);

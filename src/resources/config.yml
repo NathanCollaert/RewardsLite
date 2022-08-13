@@ -36,6 +36,30 @@ includedRewards:
   - "ELIGIBLE"
   - "FINISHED"
 
+#How should rewards be ordered in the rewards GUI?
+#A list of options can be given which will determine the order of the rewards in the GUI.
+#E.g. (default ordering): rewards will be ordered by pending_reversed first, then by status, then by time_left and as last by title
+#Options:
+#   FILENAME: Compare rewards by file name alphabetically (a->z)
+#   FILENAME_REVERSED: Compare rewards by file name reversed alphabetically (z->a)
+#   TITLE: Compare rewards by display title alphabetically (a->z)
+#   TITLE: Compare rewards by display title reversed alphabetically (z->a)
+#   STATUS: Compare rewards by status (INELIGIBLE -> ELIGIBLE ->  FINISHED)
+#   STATUS_REVERSED: Compare rewards by reversed status (FINISHED -> ELIGIBLE -> INELIGIBLE)
+#   TIME_REQUIRED: Compare rewards by time required ascending (0 -> n)
+#   TIME_REQUIRED_REVERSED: Compare rewards by time required descending (n -> 0)
+#   TIME_LEFT: Compare rewards by time left ascending (0 -> n)
+#   TIME_LEFT_REVERSED: Compare rewards by time left descending (n -> 0)
+#   PENDING: Compare rewards by amount pending ascending (0 -> n)
+#   PENDING_REVERSED: Compare rewards by amount pending descending (n -> 0)
+#   REDEEMED: Compare rewards by amount redeemed ascending (0 -> n)
+#   REDEEMED_REVERSED: Compare rewards by amount redeemed descending (n -> 0)
+rewardsOrdering:
+  - "PENDING_REVERSED"
+  - "STATUS"
+  - "TIME_LEFT"
+  - "TITLE"
+
 #How many players should be included in the top playtime and top afk time commands?
 topCommandsLimit: 10
 

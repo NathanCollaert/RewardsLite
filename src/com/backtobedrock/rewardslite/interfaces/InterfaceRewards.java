@@ -24,10 +24,10 @@ public class InterfaceRewards extends AbstractPaginatedInterface {
     private final List<RewardData> viewableRewards;
 
     public InterfaceRewards(Player sender, PlayerData playerData) {
-        super(new CustomHolder(playerData.getViewableRewards(sender).size(), JavaPlugin.getPlugin(Rewardslite.class).getConfigurations().getInterfacesConfiguration().getRewardsInterfaceTitle(playerData.getPlayer().getName())), playerData.getViewableRewards(sender).size());
+        super(new CustomHolder(playerData.getViewableRewards().size(), JavaPlugin.getPlugin(Rewardslite.class).getConfigurations().getInterfacesConfiguration().getRewardsInterfaceTitle(playerData.getPlayer().getName())), playerData.getViewableRewards().size());
         this.sender = sender;
         this.playerData = playerData;
-        this.viewableRewards = playerData.getViewableRewards(sender);
+        this.viewableRewards = playerData.getViewableRewards();
         this.initialize();
     }
 
