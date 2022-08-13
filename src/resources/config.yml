@@ -39,6 +39,12 @@ includedRewards:
 #How many players should be included in the top playtime and top afk time commands?
 topCommandsLimit: 10
 
+#What time unit should time displays be limited to?
+#Options: WEEKS / DAYS / HOURS / MINUTES / SECONDS
+#E.g.: If limit is set to MINUTES all time will be displayed as x minutes, x seconds.
+#E.g. 2: If limit is set to WEEKS all time will be displayed as x weeks, x days, x hours, x minutes, x seconds.
+timeUnitLimit: DAYS
+
 
 ############################################################
 # +------------------------------------------------------+ #

@@ -8,7 +8,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,44 +21,52 @@ public class MessagesConfiguration {
     }
 
     //<editor-fold desc="Translations" defaultstate="collapsed">
+    public String getWeeks() {
+        return MessageUtils.applyColor(this.messages.getString("weeks", "weeks"));
+    }
+
     public String getDays() {
-        return MessageUtils.replacePlaceholders(this.messages.getString("days", "days"), Collections.emptyMap());
+        return MessageUtils.applyColor(this.messages.getString("days", "days"));
     }
 
     public String getHours() {
-        return MessageUtils.replacePlaceholders(this.messages.getString("hours", "hours"), Collections.emptyMap());
+        return MessageUtils.applyColor(this.messages.getString("hours", "hours"));
     }
 
     public String getMinutes() {
-        return MessageUtils.replacePlaceholders(this.messages.getString("minutes", "minutes"), Collections.emptyMap());
+        return MessageUtils.applyColor(this.messages.getString("minutes", "minutes"));
     }
 
     public String getSeconds() {
-        return MessageUtils.replacePlaceholders(this.messages.getString("seconds", "seconds"), Collections.emptyMap());
+        return MessageUtils.applyColor(this.messages.getString("seconds", "seconds"));
+    }
+
+    public String getWeek() {
+        return MessageUtils.applyColor(this.messages.getString("week", "week"));
     }
 
     public String getDay() {
-        return MessageUtils.replacePlaceholders(this.messages.getString("day", "day"), Collections.emptyMap());
+        return MessageUtils.applyColor(this.messages.getString("day", "day"));
     }
 
     public String getHour() {
-        return MessageUtils.replacePlaceholders(this.messages.getString("hour", "hour"), Collections.emptyMap());
+        return MessageUtils.applyColor(this.messages.getString("hour", "hour"));
     }
 
     public String getMinute() {
-        return MessageUtils.replacePlaceholders(this.messages.getString("minute", "minute"), Collections.emptyMap());
+        return MessageUtils.applyColor(this.messages.getString("minute", "minute"));
     }
 
     public String getSecond() {
-        return MessageUtils.replacePlaceholders(this.messages.getString("second", "second"), Collections.emptyMap());
+        return MessageUtils.applyColor(this.messages.getString("second", "second"));
     }
 
     public String getEveryone() {
-        return MessageUtils.replacePlaceholders(this.messages.getString("everyone", "everyone"), Collections.emptyMap());
+        return MessageUtils.applyColor(this.messages.getString("everyone", "everyone"));
     }
 
     public String getAllRewards() {
-        return MessageUtils.replacePlaceholders(this.messages.getString("allRewards", "all rewards"), Collections.emptyMap());
+        return MessageUtils.applyColor(this.messages.getString("allRewards", "all rewards"));
     }
     //</editor-fold>
 

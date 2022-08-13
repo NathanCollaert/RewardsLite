@@ -36,11 +36,45 @@ public class MessageUtils {
         Rewardslite plugin = JavaPlugin.getPlugin(Rewardslite.class);
         StringBuilder sb = new StringBuilder();
 
-        long d = amount / 1728000, h = amount % 1728000 / 72000, m = amount % 72000 / 1200, s = amount % 1200 / 20;
+        long w = 0, d = 0, h = 0, m = 0, s = 0;
+
+        switch (plugin.getConfigurations().getGeneralConfiguration().getTimeUnitLimit()) {
+            case WEEKS:
+                w = amount / 12096000;
+                d = amount % 12096000 / 1728000;
+                h = amount % 1728000 / 72000;
+                m = amount % 72000 / 1200;
+                s = amount % 1200 / 20;
+                break;
+            case DAYS:
+                d = amount / 1728000;
+                h = amount % 1728000 / 72000;
+                m = amount % 72000 / 1200;
+                s = amount % 1200 / 20;
+                break;
+            case HOURS:
+                h = amount / 72000;
+                m = amount % 72000 / 1200;
+                s = amount % 1200 / 20;
+                break;
+            case MINUTES:
+                m = amount / 1200;
+                s = amount % 1200 / 20;
+                break;
+            case SECONDS:
+                s = amount / 20;
+                break;
+        }
 
         switch (pattern) {
             case LONG:
+                if (w > 0) {
+                    sb.append(w).append(" ").append(w == 1 ? plugin.getMessages().getWeek() : plugin.getMessages().getWeeks());
+                }
                 if (d > 0) {
+                    if (!sb.toString().isEmpty()) {
+                        sb.append(", ");
+                    }
                     sb.append(d).append(" ").append(d == 1 ? plugin.getMessages().getDay() : plugin.getMessages().getDays());
                 }
                 if (h > 0) {
@@ -63,7 +97,13 @@ public class MessageUtils {
                 }
                 break;
             case SHORT:
+                if (w > 0) {
+                    sb.append(w).append(plugin.getMessages().getWeeks().charAt(0));
+                }
                 if (d > 0) {
+                    if (!sb.toString().isEmpty()) {
+                        sb.append(", ");
+                    }
                     sb.append(d).append(plugin.getMessages().getDays().charAt(0));
                 }
                 if (h > 0) {
@@ -86,7 +126,7 @@ public class MessageUtils {
                 }
                 break;
             case DIGITAL:
-                sb.append(d > 9 ? d : "0" + d).append(":").append(h > 9 ? h : "0" + h).append(":").append(m > 9 ? m : "0" + m).append(":").append(s > 9 ? s : "0" + s);
+                sb.append(w > 9 ? w : "0" + w).append(d > 9 ? d : "0" + d).append(":").append(h > 9 ? h : "0" + h).append(":").append(m > 9 ? m : "0" + m).append(":").append(s > 9 ? s : "0" + s);
                 break;
         }
 

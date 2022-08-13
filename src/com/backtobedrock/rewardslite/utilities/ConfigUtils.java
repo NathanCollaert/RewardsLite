@@ -1,10 +1,7 @@
 package com.backtobedrock.rewardslite.utilities;
 
 import com.backtobedrock.rewardslite.Rewardslite;
-import com.backtobedrock.rewardslite.domain.enumerations.CountPrevious;
-import com.backtobedrock.rewardslite.domain.enumerations.NotificationType;
-import com.backtobedrock.rewardslite.domain.enumerations.RewardStatus;
-import com.backtobedrock.rewardslite.domain.enumerations.StorageType;
+import com.backtobedrock.rewardslite.domain.enumerations.*;
 import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -122,6 +119,17 @@ public class ConfigUtils {
             }
         } catch (IllegalArgumentException e) {
             sendErrorMessage(String.format("%s: %s is not an existing count previous option.", id, countPrevious));
+        }
+        return null;
+    }
+
+    public static TimeUnit getTimeUnit(String id, String timeUnit) {
+        try {
+            if (timeUnit != null) {
+                return TimeUnit.valueOf(timeUnit.toUpperCase());
+            }
+        } catch (IllegalArgumentException e) {
+            sendErrorMessage(String.format("%s: %s is not an existing time unit option.", id, timeUnit));
         }
         return null;
     }
