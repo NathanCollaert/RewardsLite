@@ -3,9 +3,11 @@ package com.backtobedrock.rewardslite.mappers.player;
 import com.backtobedrock.rewardslite.domain.Reward;
 import com.backtobedrock.rewardslite.domain.RewardData;
 import com.backtobedrock.rewardslite.domain.data.PlayerData;
+import com.backtobedrock.rewardslite.domain.enumerations.MinecraftVersion;
 import com.backtobedrock.rewardslite.mappers.AbstractMapper;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Statistic;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -125,8 +127,10 @@ public class MySQLPlayerMapper extends AbstractMapper implements IPlayerMapper {
             ResultSet resultSet = preparedStatement.executeQuery();
             Map<String, Long> topMap = new LinkedHashMap<>();
             while (resultSet.next()) {
-                String playerName = Bukkit.getOfflinePlayer(UUID.fromString(resultSet.getString("player_uuid"))).getName();
-                topMap.put(playerName == null ? resultSet.getString("player_uuid") : playerName, resultSet.getLong("playtime"));
+                OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(resultSet.getString("player_uuid")));
+                MinecraftVersion minecraftVersion = MinecraftVersion.get();
+                long playtime = this.plugin.getConfigurations().getGeneralConfiguration().isCountPreviousTowardsPlaytime() && minecraftVersion != null && minecraftVersion.greaterThanOrEqualTo(MinecraftVersion.v1_16) ? player.getStatistic(Statistic.PLAY_ONE_MINUTE) - resultSet.getLong("afk_time") : resultSet.getLong("playtime");
+                topMap.put(player.getName() == null ? resultSet.getString("player_uuid") : player.getName(), playtime);
             }
             return getSortedMap(limit, topMap);
         } catch (SQLException e) {
@@ -141,8 +145,10 @@ public class MySQLPlayerMapper extends AbstractMapper implements IPlayerMapper {
             ResultSet resultSet = preparedStatement.executeQuery();
             Map<String, Long> topMap = new LinkedHashMap<>();
             while (resultSet.next()) {
-                String playerName = Bukkit.getOfflinePlayer(UUID.fromString(resultSet.getString("player_uuid"))).getName();
-                topMap.put(playerName == null ? resultSet.getString("player_uuid") : playerName, resultSet.getLong("playtime") + resultSet.getLong("afk_time"));
+                OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(resultSet.getString("player_uuid")));
+                MinecraftVersion minecraftVersion = MinecraftVersion.get();
+                long totalTime = this.plugin.getConfigurations().getGeneralConfiguration().isCountPreviousTowardsPlaytime() && minecraftVersion != null && minecraftVersion.greaterThanOrEqualTo(MinecraftVersion.v1_16) ? player.getStatistic(Statistic.PLAY_ONE_MINUTE) : resultSet.getLong("playtime") + resultSet.getLong("afk_time");
+                topMap.put(player.getName() == null ? resultSet.getString("player_uuid") : player.getName(), totalTime);
             }
             return getSortedMap(limit, topMap);
         } catch (SQLException e) {

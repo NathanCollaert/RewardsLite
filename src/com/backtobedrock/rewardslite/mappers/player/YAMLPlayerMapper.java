@@ -4,8 +4,10 @@ import com.backtobedrock.rewardslite.Rewardslite;
 import com.backtobedrock.rewardslite.domain.Reward;
 import com.backtobedrock.rewardslite.domain.RewardData;
 import com.backtobedrock.rewardslite.domain.data.PlayerData;
+import com.backtobedrock.rewardslite.domain.enumerations.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Statistic;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -113,8 +115,10 @@ public class YAMLPlayerMapper implements IPlayerMapper {
                 List<Path> result = walk.filter(Files::isRegularFile).collect(Collectors.toList());
                 result.forEach(e -> {
                     FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(e.toFile());
-                    String playerName = Bukkit.getOfflinePlayer(UUID.fromString(e.getFileName().toString().replaceAll(".yml", ""))).getName();
-                    topMap.put(playerName == null ? e.getFileName().toString().replaceAll(".yml", "") : playerName, fileConfiguration.getLong("playtime", 0));
+                    OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(e.getFileName().toString().replaceAll(".yml", "")));
+                    MinecraftVersion minecraftVersion = MinecraftVersion.get();
+                    long playtime = this.plugin.getConfigurations().getGeneralConfiguration().isCountPreviousTowardsPlaytime() && minecraftVersion != null && minecraftVersion.greaterThanOrEqualTo(MinecraftVersion.v1_16) ? player.getStatistic(Statistic.PLAY_ONE_MINUTE) - fileConfiguration.getLong("afk_time", 0) : fileConfiguration.getLong("playtime", 0);
+                    topMap.put(player.getName() == null ? e.getFileName().toString().replaceAll(".yml", "") : player.getName(), playtime);
                 });
             } catch (IOException e) {
                 this.plugin.getLogger().log(Level.SEVERE, e.getMessage());
@@ -132,8 +136,10 @@ public class YAMLPlayerMapper implements IPlayerMapper {
                 List<Path> result = walk.filter(Files::isRegularFile).collect(Collectors.toList());
                 result.forEach(e -> {
                     FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(e.toFile());
-                    String playerName = Bukkit.getOfflinePlayer(UUID.fromString(e.getFileName().toString().replaceAll(".yml", ""))).getName();
-                    topMap.put(playerName == null ? e.getFileName().toString().replaceAll(".yml", "") : playerName, fileConfiguration.getLong("playtime", 0) + fileConfiguration.getLong("afkTime", 0));
+                    OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(e.getFileName().toString().replaceAll(".yml", "")));
+                    MinecraftVersion minecraftVersion = MinecraftVersion.get();
+                    long totalTime = this.plugin.getConfigurations().getGeneralConfiguration().isCountPreviousTowardsPlaytime() && minecraftVersion != null && minecraftVersion.greaterThanOrEqualTo(MinecraftVersion.v1_16) ? player.getStatistic(Statistic.PLAY_ONE_MINUTE) : fileConfiguration.getLong("playtime", 0) + fileConfiguration.getLong("afk_time", 0);
+                    topMap.put(player.getName() == null ? e.getFileName().toString().replaceAll(".yml", "") : player.getName(), totalTime);
                 });
             } catch (IOException e) {
                 this.plugin.getLogger().log(Level.SEVERE, e.getMessage());
