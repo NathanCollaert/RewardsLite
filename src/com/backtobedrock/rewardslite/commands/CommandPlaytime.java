@@ -19,9 +19,11 @@ public class CommandPlaytime extends AbstractCommand {
     public void execute() {
         MinecraftVersion minecraftVersion = MinecraftVersion.get();
         this.setCommandParameters(this.args.length == 0, minecraftVersion != null && minecraftVersion.lessThanOrEqualTo(MinecraftVersion.v1_15), 0, 1, this.args.length == 1 ? String.format("%s.playtime.other", this.plugin.getName().toLowerCase()) : null, 0);
-        if (this.canExecute()) {
-            this.showPlaytime(this.target == null ? this.sender : this.target, minecraftVersion != null && minecraftVersion.lessThanOrEqualTo(MinecraftVersion.v1_15) ? this.onlineTarget : null, minecraftVersion);
-        }
+        this.canExecute().thenAcceptAsync(canExecute -> {
+            if (canExecute) {
+                this.showPlaytime(this.target == null ? this.sender : this.target, minecraftVersion != null && minecraftVersion.lessThanOrEqualTo(MinecraftVersion.v1_15) ? this.onlineTarget : null, minecraftVersion);
+            }
+        });
     }
 
     private void showPlaytime(OfflinePlayer commandTarget, Player onlineCommandTarget, MinecraftVersion minecraftVersion) {

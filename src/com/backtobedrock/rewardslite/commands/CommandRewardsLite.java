@@ -28,33 +28,43 @@ public class CommandRewardsLite extends AbstractCommand {
             switch (this.args[0].toLowerCase()) {
                 case "reload":
                     this.setCommandParameters(false, false, 1, 1, String.format("%s.reload", this.plugin.getName().toLowerCase()), -1);
-                    if (canExecute()) {
-                        this.executeReload();
-                    }
+                    this.canExecute().thenAcceptAsync(canExecute -> {
+                        if (canExecute) {
+                            this.executeReload();
+                        }
+                    });
                     break;
                 case "help":
                     this.setCommandParameters(false, false, 1, 1, String.format("%s.help", this.plugin.getName().toLowerCase()), -1);
-                    if (canExecute()) {
-                        this.executeHelp();
-                    }
+                    this.canExecute().thenAcceptAsync(canExecute -> {
+                        if (canExecute) {
+                            this.executeHelp();
+                        }
+                    });
                     break;
                 case "convert":
                     this.setCommandParameters(true, false, 1, 1, String.format("%s.convert", this.plugin.getName().toLowerCase()), -1);
-                    if (canExecute()) {
-                        this.executeConvert();
-                    }
+                    this.canExecute().thenAcceptAsync(canExecute -> {
+                        if (canExecute) {
+                            this.executeConvert();
+                        }
+                    });
                     break;
                 case "give":
                     this.setCommandParameters(false, true, 3, 4, String.format("%s.givereward", this.plugin.getName().toLowerCase()), 1);
-                    if (canExecute()) {
-                        this.executeGive();
-                    }
+                    this.canExecute().thenAcceptAsync(canExecute -> {
+                        if (canExecute) {
+                            this.executeGive();
+                        }
+                    });
                     break;
                 case "reset":
                     this.setCommandParameters(false, false, 3, 3, String.format("%s.reset", this.plugin.getName().toLowerCase()), this.args.length > 1 && this.args[1].equals("*") ? -1 : 1);
-                    if (canExecute()) {
-                        this.executeReset();
-                    }
+                    this.canExecute().thenAcceptAsync(canExecute -> {
+                        if (canExecute) {
+                            this.executeReset();
+                        }
+                    });
                     break;
             }
         }
@@ -81,7 +91,6 @@ public class CommandRewardsLite extends AbstractCommand {
         if (this.args[1].equals("*")) {
             this.plugin.getPlayerRepository().getAll().thenAcceptAsync(playerData -> {
                 playerData.forEach(p -> p.resetRewards(finalRewards));
-                this.plugin.getPlayerRepository().onReload();
                 this.cs.sendMessage(this.plugin.getMessages().getResetSuccess(finalRewards.size() > 1 ? this.plugin.getMessages().getAllRewards() : finalRewards.get(0).getPermissionId(), this.plugin.getMessages().getEveryone()));
             });
         } else {

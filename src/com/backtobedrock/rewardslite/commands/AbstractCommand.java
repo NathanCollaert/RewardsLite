@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractCommand {
 
@@ -44,25 +45,27 @@ public abstract class AbstractCommand {
         this.targetArgumentPosition = targetArgumentPosition;
     }
 
-    public boolean canExecute() {
-        if ((this.externalPermission != null && !this.cs.hasPermission(this.externalPermission)) || !this.hasPermission()) {
-            return false;
-        }
+    public CompletableFuture<Boolean> canExecute() {
+        return CompletableFuture.supplyAsync(() -> {
+            if ((this.externalPermission != null && !this.cs.hasPermission(this.externalPermission)) || !this.hasPermission()) {
+                return false;
+            }
 
-        if (this.requiresOnlineSender && !this.isSenderOnline()) {
-            return false;
-        }
+            if (this.requiresOnlineSender && !this.isSenderOnline()) {
+                return false;
+            }
 
-        if (this.args.length < this.minRequiredArguments || this.args.length > this.maxRequiredArguments) {
-            this.sendUsageMessage();
-            return false;
-        }
+            if (this.args.length < this.minRequiredArguments || this.args.length > this.maxRequiredArguments) {
+                this.sendUsageMessage();
+                return false;
+            }
 
-        if (this.targetArgumentPosition != -1 && this.args.length > this.targetArgumentPosition && !this.hasPlayedBefore(this.args[this.targetArgumentPosition])) {
-            return false;
-        }
+            if (this.targetArgumentPosition != -1 && this.args.length > this.targetArgumentPosition && !this.hasPlayedBefore(this.args[this.targetArgumentPosition])) {
+                return false;
+            }
 
-        return !this.requiresOnlineTarget || this.isTargetOnline();
+            return !this.requiresOnlineTarget || this.isTargetOnline();
+        });
     }
 
     public abstract void execute();
