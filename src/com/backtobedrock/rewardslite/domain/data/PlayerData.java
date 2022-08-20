@@ -63,14 +63,16 @@ public class PlayerData {
         this.plugin.getPlayerRepository().updatePlayerData(this);
     }
 
-    public void onReload(Player player) {
+    public void onReload() {
         List<RewardData> rewardsData = new ArrayList<>();
         this.plugin.getRewardsRepository().getAll().forEach(r -> {
             RewardData rewardData = this.rewards.stream().filter(rd -> rd.getUuid().equals(r.getUuid())).findFirst().orElse(null);
             rewardsData.add(rewardData != null ? new RewardData(r, rewardData) : new RewardData(r));
         });
         this.setRewards(rewardsData);
-        this.onJoin(player);
+        if (this.player.getPlayer() != null) {
+            this.onJoin(this.player.getPlayer());
+        }
         this.observers.forEach((key, value) -> value.get(RewardsObserver.class).update());
     }
 
@@ -168,6 +170,6 @@ public class PlayerData {
         if (this.plugin.getPlayerRepository().doesCacheContainPlayer(this.getPlayer().getUniqueId())) {
             this.plugin.getPlayerRepository().setInPlayerCache(this);
         }
-        this.plugin.getPlayerRepository().updatePlayerData(this);
+        this.onReload();
     }
 }

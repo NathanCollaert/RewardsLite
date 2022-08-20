@@ -19,7 +19,9 @@ public class RewardRepository {
     public RewardRepository() {
         this.plugin = JavaPlugin.getPlugin(Rewardslite.class);
         this.initializeMapper();
-        this.plugin.getLogger().log(Level.INFO, "Loaded {0} {1}.", new Object[]{this.getAll().size(), this.getAll().size() == 1 ? "reward" : "rewards"});
+        if (this.getAll() != null && this.plugin.isEnabled()) {
+            this.plugin.getLogger().log(Level.INFO, "Loaded {0} {1}.", new Object[]{this.getAll().size(), this.getAll().size() == 1 ? "reward" : "rewards"});
+        }
     }
 
     private void initializeMapper() {
@@ -51,5 +53,9 @@ public class RewardRepository {
 
     public void clearRewardsCache() {
         this.rewards = null;
+    }
+
+    public void onReload() {
+        this.clearRewardsCache();
     }
 }

@@ -126,7 +126,7 @@ public class MessageUtils {
                 }
                 break;
             case DIGITAL:
-                sb.append(w > 9 ? w : "0" + w).append(d > 9 ? d : "0" + d).append(":").append(h > 9 ? h : "0" + h).append(":").append(m > 9 ? m : "0" + m).append(":").append(s > 9 ? s : "0" + s);
+                sb.append(w > 9 ? w : "0" + w).append(":").append(d > 9 ? d : "0" + d).append(":").append(h > 9 ? h : "0" + h).append(":").append(m > 9 ? m : "0" + m).append(":").append(s > 9 ? s : "0" + s);
                 break;
         }
 

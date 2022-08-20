@@ -43,7 +43,7 @@ includedRewards:
 #   FILENAME: Compare rewards by file name alphabetically (a->z)
 #   FILENAME_REVERSED: Compare rewards by file name reversed alphabetically (z->a)
 #   TITLE: Compare rewards by display title alphabetically (a->z)
-#   TITLE: Compare rewards by display title reversed alphabetically (z->a)
+#   TITLE_REVERSED: Compare rewards by display title reversed alphabetically (z->a)
 #   STATUS: Compare rewards by status (INELIGIBLE -> ELIGIBLE ->  FINISHED)
 #   STATUS_REVERSED: Compare rewards by reversed status (FINISHED -> ELIGIBLE -> INELIGIBLE)
 #   TIME_REQUIRED: Compare rewards by time required ascending (0 -> n)

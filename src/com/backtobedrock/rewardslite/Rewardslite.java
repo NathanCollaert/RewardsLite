@@ -39,7 +39,6 @@ public final class Rewardslite extends JavaPlugin {
     private final Map<Class<?>, AbstractEventListener> activeEventListeners = new HashMap<>();
     private final Map<UUID, AbstractInterface> openInterfaces = new HashMap<>();
     private UpdateChecker updateChecker;
-    private boolean stopping = false;
 
     //configurations
     private Commands commands;
@@ -61,7 +60,6 @@ public final class Rewardslite extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        this.stopping = true;
         this.getServer().getOnlinePlayers().forEach(p -> this.playerRepository.updatePlayerData(this.playerRepository.getByPlayerSync(p)));
         super.onDisable();
     }
@@ -164,15 +162,25 @@ public final class Rewardslite extends JavaPlugin {
     }
 
     private void initializeRepositories() {
-        this.rewardsRepository = new RewardRepository();
         if (this.playerRepository == null) {
-            this.playerRepository = new PlayerRepository();
+            this.rewardsRepository = new RewardRepository();
+        } else {
+            this.rewardsRepository.onReload();
+        }
+        if (this.playerRepository == null) {
+            if (this.isEnabled()) {
+                this.playerRepository = new PlayerRepository();
+            }
         } else {
             this.playerRepository.onReload();
         }
     }
 
     private void registerListeners() {
+        if (!this.isEnabled()) {
+            return;
+        }
+
         Arrays.asList(
                 new ListenerCustomInventory(),
                 new ListenerPlayerJoin(),
@@ -203,10 +211,6 @@ public final class Rewardslite extends JavaPlugin {
 
     public PlayerRepository getPlayerRepository() {
         return playerRepository;
-    }
-
-    public boolean isStopping() {
-        return stopping;
     }
 
     public IEssentials getEssentials() {

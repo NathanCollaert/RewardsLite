@@ -184,7 +184,7 @@ public class YAMLPlayerMapper implements IPlayerMapper {
 
     @Override
     public void updatePlayerData(PlayerData playerData) {
-        if (this.plugin.isStopping()) {
+        if (!this.plugin.isEnabled()) {
             this.upsertPlayerData(playerData);
         } else {
             CompletableFuture
@@ -204,7 +204,7 @@ public class YAMLPlayerMapper implements IPlayerMapper {
 
     @Override
     public void updateRewardData(OfflinePlayer player, RewardData rewardData) {
-        if (this.plugin.isStopping()) {
+        if (!this.plugin.isEnabled()) {
             this.upsertReward(player, rewardData);
         } else {
             CompletableFuture

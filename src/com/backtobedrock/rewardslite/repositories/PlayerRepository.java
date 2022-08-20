@@ -34,7 +34,7 @@ public class PlayerRepository {
 
     public void onReload() {
         this.initializeMapper();
-        this.plugin.getServer().getOnlinePlayers().stream().filter(p -> this.playerCache.containsKey(p.getUniqueId())).forEach(p -> this.playerCache.get(p.getUniqueId()).onReload(p));
+        this.playerCache.values().forEach(PlayerData::onReload);
     }
 
     private void initializeMapper() {

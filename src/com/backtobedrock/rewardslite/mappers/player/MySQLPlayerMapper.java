@@ -44,8 +44,7 @@ public class MySQLPlayerMapper extends AbstractMapper implements IPlayerMapper {
 
     @Override
     public CompletableFuture<List<PlayerData>> getAll() {
-        return CompletableFuture
-                .supplyAsync(this::getAllSync)
+        return CompletableFuture.supplyAsync(this::getAllSync)
                 .exceptionally(ex -> {
                     ex.printStackTrace();
                     return null;
@@ -223,7 +222,7 @@ public class MySQLPlayerMapper extends AbstractMapper implements IPlayerMapper {
 
     @Override
     public void updatePlayerData(PlayerData playerData) {
-        if (this.plugin.isStopping()) {
+        if (!this.plugin.isEnabled()) {
             this.upsertPlayerData(playerData);
         } else {
             CompletableFuture.runAsync(() -> this.upsertPlayerData(playerData))
@@ -236,7 +235,7 @@ public class MySQLPlayerMapper extends AbstractMapper implements IPlayerMapper {
 
     @Override
     public void updateRewardData(OfflinePlayer player, RewardData rewardData) {
-        if (this.plugin.isStopping()) {
+        if (!this.plugin.isEnabled()) {
             this.upsertRewardData(player.getUniqueId(), rewardData);
         } else {
             CompletableFuture.runAsync(() -> this.upsertRewardData(player.getUniqueId(), rewardData))
@@ -329,7 +328,7 @@ public class MySQLPlayerMapper extends AbstractMapper implements IPlayerMapper {
     }
 
     private String getTopPlaytime() {
-        return "SELECT player_uuid, playtime "
+        return "SELECT player_uuid, playtime, afk_time "
                 + "FROM rl_player;";
     }
 

@@ -36,13 +36,19 @@ public class YAMLRewardMapper extends AbstractMapper implements IRewardMapper {
     public List<Reward> getAll() {
         List<Reward> rewards = new ArrayList<>();
         try (Stream<Path> walk = Files.walk(this.getDirectory().toPath())) {
-            List<Path> result = walk.filter(Files::isRegularFile).collect(Collectors.toList());
-            result.forEach(e -> {
-                Reward reward = this.getPlaytimeRewardFromFile(e.toFile());
+            for (Path path : walk.filter(Files::isRegularFile).collect(Collectors.toList())) {
+                Reward reward = this.getPlaytimeRewardFromFile(path.toFile());
                 if (reward != null) {
-                    rewards.add(reward);
+                    Reward duplicate = rewards.stream().filter(r -> r.getUuid().equals(reward.getUuid())).findFirst().orElse(null);
+                    if (duplicate == null) {
+                        rewards.add(reward);
+                    } else {
+                        this.plugin.getLogger().log(Level.SEVERE, String.format("Found duplicate UUID on rewards %s.yml and %s.yml. Please make sure you have removed the generated section from all newly created rewards. %s has been disabled to prevent player data corruption and progress loss.", reward.getFileName(), duplicate.getFileName(), this.plugin.getName()));
+                        this.plugin.getPluginLoader().disablePlugin(this.plugin);
+                        break;
+                    }
                 }
-            });
+            }
         } catch (IOException e) {
             this.plugin.getLogger().log(Level.SEVERE, e.getMessage());
         }
