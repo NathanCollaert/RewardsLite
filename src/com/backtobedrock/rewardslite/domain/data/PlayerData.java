@@ -105,9 +105,9 @@ public class PlayerData {
         return afkTime;
     }
 
-    public List<RewardData> getViewableRewards() {
+    public List<RewardData> getViewableRewards(OfflinePlayer player) {
         Comparator<RewardData> rewardDataComparator = null;
-        for (Comparator<RewardData> comparator : this.plugin.getConfigurations().getGeneralConfiguration().getRewardsOrdering().stream().map(r -> r.getComparator(this.player)).collect(Collectors.toList())) {
+        for (Comparator<RewardData> comparator : this.plugin.getConfigurations().getGeneralConfiguration().getRewardsOrdering().stream().map(r -> r.getComparator(player)).collect(Collectors.toList())) {
             if (rewardDataComparator == null) {
                 rewardDataComparator = comparator;
             } else {
@@ -115,7 +115,7 @@ public class PlayerData {
             }
         }
         return this.rewards.stream()
-                .filter(r -> this.plugin.getConfigurations().getGeneralConfiguration().getIncludedRewards().contains(RewardStatus.getRewardStatus(r, this.player)))
+                .filter(r -> this.plugin.getConfigurations().getGeneralConfiguration().getIncludedRewards().contains(RewardStatus.getRewardStatus(r, player)))
                 .sorted(rewardDataComparator)
                 .collect(Collectors.toList());
     }

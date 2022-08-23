@@ -23,7 +23,7 @@ public class CommandRewards extends AbstractCommand {
 
     private void openRewardsGUI(OfflinePlayer commandTarget) {
         this.plugin.getPlayerRepository().getByPlayer(commandTarget)
-                .thenAcceptAsync(playerData -> PlayerUtils.openInventory(this.sender, new InterfaceRewards(this.sender, playerData)))
+                .thenAcceptAsync(playerData -> PlayerUtils.openInventory(this.sender, new InterfaceRewards(this.sender, commandTarget, playerData)))
                 .exceptionally(ex -> {
                     ex.printStackTrace();
                     return null;

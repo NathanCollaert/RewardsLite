@@ -15,6 +15,6 @@ public class RewardsObserver implements IObserver {
 
     @Override
     public void update() {
-        PlayerUtils.openInventory(this.iface.getSender(), new InterfaceRewards(this.iface.getSender(), this.playerData));
+        PlayerUtils.openInventory(this.iface.getSender(), new InterfaceRewards(this.iface.getSender(), this.iface.getTarget(), this.playerData));
     }
 }

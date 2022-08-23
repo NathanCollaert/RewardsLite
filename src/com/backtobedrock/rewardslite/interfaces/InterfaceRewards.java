@@ -7,6 +7,7 @@ import com.backtobedrock.rewardslite.domain.RewardData;
 import com.backtobedrock.rewardslite.domain.data.PlayerData;
 import com.backtobedrock.rewardslite.interfaces.clickActions.AbstractClickAction;
 import com.backtobedrock.rewardslite.interfaces.clickActions.ClickActionRedeemReward;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,15 +20,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InterfaceRewards extends AbstractPaginatedInterface {
     private final Player sender;
+    private final OfflinePlayer target;
     private final PlayerData playerData;
     private Map<UUID, Integer> rewards;
     private final List<RewardData> viewableRewards;
 
-    public InterfaceRewards(Player sender, PlayerData playerData) {
-        super(new CustomHolder(playerData.getViewableRewards().size(), JavaPlugin.getPlugin(Rewardslite.class).getConfigurations().getInterfacesConfiguration().getRewardsInterfaceTitle(playerData.getPlayer().getName())), playerData.getViewableRewards().size());
+    public InterfaceRewards(Player sender, OfflinePlayer target, PlayerData playerData) {
+        super(new CustomHolder(playerData.getViewableRewards(target).size(), JavaPlugin.getPlugin(Rewardslite.class).getConfigurations().getInterfacesConfiguration().getRewardsInterfaceTitle(playerData.getPlayer().getName())), playerData.getViewableRewards(target).size());
         this.sender = sender;
+        this.target = target;
         this.playerData = playerData;
-        this.viewableRewards = playerData.getViewableRewards();
+        this.viewableRewards = playerData.getViewableRewards(target);
         this.initialize();
     }
 
@@ -89,5 +92,9 @@ public class InterfaceRewards extends AbstractPaginatedInterface {
 
     public Player getSender() {
         return sender;
+    }
+
+    public OfflinePlayer getTarget() {
+        return target;
     }
 }
