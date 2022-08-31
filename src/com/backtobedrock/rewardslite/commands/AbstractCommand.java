@@ -21,13 +21,13 @@ public abstract class AbstractCommand {
     protected OfflinePlayer target = null;
     protected Player onlineTarget = null;
 
-    protected boolean requiresOnlineSender;
-    protected boolean requiresOnlineTarget;
-    protected int minRequiredArguments;
-    protected int maxRequiredArguments;
+    protected boolean requiresOnlineSender = false;
+    protected boolean requiresOnlineTarget = false;
+    protected int minRequiredArguments = 0;
+    protected int maxRequiredArguments = 0;
 
-    protected String externalPermission;
-    protected int targetArgumentPosition;
+    protected String externalPermission = null;
+    protected int targetArgumentPosition = -1;
 
     public AbstractCommand(CommandSender cs, Command command, String[] args) {
         this.plugin = JavaPlugin.getPlugin(Rewardslite.class);
@@ -36,18 +36,9 @@ public abstract class AbstractCommand {
         this.args = args;
     }
 
-    public void setCommandParameters(boolean requiresOnlineSender, boolean requiresOnlineTarget, int minRequiredArguments, int maxRequiredArguments, String externalPermission, int targetArgumentPosition) {
-        this.requiresOnlineSender = requiresOnlineSender;
-        this.requiresOnlineTarget = requiresOnlineTarget;
-        this.minRequiredArguments = minRequiredArguments;
-        this.maxRequiredArguments = maxRequiredArguments;
-        this.externalPermission = externalPermission;
-        this.targetArgumentPosition = targetArgumentPosition;
-    }
-
     public CompletableFuture<Boolean> canExecute() {
         return CompletableFuture.supplyAsync(() -> {
-            if ((this.externalPermission != null && !this.cs.hasPermission(this.externalPermission)) || !this.hasPermission()) {
+            if (!this.hasPermission()) {
                 return false;
             }
 
@@ -65,12 +56,22 @@ public abstract class AbstractCommand {
             }
 
             return !this.requiresOnlineTarget || this.isTargetOnline();
+        }).exceptionally(ex -> {
+            ex.printStackTrace();
+            return null;
         });
     }
 
     public abstract void execute();
 
     protected boolean hasPermission() {
+        if (this.externalPermission != null) {
+            boolean hasPermission = this.cs.hasPermission(this.externalPermission);
+            if (!hasPermission) {
+                this.cs.sendMessage(this.plugin.getMessages().getNoPermissionError());
+            }
+            return hasPermission;
+        }
         return this.command.testPermission(this.cs);
     }
 
@@ -79,7 +80,7 @@ public abstract class AbstractCommand {
             this.cs.sendMessage(this.plugin.getMessages().getRequireOnlinePlayerError());
             return false;
         }
-        this.sender = (Player) cs;
+        this.sender = (Player) this.cs;
         return true;
     }
 
@@ -110,5 +111,35 @@ public abstract class AbstractCommand {
     public void sendUsageMessage() {
         String[] message = new String[]{this.plugin.getMessages().getCommandUsageHeader(), CommandUtils.getFancyVersion(this.command), this.plugin.getMessages().getCommandUsageFooter()};
         this.cs.sendMessage(message);
+    }
+
+    public AbstractCommand setRequiresOnlineSender(boolean requiresOnlineSender) {
+        this.requiresOnlineSender = requiresOnlineSender;
+        return this;
+    }
+
+    public AbstractCommand setRequiresOnlineTarget(boolean requiresOnlineTarget) {
+        this.requiresOnlineTarget = requiresOnlineTarget;
+        return this;
+    }
+
+    public AbstractCommand setMinRequiredArguments(int minRequiredArguments) {
+        this.minRequiredArguments = minRequiredArguments;
+        return this;
+    }
+
+    public AbstractCommand setMaxRequiredArguments(int maxRequiredArguments) {
+        this.maxRequiredArguments = maxRequiredArguments;
+        return this;
+    }
+
+    public AbstractCommand setExternalPermission(String externalPermission) {
+        this.externalPermission = externalPermission;
+        return this;
+    }
+
+    public AbstractCommand setTargetArgumentPosition(int targetArgumentPosition) {
+        this.targetArgumentPosition = targetArgumentPosition;
+        return this;
     }
 }

@@ -1,5 +1,6 @@
 package com.backtobedrock.rewardslite.configurations.sections;
 
+import com.backtobedrock.rewardslite.domain.enumerations.MinecraftVersion;
 import com.backtobedrock.rewardslite.domain.enumerations.RewardStatus;
 import com.backtobedrock.rewardslite.domain.enumerations.RewardsOrder;
 import com.backtobedrock.rewardslite.domain.enumerations.TimeUnit;
@@ -26,7 +27,8 @@ public class ConfigurationGeneral {
     }
 
     public static ConfigurationGeneral deserialize(ConfigurationSection section) {
-        boolean cCountPreviousTowardsPlaytime = section.getBoolean("countPreviousTowardsPlaytime", true);
+        MinecraftVersion minecraftVersion = MinecraftVersion.get();
+        boolean cCountPreviousTowardsPlaytime = minecraftVersion != null && minecraftVersion.greaterThanOrEqualTo(MinecraftVersion.v1_13) && section.getBoolean("countPreviousTowardsPlaytime", true);
         List<RewardStatus> cIncludedRewards = section.getStringList("includedRewards").stream().map(s -> ConfigUtils.getRewardStatus("includedRewards", s)).collect(Collectors.toList());
         List<RewardsOrder> cRewardsOrdering = section.getStringList("rewardsOrdering").stream().map(r -> ConfigUtils.getRewardOrder("rewardsOrdering", r)).collect(Collectors.toList());
         int cTopCommandLimit = section.getInt("topCommandsLimit", 10);

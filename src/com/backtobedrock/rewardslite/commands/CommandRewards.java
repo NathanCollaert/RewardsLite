@@ -13,12 +13,19 @@ public class CommandRewards extends AbstractCommand {
 
     @Override
     public void execute() {
-        this.setCommandParameters(true, false, 0, 1, this.args.length == 1 ? String.format("%s.rewards.other", this.plugin.getName().toLowerCase()) : null, 0);
-        this.canExecute().thenAcceptAsync(canExecute -> {
-            if (canExecute) {
-                this.openRewardsGUI(this.args.length == 1 ? this.target : this.sender);
-            }
-        });
+        this.setRequiresOnlineSender(true)
+                .setMaxRequiredArguments(1)
+                .setExternalPermission(this.args.length == 1 ? String.format("%s.rewards.other", this.plugin.getName().toLowerCase()) : null)
+                .setTargetArgumentPosition(0)
+                .canExecute()
+                .thenAcceptAsync(canExecute -> {
+                    if (canExecute) {
+                        this.openRewardsGUI(this.args.length == 1 ? this.target : this.sender);
+                    }
+                }).exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
     }
 
     private void openRewardsGUI(OfflinePlayer commandTarget) {

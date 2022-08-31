@@ -61,7 +61,7 @@ public class PlaceholdersRewardsLite extends PlaceholderExpansion {
 
                 //playtime
                 if (Arrays.asList("playtime_long", "playtime_short", "playtime_digital").contains(identifier)) {
-                    long playtime = plugin.getConfigurations().getGeneralConfiguration().isCountPreviousTowardsPlaytime() && minecraftVersion != null && minecraftVersion.greaterThanOrEqualTo(MinecraftVersion.v1_13)
+                    long playtime = plugin.getConfigurations().getGeneralConfiguration().isCountPreviousTowardsPlaytime()
                             ? Math.min(onlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE) - playerData.getAfkTime(), onlinePlayer.getStatistic(Statistic.PLAY_ONE_MINUTE))
                             : playerData.getPlaytime();
                     switch (identifier) {

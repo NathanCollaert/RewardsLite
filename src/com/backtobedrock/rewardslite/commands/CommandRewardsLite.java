@@ -27,44 +27,78 @@ public class CommandRewardsLite extends AbstractCommand {
         } else {
             switch (this.args[0].toLowerCase()) {
                 case "reload":
-                    this.setCommandParameters(false, false, 1, 1, String.format("%s.reload", this.plugin.getName().toLowerCase()), -1);
-                    this.canExecute().thenAcceptAsync(canExecute -> {
-                        if (canExecute) {
-                            this.executeReload();
-                        }
-                    });
+                    this.setMinRequiredArguments(1)
+                            .setMaxRequiredArguments(1)
+                            .setExternalPermission(String.format("%s.reload", this.plugin.getName().toLowerCase()))
+                            .canExecute()
+                            .thenAcceptAsync(canExecute -> {
+                                if (canExecute) {
+                                    this.executeReload();
+                                }
+                            }).exceptionally(ex -> {
+                                ex.printStackTrace();
+                                return null;
+                            });
                     break;
                 case "help":
-                    this.setCommandParameters(false, false, 1, 1, String.format("%s.help", this.plugin.getName().toLowerCase()), -1);
-                    this.canExecute().thenAcceptAsync(canExecute -> {
-                        if (canExecute) {
-                            this.executeHelp();
-                        }
-                    });
+                    this.setMinRequiredArguments(1)
+                            .setMaxRequiredArguments(1)
+                            .setExternalPermission(String.format("%s.help", this.plugin.getName().toLowerCase()))
+                            .canExecute()
+                            .thenAcceptAsync(canExecute -> {
+                                if (canExecute) {
+                                    this.executeHelp();
+                                }
+                            }).exceptionally(ex -> {
+                                ex.printStackTrace();
+                                return null;
+                            });
                     break;
                 case "convert":
-                    this.setCommandParameters(true, false, 1, 1, String.format("%s.convert", this.plugin.getName().toLowerCase()), -1);
-                    this.canExecute().thenAcceptAsync(canExecute -> {
-                        if (canExecute) {
-                            this.executeConvert();
-                        }
-                    });
+                    this.setRequiresOnlineSender(true)
+                            .setMinRequiredArguments(1)
+                            .setMaxRequiredArguments(1)
+                            .setExternalPermission(String.format("%s.convert", this.plugin.getName().toLowerCase()))
+                            .canExecute()
+                            .thenAcceptAsync(canExecute -> {
+                                if (canExecute) {
+                                    this.executeConvert();
+                                }
+                            }).exceptionally(ex -> {
+                                ex.printStackTrace();
+                                return null;
+                            });
                     break;
                 case "give":
-                    this.setCommandParameters(false, true, 3, 4, String.format("%s.givereward", this.plugin.getName().toLowerCase()), 1);
-                    this.canExecute().thenAcceptAsync(canExecute -> {
-                        if (canExecute) {
-                            this.executeGive();
-                        }
-                    });
+                    this.setRequiresOnlineTarget(true)
+                            .setMinRequiredArguments(3)
+                            .setMaxRequiredArguments(4)
+                            .setExternalPermission(String.format("%s.givereward", this.plugin.getName().toLowerCase()))
+                            .setTargetArgumentPosition(1)
+                            .canExecute()
+                            .thenAcceptAsync(canExecute -> {
+                                if (canExecute) {
+                                    this.executeGive();
+                                }
+                            }).exceptionally(ex -> {
+                                ex.printStackTrace();
+                                return null;
+                            });
                     break;
                 case "reset":
-                    this.setCommandParameters(false, false, 3, 3, String.format("%s.reset", this.plugin.getName().toLowerCase()), this.args.length > 1 && this.args[1].equals("*") ? -1 : 1);
-                    this.canExecute().thenAcceptAsync(canExecute -> {
-                        if (canExecute) {
-                            this.executeReset();
-                        }
-                    });
+                    this.setMinRequiredArguments(3)
+                            .setMaxRequiredArguments(3)
+                            .setExternalPermission(String.format("%s.reset", this.plugin.getName().toLowerCase()))
+                            .setTargetArgumentPosition(this.args.length > 1 && this.args[1].equals("*") ? -1 : 1)
+                            .canExecute()
+                            .thenAcceptAsync(canExecute -> {
+                                if (canExecute) {
+                                    this.executeReset();
+                                }
+                            }).exceptionally(ex -> {
+                                ex.printStackTrace();
+                                return null;
+                            });
                     break;
             }
         }
@@ -131,8 +165,11 @@ public class CommandRewardsLite extends AbstractCommand {
     }
 
     private void executeReload() {
-        this.plugin.initialize();
-        this.cs.sendMessage(this.plugin.getMessages().getReloadSuccess());
+        Bukkit.getScheduler().runTask(this.plugin, () -> {
+            this.plugin.initialize();
+            this.cs.sendMessage(this.plugin.getMessages().getReloadSuccess());
+        });
+
     }
 
     private void executeHelp() {

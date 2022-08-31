@@ -117,7 +117,7 @@ public class YAMLPlayerMapper implements IPlayerMapper {
                     FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(e.toFile());
                     OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(e.getFileName().toString().replaceAll(".yml", "")));
                     MinecraftVersion minecraftVersion = MinecraftVersion.get();
-                    long playtime = this.plugin.getConfigurations().getGeneralConfiguration().isCountPreviousTowardsPlaytime() && minecraftVersion != null && minecraftVersion.greaterThanOrEqualTo(MinecraftVersion.v1_16) ? player.getStatistic(Statistic.PLAY_ONE_MINUTE) - fileConfiguration.getLong("afk_time", 0) : fileConfiguration.getLong("playtime", 0);
+                    long playtime = this.plugin.getConfigurations().getGeneralConfiguration().isCountPreviousTowardsPlaytime() && minecraftVersion != null && minecraftVersion.greaterThanOrEqualTo(MinecraftVersion.v1_16) ? player.getStatistic(Statistic.PLAY_ONE_MINUTE) - fileConfiguration.getLong("afkTime", 0) : fileConfiguration.getLong("playtime", 0);
                     topMap.put(player.getName() == null ? e.getFileName().toString().replaceAll(".yml", "") : player.getName(), playtime);
                 });
             } catch (IOException e) {
@@ -138,7 +138,7 @@ public class YAMLPlayerMapper implements IPlayerMapper {
                     FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(e.toFile());
                     OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(e.getFileName().toString().replaceAll(".yml", "")));
                     MinecraftVersion minecraftVersion = MinecraftVersion.get();
-                    long totalTime = this.plugin.getConfigurations().getGeneralConfiguration().isCountPreviousTowardsPlaytime() && minecraftVersion != null && minecraftVersion.greaterThanOrEqualTo(MinecraftVersion.v1_16) ? player.getStatistic(Statistic.PLAY_ONE_MINUTE) : fileConfiguration.getLong("playtime", 0) + fileConfiguration.getLong("afk_time", 0);
+                    long totalTime = this.plugin.getConfigurations().getGeneralConfiguration().isCountPreviousTowardsPlaytime() && minecraftVersion != null && minecraftVersion.greaterThanOrEqualTo(MinecraftVersion.v1_16) ? player.getStatistic(Statistic.PLAY_ONE_MINUTE) : fileConfiguration.getLong("playtime", 0) + fileConfiguration.getLong("afkTime", 0);
                     topMap.put(player.getName() == null ? e.getFileName().toString().replaceAll(".yml", "") : player.getName(), totalTime);
                 });
             } catch (IOException e) {

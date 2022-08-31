@@ -89,6 +89,10 @@ public class MessagesConfiguration {
     //</editor-fold>
 
     //<editor-fold desc="Commands" defaultstate="collapsed">
+    public String getNoPermissionError() {
+        return MessageUtils.applyColor(this.messages.getString("noPermissionError", "&cYou do not have permission to use this command."));
+    }
+
     public String getRequireOnlinePlayerError() {
         return MessageUtils.applyColor(this.messages.getString("requireOnlinePlayerError", "&cYou will need to log in to use this command."));
     }
