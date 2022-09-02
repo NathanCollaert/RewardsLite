@@ -162,16 +162,15 @@ public final class Rewardslite extends JavaPlugin {
     }
 
     private void initializeRepositories() {
-        if (this.playerRepository == null) {
+        if (this.rewardsRepository == null) {
             this.rewardsRepository = new RewardRepository();
         } else {
             this.rewardsRepository.onReload();
         }
-        if (this.playerRepository == null) {
-            if (this.isEnabled()) {
-                this.playerRepository = new PlayerRepository();
-            }
-        } else {
+
+        if (this.playerRepository == null && this.isEnabled()) {
+            this.playerRepository = new PlayerRepository();
+        } else if (this.playerRepository != null) {
             this.playerRepository.onReload();
         }
     }

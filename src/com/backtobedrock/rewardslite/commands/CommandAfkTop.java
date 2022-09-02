@@ -12,12 +12,15 @@ public class CommandAfkTop extends AbstractCommand {
 
     @Override
     public void execute() {
-        this.setCommandParameters(false, false, 0, 0, null, -1);
-        this.canExecute().thenAcceptAsync(canExecute -> {
-            if (canExecute) {
-                this.executeTopAfkTime();
-            }
-        });
+        this.canExecute()
+                .thenAcceptAsync(canExecute -> {
+                    if (canExecute) {
+                        this.executeTopAfkTime();
+                    }
+                }).exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
     }
 
     private void executeTopAfkTime() {

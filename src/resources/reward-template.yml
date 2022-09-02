@@ -46,7 +46,7 @@ maximumAmountPending: -1
 maximumAmountRedeemed: -1
 
 #In which worlds should playtime not count towards this reward?
-disableGainingPlaytimeInWorlds: [ ]
+disableGainingchePlaytimeInWorlds: [ ]
 
 #In which worlds should be claiming this reward not be possible?
 disableRedeemingInWorlds: [ ]
@@ -109,8 +109,8 @@ notification:
       title: ""
       subtitle: ""
 
-#What type of notification should broadcast to the online players when someone redeems this reward?
-broadcastNotification:
+#What type of notification should be sent to the player when the reward is ready to be redeemed manually?
+pendingNotification:
   actionbar:
     enabled: false
     configuration:
@@ -131,8 +131,8 @@ broadcastNotification:
       title: ""
       subtitle: ""
 
-#What type of notification should be sent to the player when the reward is ready to be redeemed manually?
-pendingNotification:
+#What type of notification should broadcast to the online players when someone redeems this reward?
+broadcastNotification:
   actionbar:
     enabled: false
     configuration:

@@ -14,12 +14,16 @@ public class CommandPlayTop extends AbstractCommand {
 
     @Override
     public void execute() {
-        this.setCommandParameters(false, false, 0, 1, null, -1);
-        this.canExecute().thenAcceptAsync(canExecute -> {
-            if (canExecute) {
-                this.executeTopPlaytime();
-            }
-        });
+        this.setMaxRequiredArguments(1)
+                .canExecute()
+                .thenAcceptAsync(canExecute -> {
+                    if (canExecute) {
+                        this.executeTopPlaytime();
+                    }
+                }).exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                });
     }
 
     private void executeTopPlaytime() {

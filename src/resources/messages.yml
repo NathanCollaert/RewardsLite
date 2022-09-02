@@ -51,6 +51,8 @@ inventoryFullRedeemWarning: "&eThe %reward_title% reward requires %required_spac
 # +------------------------------------------------------+ #
 ############################################################
 
+noPermissionError: "&cYou do not have permission to use this command."
+
 #Error given when you need to be online to use this command.
 requireOnlinePlayerError: "&cYou will need to log in to use this command."
 

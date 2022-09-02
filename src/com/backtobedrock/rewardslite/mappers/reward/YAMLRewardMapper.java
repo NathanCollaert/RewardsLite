@@ -176,7 +176,7 @@ public class YAMLRewardMapper extends AbstractMapper implements IRewardMapper {
     private File getDirectory() {
         File rewardsDirectory = new File(this.plugin.getDataFolder(), "rewards");
         if (!rewardsDirectory.exists() && rewardsDirectory.mkdir()) {
-            //initialize default reward
+            //initialize default reward if, and only if, the rewards' folder is created
             File defaultResource = new File(this.plugin.getDataFolder(), "/rewards/default-reward.yml");
             try {
                 if (defaultResource.createNewFile()) {
