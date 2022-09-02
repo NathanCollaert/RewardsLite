@@ -14,14 +14,12 @@ public class RewardRepository {
     private final Rewardslite plugin;
     private IRewardMapper mapper;
 
-    private List<Reward> rewards = null;
+    private List<Reward> rewards;
 
     public RewardRepository() {
         this.plugin = JavaPlugin.getPlugin(Rewardslite.class);
         this.initializeMapper();
-        if (this.getAll() != null && this.plugin.isEnabled()) {
-            this.plugin.getLogger().log(Level.INFO, "Loaded {0} {1}.", new Object[]{this.getAll().size(), this.getAll().size() == 1 ? "reward" : "rewards"});
-        }
+        this.logEnabledRewards();
     }
 
     private void initializeMapper() {
@@ -57,5 +55,13 @@ public class RewardRepository {
 
     public void onReload() {
         this.clearRewardsCache();
+        this.initializeMapper();
+        this.logEnabledRewards();
+    }
+
+    private void logEnabledRewards() {
+        if (this.getAll() != null && this.plugin.isEnabled()) {
+            this.plugin.getLogger().log(Level.INFO, "Loaded {0} {1}.", new Object[]{this.getAll().size(), this.getAll().size() == 1 ? "reward" : "rewards"});
+        }
     }
 }

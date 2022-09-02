@@ -29,16 +29,11 @@ public class CommandRewardsLite extends AbstractCommand {
                 case "reload":
                     this.setMinRequiredArguments(1)
                             .setMaxRequiredArguments(1)
-                            .setExternalPermission(String.format("%s.reload", this.plugin.getName().toLowerCase()))
-                            .canExecute()
-                            .thenAcceptAsync(canExecute -> {
-                                if (canExecute) {
-                                    this.executeReload();
-                                }
-                            }).exceptionally(ex -> {
-                                ex.printStackTrace();
-                                return null;
-                            });
+                            .setExternalPermission(String.format("%s.reload", this.plugin.getName().toLowerCase()));
+
+                    if (this.canExecuteSync()) {
+                        this.executeReload();
+                    }
                     break;
                 case "help":
                     this.setMinRequiredArguments(1)
@@ -165,11 +160,8 @@ public class CommandRewardsLite extends AbstractCommand {
     }
 
     private void executeReload() {
-        Bukkit.getScheduler().runTask(this.plugin, () -> {
-            this.plugin.initialize();
-            this.cs.sendMessage(this.plugin.getMessages().getReloadSuccess());
-        });
-
+        this.plugin.initialize();
+        this.cs.sendMessage(this.plugin.getMessages().getReloadSuccess());
     }
 
     private void executeHelp() {

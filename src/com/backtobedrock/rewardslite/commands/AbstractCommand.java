@@ -36,27 +36,29 @@ public abstract class AbstractCommand {
         this.args = args;
     }
 
+    public Boolean canExecuteSync() {
+        if (!this.hasPermission()) {
+            return false;
+        }
+
+        if (this.requiresOnlineSender && !this.isSenderOnline()) {
+            return false;
+        }
+
+        if (this.args.length < this.minRequiredArguments || this.args.length > this.maxRequiredArguments) {
+            this.sendUsageMessage();
+            return false;
+        }
+
+        if (this.targetArgumentPosition != -1 && this.args.length > this.targetArgumentPosition && !this.hasPlayedBefore(this.args[this.targetArgumentPosition])) {
+            return false;
+        }
+
+        return !this.requiresOnlineTarget || this.isTargetOnline();
+    }
+
     public CompletableFuture<Boolean> canExecute() {
-        return CompletableFuture.supplyAsync(() -> {
-            if (!this.hasPermission()) {
-                return false;
-            }
-
-            if (this.requiresOnlineSender && !this.isSenderOnline()) {
-                return false;
-            }
-
-            if (this.args.length < this.minRequiredArguments || this.args.length > this.maxRequiredArguments) {
-                this.sendUsageMessage();
-                return false;
-            }
-
-            if (this.targetArgumentPosition != -1 && this.args.length > this.targetArgumentPosition && !this.hasPlayedBefore(this.args[this.targetArgumentPosition])) {
-                return false;
-            }
-
-            return !this.requiresOnlineTarget || this.isTargetOnline();
-        }).exceptionally(ex -> {
+        return CompletableFuture.supplyAsync(this::canExecuteSync).exceptionally(ex -> {
             ex.printStackTrace();
             return null;
         });
