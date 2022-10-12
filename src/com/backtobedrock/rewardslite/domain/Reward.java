@@ -4,7 +4,6 @@ import com.backtobedrock.rewardslite.Rewardslite;
 import com.backtobedrock.rewardslite.domain.enumerations.CountPrevious;
 import com.backtobedrock.rewardslite.utilities.MessageUtils;
 import com.backtobedrock.rewardslite.utilities.PlayerUtils;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -117,18 +116,10 @@ public class Reward {
             put("player", player.getName());
             put("player_uuid", player.getUniqueId().toString());
         }};
-        this.rewards.forEach(r -> Bukkit.getScheduler().runTask(this.plugin, () -> Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), replaceAllPlaceholders(player, r, placeholders))));
+        this.rewards.forEach(r -> Bukkit.getScheduler().runTask(this.plugin, () -> Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), MessageUtils.replaceAllPlaceholders(player, r, placeholders))));
 
         this.notify(player);
         return true;
-    }
-
-    private String replaceAllPlaceholders(Player player, String text, Map<String, String> internalPlaceholders) {
-        String result = MessageUtils.replacePlaceholders(text, internalPlaceholders);
-        if (Rewardslite.PAPI_ENABLED) {
-            result = PlaceholderAPI.setPlaceholders(player, result);
-        }
-        return result;
     }
 
     private void notify(Player player) {

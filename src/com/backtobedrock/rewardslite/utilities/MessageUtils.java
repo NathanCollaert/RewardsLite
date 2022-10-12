@@ -3,7 +3,9 @@ package com.backtobedrock.rewardslite.utilities;
 import com.backtobedrock.rewardslite.Rewardslite;
 import com.backtobedrock.rewardslite.domain.enumerations.MinecraftVersion;
 import com.backtobedrock.rewardslite.domain.enumerations.TimePattern;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -131,6 +133,14 @@ public class MessageUtils {
         }
 
         return sb.toString();
+    }
+
+    public static String replaceAllPlaceholders(Player player, String text, Map<String, String> internalPlaceholders) {
+        String result = replacePlaceholders(text, internalPlaceholders);
+        if (Rewardslite.PAPI_ENABLED) {
+            result = PlaceholderAPI.setPlaceholders(player, result);
+        }
+        return result;
     }
 
     public static String replacePlaceholders(String string, Map<String, String> placeholders) {
