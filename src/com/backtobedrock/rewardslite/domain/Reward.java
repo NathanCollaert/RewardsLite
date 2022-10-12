@@ -116,7 +116,7 @@ public class Reward {
             put("player", player.getName());
             put("player_uuid", player.getUniqueId().toString());
         }};
-        this.rewards.forEach(r -> Bukkit.getScheduler().runTask(this.plugin, () -> Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), MessageUtils.replacePlaceholders(r, placeholders))));
+        this.rewards.forEach(r -> Bukkit.getScheduler().runTask(this.plugin, () -> Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), MessageUtils.replaceAllPlaceholders(player, r, placeholders))));
 
         this.notify(player);
         return true;

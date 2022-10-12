@@ -6,7 +6,7 @@
 
     <groupId>com.backtobedrock</groupId>
     <artifactId>Rewardslite</artifactId>
-    <version>3.1.3</version>
+    <version>3.1.4-papi-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>RewardsLite</name>
