@@ -40,6 +40,8 @@ public final class Rewardslite extends JavaPlugin {
     private final Map<UUID, AbstractInterface> openInterfaces = new HashMap<>();
     private UpdateChecker updateChecker;
 
+    public static boolean PAPI_ENABLED = false;
+
     //configurations
     private Commands commands;
     private Configurations configurations;
@@ -96,6 +98,7 @@ public final class Rewardslite extends JavaPlugin {
         //PAPI
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceholdersRewardsLite().register();
+            PAPI_ENABLED = true;
         }
 
         //EssentialsX
