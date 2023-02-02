@@ -46,7 +46,7 @@ maximumAmountPending: -1
 maximumAmountRedeemed: -1
 
 #In which worlds should playtime not count towards this reward?
-disableGainingchePlaytimeInWorlds: [ ]
+disableGainingPlaytimeInWorlds: [ ]
 
 #In which worlds should be claiming this reward not be possible?
 disableRedeemingInWorlds: [ ]
