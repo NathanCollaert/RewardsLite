@@ -14,7 +14,8 @@ public enum MinecraftVersion {
     v1_16("1_16", 8),
     v1_17("1_17", 9),
     v1_18("1_18", 10),
-    v1_19("1_19", 11);
+    v1_19("1_19", 11),
+    v1_20("1_20", 12);
 
     private final int order;
     private final String key;
@@ -24,14 +25,6 @@ public enum MinecraftVersion {
         order = v;
     }
 
-    public boolean greaterThanOrEqualTo(MinecraftVersion other) {
-        return order >= other.order;
-    }
-
-    public boolean lessThanOrEqualTo(MinecraftVersion other) {
-        return order <= other.order;
-    }
-
     public static MinecraftVersion get() {
         for (MinecraftVersion k : MinecraftVersion.values()) {
             if (Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].contains(k.key)) {
@@ -39,5 +32,13 @@ public enum MinecraftVersion {
             }
         }
         return null;
+    }
+
+    public boolean greaterThanOrEqualTo(MinecraftVersion other) {
+        return order >= other.order;
+    }
+
+    public boolean lessThanOrEqualTo(MinecraftVersion other) {
+        return order <= other.order;
     }
 }

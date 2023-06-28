@@ -112,13 +112,6 @@ notification:
       title: ""
       subtitle: "You have received the default reward!"
 
-#What type of notification should broadcast to the online players when someone redeems this reward?
-broadcastNotification:
-  chat:
-    enabled: true
-    configuration:
-      text: "%player% has received the default reward!"
-
 #What type of notification should be sent to the player when the reward is ready to be redeemed manually?
 pendingNotification:
   bossbar:
@@ -127,3 +120,10 @@ pendingNotification:
       text: "&eThe default reward is ready to be redeemed manually!"
       color: "yellow"
       style: "solid"
+
+#What type of notification should broadcast to the online players when someone redeems this reward?
+broadcastNotification:
+  chat:
+    enabled: true
+    configuration:
+      text: "%player% has received the default reward!"
