@@ -19,6 +19,7 @@ public enum MinecraftVersion {
 
     private final int order;
     private final String key;
+    private static MinecraftVersion currentVersion;
 
     MinecraftVersion(String key, int v) {
         this.key = key;
@@ -26,11 +27,26 @@ public enum MinecraftVersion {
     }
 
     public static MinecraftVersion get() {
-        for (MinecraftVersion k : MinecraftVersion.values()) {
-            if (Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].contains(k.key)) {
-                return k;
+        if (currentVersion != null) {
+            return currentVersion;
+        }
+
+        String fullVersion = Bukkit.getVersion();
+        String[] splitVersion = fullVersion.split("\\(MC: ");
+        if (splitVersion.length > 1) {
+            String mcVersion = splitVersion[1].replace(")", "").trim();
+            String[] parts = mcVersion.split("\\.");
+            if (parts.length >= 2) {
+                String versionKey = parts[0] + "_" + parts[1];
+                for (MinecraftVersion version : MinecraftVersion.values()) {
+                    if (versionKey.equals(version.key)) {
+                        currentVersion = version;
+                        return version;
+                    }
+                }
             }
         }
+
         return null;
     }
 

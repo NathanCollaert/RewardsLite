@@ -8,7 +8,7 @@ authors: [ Nathan ]
 description: Enhance your server with fully configurable playtime rewards
 website: backtobedrock.com
 libraries:
-  - com.zaxxer:HikariCP:5.0.1
+  - com.zaxxer:HikariCP:5.1.0
 commands:
   playtime:
     description: Check your current playtime and AFK time

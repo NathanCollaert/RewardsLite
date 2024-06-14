@@ -3,11 +3,12 @@ package com.backtobedrock.rewardslite.listeners;
 import com.backtobedrock.rewardslite.domain.enumerations.PluginVersionState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class ListenerPlayerJoin extends AbstractEventListener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (player.isOp() && this.plugin.getUpdateChecker().getPluginVersionState() != PluginVersionState.LATEST) {

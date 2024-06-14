@@ -20,18 +20,15 @@ import java.util.stream.Collectors;
 public class PlayerData {
     private final Rewardslite plugin;
     private final OfflinePlayer player;
-
+    private final Map<UUID, Map<Class<?>, IObserver>> observers;
     //data
     private long playtime;
     private long afkTime;
     private List<RewardData> rewards;
-
     //dependencies for AFK
     private User user = null;
-
     //helpers
     private Playtime playtimeRunnable;
-    private final Map<UUID, Map<Class<?>, IObserver>> observers;
 
     public PlayerData(OfflinePlayer player, long playtime, long afkTime, List<RewardData> rewards) {
         this.plugin = JavaPlugin.getPlugin(Rewardslite.class);
@@ -77,8 +74,10 @@ public class PlayerData {
     }
 
     public void onQuit() {
-        this.playtimeRunnable.stop();
-        this.playtimeRunnable = null;
+        if (this.playtimeRunnable != null) {
+            this.playtimeRunnable.stop();
+            this.playtimeRunnable = null;
+        }
         this.plugin.getPlayerRepository().updatePlayerData(this);
         this.plugin.getPlayerRepository().queueCacheClear(this.getPlayer());
     }
@@ -139,6 +138,10 @@ public class PlayerData {
         return this.rewards.stream().sorted(Comparator.comparingLong(RewardData::getRequiredTime)).collect(Collectors.toList());
     }
 
+    public void setRewards(List<RewardData> rewards) {
+        this.rewards = Collections.synchronizedList(rewards);
+    }
+
     public void registerObserver(Player player, AbstractInterface iface) {
         Map<Class<?>, IObserver> observers = new HashMap<>();
         if (iface instanceof InterfaceRewards) {
@@ -154,10 +157,6 @@ public class PlayerData {
 
     public void unregisterObserver(Player player) {
         this.observers.remove(player.getUniqueId());
-    }
-
-    public void setRewards(List<RewardData> rewards) {
-        this.rewards = Collections.synchronizedList(rewards);
     }
 
     public RewardData getRewardData(Reward reward) {

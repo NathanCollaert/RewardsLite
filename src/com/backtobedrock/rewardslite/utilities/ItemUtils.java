@@ -7,10 +7,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 
 import java.util.List;
 
@@ -20,11 +17,11 @@ public class ItemUtils {
         ItemMeta im = item.getItemMeta();
         if (im != null) {
             im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-            im.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+            im.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
             im.setDisplayName(displayName);
             im.setLore(lore);
             if (glowing) {
-                im.addEnchant(Enchantment.ARROW_INFINITE, 0, true);
+                im.addEnchant(Enchantment.INFINITY, 0, true);
                 im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             }
             item.setItemMeta(im);
@@ -46,21 +43,5 @@ public class ItemUtils {
             return item;
         }
         return null;
-    }
-
-    public static ItemStack createPotion(String displayName, List<String> lore) {
-        ItemStack item = new ItemStack(Material.POTION);
-        PotionMeta sm = (PotionMeta) item.getItemMeta();
-        if (sm != null) {
-            MinecraftVersion minecraftVersion = MinecraftVersion.get();
-            if (minecraftVersion != null && minecraftVersion.greaterThanOrEqualTo(MinecraftVersion.v1_9)) {
-                sm.setBasePotionData(new PotionData(PotionType.SPEED));
-            }
-            sm.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-            sm.setDisplayName(displayName);
-            sm.setLore(lore);
-            item.setItemMeta(sm);
-        }
-        return item;
     }
 }
