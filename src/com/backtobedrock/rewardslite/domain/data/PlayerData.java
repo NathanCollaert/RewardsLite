@@ -139,7 +139,7 @@ public class PlayerData {
     }
 
     public void setRewards(List<RewardData> rewards) {
-        this.rewards = Collections.synchronizedList(rewards);
+        this.rewards = Collections.synchronizedList(new ArrayList<>(rewards));
     }
 
     public void registerObserver(Player player, AbstractInterface iface) {

@@ -101,6 +101,11 @@ public class RewardData extends Reward {
     }
 
     public boolean decreaseTimeLeft(long amount, Player player, boolean ignorePredicate) {
+        if (super.getRequiredTime() <= 0) {
+            this.plugin.getLogger().warning(String.format("Reward '%s' has requiredTime <= 0; skipping countdown to avoid an infinite loop. Please fix the reward configuration.", super.getFileName()));
+            return false;
+        }
+
         if (!ignorePredicate && !getAvailabilityPredicate(player).test(this)) {
             return false;
         }

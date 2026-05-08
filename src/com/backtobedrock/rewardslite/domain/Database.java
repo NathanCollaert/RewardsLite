@@ -70,7 +70,7 @@ public class Database {
                 this.dataSource.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
                 this.dataSource.addDataSourceProperty("useServerPrepStmts", "true");
             } catch (Exception e) {
-                this.plugin.getLogger().log(Level.SEVERE, String.format("Database: cannot connect to %s with username: %s and password: %s.", String.format("jdbc:mysql://%s:%s/%s", this.getHostname(), this.getPort(), this.getDatabaseName()), this.getUsername(), String.join("", Collections.nCopies(this.getPassword().length(), "*"))));
+                this.plugin.getLogger().log(Level.SEVERE, String.format("Database: cannot connect to %s with username: %s and password: %s.", String.format("jdbc:mysql://%s:%s/%s", this.getHostname(), this.getPort(), this.getDatabaseName()), this.getUsername(), String.join("", Collections.nCopies(this.getPassword().length(), "*"))), e);
             }
         }
         return this.dataSource;

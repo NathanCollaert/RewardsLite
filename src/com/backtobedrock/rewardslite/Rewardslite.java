@@ -71,11 +71,11 @@ public final class Rewardslite extends JavaPlugin {
 
     public void initialize() {
         this.initializeUpdateChecker();
-        this.initializeMetrics();
         this.initializeDependencies();
         this.initializeConfigurations();
         this.initializeDatabase(false);
         this.initializeRepositories();
+        this.initializeMetrics();
         this.registerListeners();
     }
 
@@ -87,9 +87,11 @@ public final class Rewardslite extends JavaPlugin {
     }
 
     private void initializeMetrics() {
-        //bstats metrics
         Metrics metrics = new Metrics(this, 7380);
-        metrics.addCustomChart(new SimplePie("reward_count", () -> Integer.toString(this.getRewardsRepository().getAll().size())));
+        metrics.addCustomChart(new SimplePie("reward_count", () -> {
+            RewardRepository repo = this.getRewardsRepository();
+            return Integer.toString(repo == null ? 0 : repo.getAll().size());
+        }));
     }
 
     private void initializeDependencies() {
@@ -148,7 +150,7 @@ public final class Rewardslite extends JavaPlugin {
         String[] queries = setup.split(";");
         for (String query : queries) {
             if (query.isEmpty()) {
-                return;
+                continue;
             }
             try (Connection conn = this.getConfigurations().getDataConfiguration().getDatabase().getDataSource().getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.execute();

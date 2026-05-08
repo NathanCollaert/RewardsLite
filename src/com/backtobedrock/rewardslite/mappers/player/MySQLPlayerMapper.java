@@ -60,20 +60,15 @@ public class MySQLPlayerMapper extends AbstractMapper implements IPlayerMapper {
             PlayerData playerData = null;
             List<RewardData> rewards = new ArrayList<>();
             while (resultSet.next()) {
-                if (player != null && !player.getUniqueId().equals(UUID.fromString(resultSet.getString("player_uuid")))) {
-                    this.plugin.getRewardsRepository().getAll().stream()
-                            .filter(r -> !rewards.stream()
-                                    .map(RewardData::getUuid)
-                                    .collect(Collectors.toList()).contains(r.getUuid()))
-                            .forEach(r -> rewards.add(new RewardData(r)));
-                    playerData.setRewards(rewards);
-                    playerDataList.add(playerData);
+                UUID rowUuid = UUID.fromString(resultSet.getString("player_uuid"));
+                if (player != null && !player.getUniqueId().equals(rowUuid)) {
+                    this.finalizePlayerData(playerData, rewards, playerDataList);
                     player = null;
                     playerData = null;
-                    rewards.clear();
+                    rewards = new ArrayList<>();
                 }
                 if (player == null) {
-                    player = this.plugin.getServer().getOfflinePlayer(UUID.fromString(resultSet.getString("player_uuid")));
+                    player = this.plugin.getServer().getOfflinePlayer(rowUuid);
                 }
                 if (playerData == null) {
                     playerData = new PlayerData(player, resultSet.getLong("playtime"), resultSet.getLong("afk_time"), new ArrayList<>());
@@ -82,15 +77,26 @@ public class MySQLPlayerMapper extends AbstractMapper implements IPlayerMapper {
                 Reward reward = uuid == null ? null : this.plugin.getRewardsRepository().getById(UUID.fromString(uuid));
                 if (reward != null) {
                     rewards.add(new RewardData(reward, resultSet.getLong("time_left"), resultSet.getInt("redeemed"), resultSet.getInt("pending"), resultSet.getBoolean("active"), resultSet.getBoolean("counted_previous")));
-                } else {
-                    this.deleteRewardData(player.getUniqueId(), resultSet.getString("reward_uuid"));
+                } else if (uuid != null) {
+                    this.deleteRewardData(player.getUniqueId(), uuid);
                 }
+            }
+            if (playerData != null) {
+                this.finalizePlayerData(playerData, rewards, playerDataList);
             }
             return playerDataList;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private void finalizePlayerData(PlayerData playerData, List<RewardData> rewards, List<PlayerData> playerDataList) {
+        this.plugin.getRewardsRepository().getAll().stream()
+                .filter(r -> rewards.stream().map(RewardData::getUuid).noneMatch(id -> id.equals(r.getUuid())))
+                .forEach(r -> rewards.add(new RewardData(r)));
+        playerData.setRewards(rewards);
+        playerDataList.add(playerData);
     }
 
     @Override

@@ -24,11 +24,13 @@ public class PlayerRepository {
 
     private final Map<UUID, PlayerData> playerCache;
     private final Map<UUID, CacheClear> playerCacheClear;
+    private final Map<UUID, CompletableFuture<PlayerData>> inFlightLoads;
 
     public PlayerRepository() {
         this.plugin = JavaPlugin.getPlugin(Rewardslite.class);
         this.playerCache = new ConcurrentHashMap<>();
         this.playerCacheClear = new ConcurrentHashMap<>();
+        this.inFlightLoads = new ConcurrentHashMap<>();
         this.initializeMapper();
     }
 
@@ -53,14 +55,8 @@ public class PlayerRepository {
     }
 
     public CompletableFuture<PlayerData> getByPlayer(OfflinePlayer player) {
-        if (!doesCacheContainPlayer(player.getUniqueId())) {
-            return this.mapper.getByPlayer(player)
-                    .thenApplyAsync(playerData -> this.getFromDataAndCache(player, playerData))
-                    .exceptionally(ex -> {
-                        ex.printStackTrace();
-                        return null;
-                    });
-        } else {
+        UUID uuid = player.getUniqueId();
+        if (doesCacheContainPlayer(uuid)) {
             return CompletableFuture.supplyAsync(() -> player)
                     .thenApplyAsync(this::getFromCache)
                     .exceptionally(ex -> {
@@ -68,6 +64,22 @@ public class PlayerRepository {
                         return null;
                     });
         }
+
+        CompletableFuture<PlayerData> existing = this.inFlightLoads.get(uuid);
+        if (existing != null) {
+            return existing;
+        }
+
+        CompletableFuture<PlayerData> future = this.mapper.getByPlayer(player)
+                .thenApplyAsync(playerData -> this.getFromDataAndCache(player, playerData))
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return null;
+                })
+                .whenComplete((result, ex) -> this.inFlightLoads.remove(uuid));
+
+        CompletableFuture<PlayerData> prev = this.inFlightLoads.putIfAbsent(uuid, future);
+        return prev != null ? prev : future;
     }
 
     public PlayerData getByPlayerSync(OfflinePlayer player) {
