@@ -16,7 +16,8 @@ public enum MinecraftVersion {
     v1_18("1_18", 10),
     v1_19("1_19", 11),
     v1_20("1_20", 12),
-    v1_21("1_21", 13);
+    v1_21("1_21", 13),
+    v26_1("26_1", 14);
 
     private final int order;
     private final String key;
@@ -39,7 +40,7 @@ public enum MinecraftVersion {
             String[] parts = mcVersion.split("\\.");
             if (parts.length >= 2) {
                 String versionKey = parts[0] + "_" + parts[1];
-                for (MinecraftVersion version : MinecraftVersion.values()) {
+                for (MinecraftVersion version : values()) {
                     if (versionKey.equals(version.key)) {
                         currentVersion = version;
                         return version;
@@ -48,7 +49,10 @@ public enum MinecraftVersion {
             }
         }
 
-        return null;
+        // Unknown/newer version: assume latest known so all feature gates stay open.
+        MinecraftVersion[] all = values();
+        currentVersion = all[all.length - 1];
+        return currentVersion;
     }
 
     public boolean greaterThanOrEqualTo(MinecraftVersion other) {

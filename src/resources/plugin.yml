@@ -1,14 +1,14 @@
 name: RewardsLite
 version: '${project.version}'
 main: com.backtobedrock.rewardslite.Rewardslite
-api-version: 1.13
+api-version: '1.21'
 prefix: RewardsLite
 softdepend: [ Essentials, PlaceholderAPI ]
 authors: [ Nathan ]
 description: Enhance your server with fully configurable playtime rewards
 website: backtobedrock.com
 libraries:
-  - com.zaxxer:HikariCP:5.1.0
+  - com.zaxxer:HikariCP:7.0.2
 commands:
   playtime:
     description: Check your current playtime and AFK time
