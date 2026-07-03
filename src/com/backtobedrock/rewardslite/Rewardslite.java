@@ -3,6 +3,11 @@ package com.backtobedrock.rewardslite;
 import com.backtobedrock.rewardslite.commands.Commands;
 import com.backtobedrock.rewardslite.configurations.Configurations;
 import com.backtobedrock.rewardslite.configurations.MessagesConfiguration;
+import com.backtobedrock.rewardslite.domain.afk.AfkHook;
+import com.backtobedrock.rewardslite.domain.afk.AfkPlusAfkHook;
+import com.backtobedrock.rewardslite.domain.afk.CmiAfkHook;
+import com.backtobedrock.rewardslite.domain.afk.EssentialsAfkHook;
+import com.backtobedrock.rewardslite.domain.afk.ServerEssentialsAfkHook;
 import com.backtobedrock.rewardslite.domain.enumerations.StorageType;
 import com.backtobedrock.rewardslite.domain.placholderAPI.PlaceholdersRewardsLite;
 import com.backtobedrock.rewardslite.interfaces.AbstractInterface;
@@ -19,6 +24,7 @@ import net.ess3.api.IEssentials;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -51,6 +57,7 @@ public final class Rewardslite extends JavaPlugin {
 
     //dependencies
     private IEssentials essentials;
+    private final List<AfkHook> afkHooks = new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -102,6 +109,25 @@ public final class Rewardslite extends JavaPlugin {
 
         //EssentialsX
         this.essentials = (IEssentials) Bukkit.getPluginManager().getPlugin("Essentials");
+
+        //AFK tracking, a player counts as AFK if any installed plugin with active AFK detection reports them as such
+        this.afkHooks.clear();
+        if (this.essentials != null) {
+            this.afkHooks.add(new EssentialsAfkHook(this.essentials));
+        }
+        if (Bukkit.getPluginManager().getPlugin("CMI") != null) {
+            this.afkHooks.add(new CmiAfkHook());
+        }
+        if (Bukkit.getPluginManager().getPlugin("AFKPlus") != null) {
+            this.afkHooks.add(new AfkPlusAfkHook());
+        }
+        if (Bukkit.getPluginManager().getPlugin("ServerEssentials") != null) {
+            try {
+                this.afkHooks.add(new ServerEssentialsAfkHook());
+            } catch (ReflectiveOperationException e) {
+                this.getLogger().log(Level.WARNING, "Could not hook into ServerEssentials for AFK tracking.", e);
+            }
+        }
     }
 
     private void initializeConfigurations() {
@@ -216,6 +242,10 @@ public final class Rewardslite extends JavaPlugin {
 
     public IEssentials getEssentials() {
         return essentials;
+    }
+
+    public boolean isPlayerAfk(OfflinePlayer player) {
+        return this.afkHooks.stream().anyMatch(hook -> hook.isActive() && hook.isAfk(player));
     }
 
     public void addToInterfaces(Player player, AbstractInterface iface) {

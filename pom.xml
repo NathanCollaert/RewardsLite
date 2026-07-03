@@ -6,7 +6,7 @@
 
     <groupId>com.backtobedrock</groupId>
     <artifactId>Rewardslite</artifactId>
-    <version>3.2.0</version>
+    <version>3.2.1</version>
     <packaging>jar</packaging>
 
     <name>RewardsLite</name>
@@ -87,6 +87,10 @@
             <id>maven-central</id>
             <url>https://oss.sonatype.org/content/groups/public</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -137,6 +141,24 @@
                 <exclusion>
                     <groupId>io.papermc.paper</groupId>
                     <artifactId>paper-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Zrips</groupId>
+            <artifactId>CMI-API</artifactId>
+            <version>9.8.6.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.lapismc</groupId>
+            <artifactId>AFKPlus</artifactId>
+            <version>3.4.1</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.tchristofferson</groupId>
+                    <artifactId>ConfigUpdater</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

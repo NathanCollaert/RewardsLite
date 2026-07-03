@@ -9,7 +9,6 @@ import com.backtobedrock.rewardslite.domain.observer.RewardsObserver;
 import com.backtobedrock.rewardslite.interfaces.AbstractInterface;
 import com.backtobedrock.rewardslite.interfaces.InterfaceRewards;
 import com.backtobedrock.rewardslite.runnables.Playtime;
-import com.earth2me.essentials.User;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,8 +24,6 @@ public class PlayerData {
     private long playtime;
     private long afkTime;
     private List<RewardData> rewards;
-    //dependencies for AFK
-    private User user = null;
     //helpers
     private Playtime playtimeRunnable;
 
@@ -36,9 +33,6 @@ public class PlayerData {
         this.playtime = playtime;
         this.afkTime = afkTime;
         this.setRewards(rewards);
-        if (this.plugin.getEssentials() != null) {
-            this.user = this.plugin.getEssentials().getUser(player.getUniqueId());
-        }
         this.observers = new HashMap<>();
     }
 
@@ -127,7 +121,7 @@ public class PlayerData {
     }
 
     public boolean isAfk() {
-        return (this.user != null && this.user.isAfk());
+        return this.plugin.isPlayerAfk(this.player);
     }
 
     public Playtime getPlaytimeRunnable() {
