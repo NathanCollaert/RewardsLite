@@ -6,7 +6,7 @@
 
     <groupId>com.backtobedrock</groupId>
     <artifactId>Rewardslite</artifactId>
-    <version>3.2.1</version>
+    <version>3.2.2</version>
     <packaging>jar</packaging>
 
     <name>RewardsLite</name>
@@ -161,6 +161,12 @@
                     <artifactId>ConfigUpdater</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.github.RocketManKian.ServerEssentials</groupId>
+            <artifactId>serveressentials-api</artifactId>
+            <version>2.5.2</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

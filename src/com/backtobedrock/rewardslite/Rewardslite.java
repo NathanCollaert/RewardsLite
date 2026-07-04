@@ -122,11 +122,7 @@ public final class Rewardslite extends JavaPlugin {
             this.afkHooks.add(new AfkPlusAfkHook());
         }
         if (Bukkit.getPluginManager().getPlugin("ServerEssentials") != null) {
-            try {
-                this.afkHooks.add(new ServerEssentialsAfkHook());
-            } catch (ReflectiveOperationException e) {
-                this.getLogger().log(Level.WARNING, "Could not hook into ServerEssentials for AFK tracking.", e);
-            }
+            this.afkHooks.add(new ServerEssentialsAfkHook());
         }
     }
 
